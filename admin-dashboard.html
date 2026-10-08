@@ -1,0 +1,3076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard | Food Platform</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 235px;
+            background: #111827;
+            color: white;
+            padding: 20px 14px;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 8px 10px 22px;
+        }
+
+        .nav-item {
+            display: block;
+            width: 100%;
+            padding: 12px 14px;
+            margin-bottom: 5px;
+            color: #d1d5db;
+            text-decoration: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #f97316;
+            color: white;
+        }
+
+        .logout {
+            margin-top: 20px;
+            color: #fca5a5;
+        }
+
+        .main {
+            margin-left: 235px;
+            padding: 20px;
+        }
+
+        .topbar {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+        }
+
+        .topbar h1 {
+            font-size: 21px;
+        }
+
+        .admin-info {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 17px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .orange {
+            color: #f97316;
+        }
+
+        .green {
+            color: #16a34a;
+        }
+
+        .red {
+            color: #dc2626;
+        }
+
+        .blue {
+            color: #2563eb;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input,
+        select {
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            padding: 9px 11px;
+            background: white;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #f97316;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 9px 14px;
+            cursor: pointer;
+            background: #f97316;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            opacity: .9;
+        }
+
+        .secondary {
+            background: #374151;
+        }
+
+        .danger {
+            background: #dc2626;
+        }
+
+        .success {
+            background: #16a34a;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 11px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: bold;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .status-confirmed {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status-preparing {
+            background: #fefce8;
+            color: #a16207;
+        }
+
+        .status-ready {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .status-cancelled {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .empty {
+            padding: 25px;
+            text-align: center;
+            color: #777;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 7px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .message.success-msg {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .vendor-name {
+            font-weight: bold;
+        }
+
+        .commission-total {
+            font-weight: bold;
+            color: #f97316;
+        }
+
+        .money {
+            font-weight: bold;
+        }
+
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            background: #f9fafb;
+            padding: 14px;
+            border-radius: 9px;
+        }
+
+        .summary-item span {
+            display: block;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .summary-item strong {
+            font-size: 19px;
+        }
+
+        .business-small {
+            font-size: 11px;
+            color: #777;
+            margin-top: 3px;
+        }
+
+        @media (max-width: 1000px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                bottom: auto;
+                position: relative;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .summary-box {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                gap: 10px;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">
+        Food Platform
+    </div>
+
+    <a class="nav-item active" data-section="dashboard">
+        Dashboard
+    </a>
+
+    <a class="nav-item" data-section="orders">
+        Orders
+    </a>
+
+    <a class="nav-item" data-section="commission">
+        Commission
+    </a>
+
+    <a class="nav-item" data-section="restaurants">
+        Restaurants
+    </a>
+
+    <a class="nav-item" data-section="vendors">
+        Vendors
+    </a>
+
+    <a class="nav-item" href="index.html">
+        View Platform
+    </a>
+
+    <a class="nav-item logout" id="logoutBtn">
+        Logout
+    </a>
+
+</aside>
+
+
+<main class="main">
+
+    <div class="topbar">
+
+        <h1>
+            Admin Dashboard
+        </h1>
+
+        <div
+            class="admin-info"
+            id="adminInfo"
+        >
+            Loading admin...
+        </div>
+
+    </div>
+
+
+    <div
+        id="globalMessage"
+        class="message"
+    ></div>
+
+
+    <!-- ================= DASHBOARD ================= -->
+
+    <section
+        id="dashboard"
+        class="section active"
+    >
+
+        <h2 class="section-title">
+            Overview
+        </h2>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Customers
+                </div>
+
+                <div
+                    class="stat-value blue"
+                    id="customersCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Vendors
+                </div>
+
+                <div
+                    class="stat-value orange"
+                    id="vendorsCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Restaurants
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="restaurantsCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Orders
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="ordersCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Sales
+                </div>
+
+                <div
+                    class="stat-value green"
+                    id="totalSales"
+                >
+                    TSh 0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Pending
+                </div>
+
+                <div
+                    class="stat-value orange"
+                    id="pendingCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Preparing
+                </div>
+
+                <div
+                    class="stat-value blue"
+                    id="preparingCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Ready
+                </div>
+
+                <div
+                    class="stat-value green"
+                    id="readyCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+                    Commission Summary
+                </div>
+
+                <button
+                    onclick="showSection('commission')"
+                >
+                    View Vendor Commission
+                </button>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <div class="summary-item">
+
+                    <span>
+                        Commission Rate
+                    </span>
+
+                    <strong
+                        id="dashboardCommissionRate"
+                    >
+                        10%
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Commission Earned
+                    </span>
+
+                    <strong
+                        class="orange"
+                        id="dashboardCommission"
+                    >
+                        TSh 0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Vendor Earnings
+                    </span>
+
+                    <strong
+                        class="green"
+                        id="dashboardVendorEarnings"
+                    >
+                        TSh 0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= ORDERS ================= -->
+
+    <section
+        id="orders"
+        class="section"
+    >
+
+        <h2 class="section-title">
+            Orders
+        </h2>
+
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+                    All Orders
+                </div>
+
+
+                <div class="settings-row">
+
+                    <input
+                        type="text"
+                        id="orderSearch"
+                        placeholder="Search order..."
+                    >
+
+
+                    <select
+                        id="orderStatusFilter"
+                    >
+
+                        <option value="">
+                            All Status
+                        </option>
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="Confirmed">
+                            Confirmed
+                        </option>
+
+                        <option value="Preparing">
+                            Preparing
+                        </option>
+
+                        <option value="Ready">
+                            Ready
+                        </option>
+
+                        <option value="Cancelled">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Order
+                            </th>
+
+                            <th>
+                                Customer
+                            </th>
+
+                            <th>
+                                Restaurant
+                            </th>
+
+                            <th>
+                                Total
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="ordersTable"
+                    >
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty"
+                            >
+                                Loading orders...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= COMMISSION ================= -->
+
+    <section
+        id="commission"
+        class="section"
+    >
+
+        <h2 class="section-title">
+            Commission
+        </h2>
+
+
+        <!-- SETTINGS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+                    Commission Settings
+                </div>
+
+            </div>
+
+
+            <div class="settings-row">
+
+                <label>
+                    Commission Rate (%)
+                </label>
+
+
+                <input
+                    type="number"
+                    id="commissionRate"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value="10"
+                >
+
+
+                <button
+                    id="saveCommissionBtn"
+                >
+                    Save Rate
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTALS -->
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Commission Rate
+                </div>
+
+                <div
+                    class="stat-value orange"
+                    id="commissionRateDisplay"
+                >
+                    10%
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Platform Commission
+                </div>
+
+                <div
+                    class="stat-value orange"
+                    id="totalCommissionDisplay"
+                >
+                    TSh 0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Vendor Earnings
+                </div>
+
+                <div
+                    class="stat-value green"
+                    id="totalVendorEarningsDisplay"
+                >
+                    TSh 0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Commission Orders
+                </div>
+
+                <div
+                    class="stat-value blue"
+                    id="commissionOrdersDisplay"
+                >
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PER VENDOR -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+                    Commission Per Vendor
+                </div>
+
+
+                <button
+                    class="secondary"
+                    id="refreshVendorCommissionBtn"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                Restaurant
+                            </th>
+
+                            <th>
+                                Orders
+                            </th>
+
+                            <th>
+                                Total Sales
+                            </th>
+
+                            <th>
+                                Commission
+                            </th>
+
+                            <th>
+                                Vendor Earnings
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="vendorCommissionTable"
+                    >
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="empty"
+                            >
+                                Loading vendor commissions...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMMISSION RECORDS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+                    Commission Records
+                </div>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Order
+                            </th>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                Total
+                            </th>
+
+                            <th>
+                                Rate
+                            </th>
+
+                            <th>
+                                Commission
+                            </th>
+
+                            <th>
+                                Vendor Earnings
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="commissionTable"
+                    >
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="empty"
+                            >
+                                Loading...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= RESTAURANTS ================= -->
+
+    <section
+        id="restaurants"
+        class="section"
+    >
+
+        <h2 class="section-title">
+            Restaurants
+        </h2>
+
+
+        <div class="card">
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Phone
+                            </th>
+
+                            <th>
+                                Address
+                            </th>
+
+                            <th>
+                                Rating
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="restaurantsTable"
+                    >
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="empty"
+                            >
+                                Loading restaurants...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= VENDORS ================= -->
+
+    <section
+        id="vendors"
+        class="section"
+    >
+
+        <h2 class="section-title">
+            Vendors
+        </h2>
+
+
+        <div class="card">
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Business
+                            </th>
+
+                            <th>
+                                Phone
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Restaurant ID
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="vendorsTable"
+                    >
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="empty"
+                            >
+                                Loading vendors...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
+
+let adminUser = null;
+
+let restaurants = [];
+let vendors = [];
+let orders = [];
+let commissions = [];
+
+let commissionRateValue = 10;
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function money(value) {
+
+    return "TSh " +
+        Number(value || 0).toLocaleString(
+            "en-TZ",
+            {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }
+        );
+
+}
+
+
+function escapeHtml(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function showMessage(
+    message,
+    type = "success-msg"
+) {
+
+    const box =
+        document.getElementById(
+            "globalMessage"
+        );
+
+    box.textContent = message;
+
+    box.className =
+        "message show " + type;
+
+
+    setTimeout(() => {
+
+        box.className =
+            "message";
+
+    }, 3500);
+
+}
+
+
+function statusClass(status) {
+
+    const value =
+        String(status || "")
+        .toLowerCase();
+
+
+    if (value === "pending") {
+        return "status-pending";
+    }
+
+
+    if (value === "confirmed") {
+        return "status-confirmed";
+    }
+
+
+    if (value === "preparing") {
+        return "status-preparing";
+    }
+
+
+    if (value === "ready") {
+        return "status-ready";
+    }
+
+
+    if (value === "cancelled") {
+        return "status-cancelled";
+    }
+
+
+    return "status-pending";
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function showSection(sectionId) {
+
+    document
+        .querySelectorAll(".section")
+        .forEach(section => {
+
+            section.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(
+            ".nav-item[data-section]"
+        )
+        .forEach(item => {
+
+            item.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+
+    if (section) {
+
+        section.classList.add(
+            "active"
+        );
+
+    }
+
+
+    const nav =
+        document.querySelector(
+            '.nav-item[data-section="' +
+            sectionId +
+            '"]'
+        );
+
+
+    if (nav) {
+
+        nav.classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+document
+    .querySelectorAll(
+        ".nav-item[data-section]"
+    )
+    .forEach(item => {
+
+        item.addEventListener(
+            "click",
+            () => {
+
+                showSection(
+                    item.dataset.section
+                );
+
+            }
+        );
+
+    });
+
+
+/* =====================================================
+   ADMIN CHECK
+===================================================== */
+
+async function checkAdmin() {
+
+    const {
+        data: {
+            user
+        },
+        error
+    } = await db.auth.getUser();
+
+
+    if (
+        error ||
+        !user
+    ) {
+
+        window.location.href =
+            "admin-login.html";
+
+        return false;
+
+    }
+
+
+    const {
+        data: admin,
+        error: adminError
+    } = await db
+        .from("food_admins")
+        .select(
+            "id, full_name, email"
+        )
+        .eq(
+            "id",
+            user.id
+        )
+        .maybeSingle();
+
+
+    if (
+        adminError ||
+        !admin
+    ) {
+
+        await db.auth.signOut();
+
+        window.location.href =
+            "admin-login.html";
+
+        return false;
+
+    }
+
+
+    adminUser = user;
+
+
+    document
+        .getElementById(
+            "adminInfo"
+        )
+        .textContent =
+            admin.full_name ||
+            admin.email ||
+            user.email;
+
+
+    return true;
+
+}
+
+
+/* =====================================================
+   COMMISSION SETTINGS
+===================================================== */
+
+async function loadCommissionSettings() {
+
+    const {
+        data,
+        error
+    } = await db
+        .from(
+            "food_commission_settings"
+        )
+        .select("*")
+        .order(
+            "id",
+            {
+                ascending: false
+            }
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Commission settings:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    if (data) {
+
+        commissionRateValue =
+            Number(
+                data.commission_rate ||
+                10
+            );
+
+    }
+
+
+    document
+        .getElementById(
+            "commissionRate"
+        )
+        .value =
+            commissionRateValue;
+
+
+    document
+        .getElementById(
+            "commissionRateDisplay"
+        )
+        .textContent =
+            commissionRateValue +
+            "%";
+
+
+    document
+        .getElementById(
+            "dashboardCommissionRate"
+        )
+        .textContent =
+            commissionRateValue +
+            "%";
+
+}
+
+
+document
+    .getElementById(
+        "saveCommissionBtn"
+    )
+    .addEventListener(
+        "click",
+        async () => {
+
+            const rate =
+                Number(
+                    document
+                        .getElementById(
+                            "commissionRate"
+                        )
+                        .value
+                );
+
+
+            if (
+                Number.isNaN(rate) ||
+                rate < 0 ||
+                rate > 100
+            ) {
+
+                showMessage(
+                    "Commission rate must be between 0 and 100.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            const {
+                data: existing,
+                error: existingError
+            } = await db
+                .from(
+                    "food_commission_settings"
+                )
+                .select("id")
+                .order(
+                    "id",
+                    {
+                        ascending: false
+                    }
+                )
+                .limit(1)
+                .maybeSingle();
+
+
+            if (existingError) {
+
+                showMessage(
+                    existingError.message,
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            let result;
+
+
+            if (existing) {
+
+                result =
+                    await db
+                        .from(
+                            "food_commission_settings"
+                        )
+                        .update({
+
+                            commission_rate:
+                                rate,
+
+                            updated_at:
+                                new Date()
+                                .toISOString()
+
+                        })
+                        .eq(
+                            "id",
+                            existing.id
+                        );
+
+            } else {
+
+                result =
+                    await db
+                        .from(
+                            "food_commission_settings"
+                        )
+                        .insert({
+
+                            commission_rate:
+                                rate
+
+                        });
+
+            }
+
+
+            if (result.error) {
+
+                showMessage(
+                    result.error.message,
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            commissionRateValue =
+                rate;
+
+
+            document
+                .getElementById(
+                    "commissionRateDisplay"
+                )
+                .textContent =
+                    rate + "%";
+
+
+            document
+                .getElementById(
+                    "dashboardCommissionRate"
+                )
+                .textContent =
+                    rate + "%";
+
+
+            showMessage(
+                "Commission rate saved successfully."
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   RESTAURANTS
+===================================================== */
+
+async function loadRestaurants() {
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_restaurants")
+        .select("*")
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        document
+            .getElementById(
+                "restaurantsTable"
+            )
+            .innerHTML =
+                `<tr>
+                    <td
+                        colspan="5"
+                        class="empty"
+                    >
+                        ${escapeHtml(
+                            error.message
+                        )}
+                    </td>
+                </tr>`;
+
+        return;
+
+    }
+
+
+    restaurants =
+        data || [];
+
+
+    document
+        .getElementById(
+            "restaurantsCount"
+        )
+        .textContent =
+            restaurants.length;
+
+
+    renderRestaurants();
+
+}
+
+
+function renderRestaurants() {
+
+    const tbody =
+        document.getElementById(
+            "restaurantsTable"
+        );
+
+
+    if (!restaurants.length) {
+
+        tbody.innerHTML =
+            `<tr>
+                <td
+                    colspan="5"
+                    class="empty"
+                >
+                    No restaurants found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        restaurants
+        .map(r => {
+
+            const open =
+                r.is_open === false
+                    ? "Closed"
+                    : "Open";
+
+
+            return `
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${escapeHtml(
+                                r.name
+                            )}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            r.phone || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            r.address || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            r.rating ?? 0
+                        )}
+                    </td>
+
+                    <td>
+
+                        <span class="status ${
+                            open === "Open"
+                                ? "status-ready"
+                                : "status-cancelled"
+                        }">
+
+                            ${open}
+
+                        </span>
+
+                    </td>
+
+                </tr>
+            `;
+
+        })
+        .join("");
+
+}
+
+
+/* =====================================================
+   VENDORS
+===================================================== */
+
+async function loadVendors() {
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_vendors")
+        .select("*")
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Vendors:",
+            error
+        );
+
+
+        document
+            .getElementById(
+                "vendorsTable"
+            )
+            .innerHTML =
+                `<tr>
+                    <td
+                        colspan="5"
+                        class="empty"
+                    >
+                        ${escapeHtml(
+                            error.message
+                        )}
+                    </td>
+                </tr>`;
+
+        return;
+
+    }
+
+
+    vendors =
+        data || [];
+
+
+    document
+        .getElementById(
+            "vendorsCount"
+        )
+        .textContent =
+            vendors.length;
+
+
+    renderVendors();
+
+}
+
+
+function renderVendors() {
+
+    const tbody =
+        document.getElementById(
+            "vendorsTable"
+        );
+
+
+    if (!vendors.length) {
+
+        tbody.innerHTML =
+            `<tr>
+                <td
+                    colspan="5"
+                    class="empty"
+                >
+                    No vendors found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        vendors
+        .map(v => {
+
+            return `
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${escapeHtml(
+                                v.full_name ||
+                                "-"
+                            )}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            v.business_name ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            v.phone ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            v.email ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            v.restaurant_id ||
+                            "-"
+                        )}
+                    </td>
+
+                </tr>
+            `;
+
+        })
+        .join("");
+
+}
+
+
+/* =====================================================
+   ORDERS
+===================================================== */
+
+async function loadOrders() {
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_orders")
+        .select("*")
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Orders:",
+            error
+        );
+
+
+        document
+            .getElementById(
+                "ordersTable"
+            )
+            .innerHTML =
+                `<tr>
+                    <td
+                        colspan="7"
+                        class="empty"
+                    >
+                        ${escapeHtml(
+                            error.message
+                        )}
+                    </td>
+                </tr>`;
+
+        return;
+
+    }
+
+
+    orders =
+        data || [];
+
+
+    renderOrders();
+
+    updateDashboardStats();
+
+}
+
+
+function renderOrders() {
+
+    const tbody =
+        document.getElementById(
+            "ordersTable"
+        );
+
+
+    const search =
+        document
+            .getElementById(
+                "orderSearch"
+            )
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    const status =
+        document
+            .getElementById(
+                "orderStatusFilter"
+            )
+            .value;
+
+
+    const filtered =
+        orders.filter(o => {
+
+            const text = [
+
+                o.order_number,
+                o.customer_name,
+                o.customer_phone
+
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+
+            const matchesSearch =
+                !search ||
+                text.includes(search);
+
+
+            const matchesStatus =
+                !status ||
+                o.status === status;
+
+
+            return (
+                matchesSearch &&
+                matchesStatus
+            );
+
+        });
+
+
+    if (!filtered.length) {
+
+        tbody.innerHTML =
+            `<tr>
+                <td
+                    colspan="7"
+                    class="empty"
+                >
+                    No orders found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        filtered
+        .map(o => {
+
+            const restaurant =
+                restaurants.find(
+                    r =>
+                        r.id ===
+                        o.restaurant_id
+                );
+
+
+            const restaurantName =
+                restaurant
+                    ? restaurant.name
+                    : "-";
+
+
+            const date =
+                o.created_at
+                    ? new Date(
+                        o.created_at
+                    ).toLocaleString()
+                    : "-";
+
+
+            return `
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${escapeHtml(
+                                o.order_number ||
+                                o.id
+                            )}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            o.customer_name ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            restaurantName
+                        )}
+                    </td>
+
+                    <td class="money">
+                        ${money(
+                            o.total
+                        )}
+                    </td>
+
+                    <td>
+
+                        <span class="status ${
+                            statusClass(
+                                o.status
+                            )
+                        }">
+
+                            ${escapeHtml(
+                                o.status ||
+                                "Pending"
+                            )}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            date
+                        )}
+                    </td>
+
+                    <td>
+
+                        <select
+                            onchange="changeOrderStatus(
+                                '${o.id}',
+                                this.value
+                            )"
+                        >
+
+                            <option
+                                value="Pending"
+                                ${
+                                    o.status ===
+                                    "Pending"
+                                        ? "selected"
+                                        : ""
+                                }
+                            >
+                                Pending
+                            </option>
+
+                            <option
+                                value="Confirmed"
+                                ${
+                                    o.status ===
+                                    "Confirmed"
+                                        ? "selected"
+                                        : ""
+                                }
+                            >
+                                Confirmed
+                            </option>
+
+                            <option
+                                value="Preparing"
+                                ${
+                                    o.status ===
+                                    "Preparing"
+                                        ? "selected"
+                                        : ""
+                                }
+                            >
+                                Preparing
+                            </option>
+
+                            <option
+                                value="Ready"
+                                ${
+                                    o.status ===
+                                    "Ready"
+                                        ? "selected"
+                                        : ""
+                                }
+                            >
+                                Ready
+                            </option>
+
+                            <option
+                                value="Cancelled"
+                                ${
+                                    o.status ===
+                                    "Cancelled"
+                                        ? "selected"
+                                        : ""
+                                }
+                            >
+                                Cancelled
+                            </option>
+
+                        </select>
+
+                    </td>
+
+                </tr>
+            `;
+
+        })
+        .join("");
+
+}
+
+
+document
+    .getElementById(
+        "orderSearch"
+    )
+    .addEventListener(
+        "input",
+        renderOrders
+    );
+
+
+document
+    .getElementById(
+        "orderStatusFilter"
+    )
+    .addEventListener(
+        "change",
+        renderOrders
+    );
+
+
+/* =====================================================
+   CHANGE ORDER STATUS
+===================================================== */
+
+async function changeOrderStatus(
+    orderId,
+    newStatus
+) {
+
+    const {
+        error
+    } = await db
+        .from("food_orders")
+        .update({
+            status: newStatus
+        })
+        .eq(
+            "id",
+            orderId
+        );
+
+
+    if (error) {
+
+        showMessage(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const order =
+        orders.find(
+            o =>
+                o.id ===
+                orderId
+        );
+
+
+    if (order) {
+
+        order.status =
+            newStatus;
+
+    }
+
+
+    renderOrders();
+
+    updateDashboardStats();
+
+
+    /*
+     * When an order becomes Ready,
+     * the Supabase trigger creates
+     * the commission automatically.
+     */
+
+    await loadCommissionData();
+
+
+    showMessage(
+        "Order status updated."
+    );
+
+}
+
+
+/* =====================================================
+   DASHBOARD STATS
+===================================================== */
+
+function updateDashboardStats() {
+
+    const totalOrders =
+        orders.length;
+
+
+    const pending =
+        orders.filter(
+            o =>
+                o.status ===
+                "Pending"
+        ).length;
+
+
+    const preparing =
+        orders.filter(
+            o =>
+                o.status ===
+                "Preparing"
+        ).length;
+
+
+    const ready =
+        orders.filter(
+            o =>
+                o.status ===
+                "Ready"
+        ).length;
+
+
+    const sales =
+        orders
+        .filter(
+            o =>
+                o.status !==
+                "Cancelled"
+        )
+        .reduce(
+            (sum, o) =>
+                sum +
+                Number(
+                    o.total || 0
+                ),
+            0
+        );
+
+
+    const customers =
+        new Set(
+            orders
+            .map(
+                o =>
+                    o.customer_id
+            )
+            .filter(Boolean)
+        ).size;
+
+
+    document
+        .getElementById(
+            "ordersCount"
+        )
+        .textContent =
+            totalOrders;
+
+
+    document
+        .getElementById(
+            "pendingCount"
+        )
+        .textContent =
+            pending;
+
+
+    document
+        .getElementById(
+            "preparingCount"
+        )
+        .textContent =
+            preparing;
+
+
+    document
+        .getElementById(
+            "readyCount"
+        )
+        .textContent =
+            ready;
+
+
+    document
+        .getElementById(
+            "totalSales"
+        )
+        .textContent =
+            money(sales);
+
+
+    document
+        .getElementById(
+            "customersCount"
+        )
+        .textContent =
+            customers;
+
+}
+
+
+/* =====================================================
+   LOAD COMMISSION RECORDS
+===================================================== */
+
+async function loadCommissionData() {
+
+    const {
+        data,
+        error
+    } = await db
+        .from(
+            "food_commissions"
+        )
+        .select("*")
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Commission:",
+            error
+        );
+
+
+        document
+            .getElementById(
+                "commissionTable"
+            )
+            .innerHTML =
+                `<tr>
+                    <td
+                        colspan="8"
+                        class="empty"
+                    >
+                        ${escapeHtml(
+                            error.message
+                        )}
+                    </td>
+                </tr>`;
+
+
+        return;
+
+    }
+
+
+    commissions =
+        data || [];
+
+
+    renderCommissionRecords();
+
+    updateCommissionTotals();
+
+
+    /*
+     * IMPORTANT:
+     * Vendor commission is loaded
+     * separately using RPC.
+     */
+
+    await loadVendorCommissions();
+
+}
+
+
+/* =====================================================
+   LOAD VENDOR COMMISSION
+===================================================== */
+
+async function loadVendorCommissions() {
+
+    const tbody =
+        document.getElementById(
+            "vendorCommissionTable"
+        );
+
+
+    tbody.innerHTML =
+        `<tr>
+            <td
+                colspan="6"
+                class="empty"
+            >
+                Loading vendor commissions...
+            </td>
+        </tr>`;
+
+
+    const {
+        data,
+        error
+    } = await db
+        .rpc(
+            "get_vendor_commission_summary"
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Vendor commission:",
+            error
+        );
+
+
+        tbody.innerHTML =
+            `<tr>
+                <td
+                    colspan="6"
+                    class="empty"
+                >
+                    ${escapeHtml(
+                        error.message
+                    )}
+                </td>
+            </tr>`;
+
+
+        return;
+
+    }
+
+
+    if (
+        !data ||
+        !data.length
+    ) {
+
+        tbody.innerHTML =
+            `<tr>
+                <td
+                    colspan="6"
+                    class="empty"
+                >
+                    No vendors found.
+                </td>
+            </tr>`;
+
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        data
+        .map(row => {
+
+            return `
+                <tr>
+
+                    <td>
+
+                        <strong
+                            class="vendor-name"
+                        >
+                            ${escapeHtml(
+                                row.vendor_name ||
+                                "Unknown Vendor"
+                            )}
+                        </strong>
+
+
+                        <div
+                            class="business-small"
+                        >
+                            ${escapeHtml(
+                                row.business_name ||
+                                "-"
+                            )}
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(
+                            row.restaurant_name ||
+                            "Unknown Restaurant"
+                        )}
+                    </td>
+
+
+                    <td>
+                        ${Number(
+                            row.commission_orders ||
+                            0
+                        )}
+                    </td>
+
+
+                    <td class="money">
+                        ${money(
+                            row.total_sales ||
+                            0
+                        )}
+                    </td>
+
+
+                    <td class="commission-total">
+                        ${money(
+                            row.total_commission ||
+                            0
+                        )}
+                    </td>
+
+
+                    <td class="money green">
+                        ${money(
+                            row.vendor_earnings ||
+                            0
+                        )}
+                    </td>
+
+                </tr>
+            `;
+
+        })
+        .join("");
+
+}
+
+
+/* =====================================================
+   COMMISSION RECORDS
+===================================================== */
+
+function renderCommissionRecords() {
+
+    const tbody =
+        document.getElementById(
+            "commissionTable"
+        );
+
+
+    if (!commissions.length) {
+
+        tbody.innerHTML =
+            `<tr>
+                <td
+                    colspan="8"
+                    class="empty"
+                >
+                    No commission records found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        commissions
+        .map(c => {
+
+            const vendor =
+                vendors.find(
+                    v =>
+                        v.restaurant_id ===
+                        c.restaurant_id
+                );
+
+
+            const order =
+                orders.find(
+                    o =>
+                        o.id ===
+                        c.order_id
+                );
+
+
+            const vendorName =
+                vendor
+                    ? (
+                        vendor.full_name ||
+                        vendor.business_name ||
+                        "Unknown Vendor"
+                    )
+                    : "Unknown Vendor";
+
+
+            const orderNumber =
+                order
+                    ? (
+                        order.order_number ||
+                        order.id
+                    )
+                    : c.order_id;
+
+
+            const date =
+                c.created_at
+                    ? new Date(
+                        c.created_at
+                    ).toLocaleString()
+                    : "-";
+
+
+            return `
+                <tr>
+
+                    <td>
+
+                        <strong>
+                            ${escapeHtml(
+                                orderNumber
+                            )}
+                        </strong>
+
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(
+                            vendorName
+                        )}
+                    </td>
+
+
+                    <td class="money">
+                        ${money(
+                            c.order_total
+                        )}
+                    </td>
+
+
+                    <td>
+                        ${Number(
+                            c.commission_rate ||
+                            0
+                        )}%
+                    </td>
+
+
+                    <td class="commission-total">
+                        ${money(
+                            c.commission_amount
+                        )}
+                    </td>
+
+
+                    <td class="money green">
+                        ${money(
+                            c.vendor_amount
+                        )}
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="status ${
+                                statusClass(
+                                    c.status
+                                )
+                            }"
+                        >
+
+                            ${escapeHtml(
+                                c.status
+                            )}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(
+                            date
+                        )}
+                    </td>
+
+                </tr>
+            `;
+
+        })
+        .join("");
+
+}
+
+
+/* =====================================================
+   COMMISSION TOTALS
+===================================================== */
+
+function updateCommissionTotals() {
+
+    const earned =
+        commissions.filter(
+            c =>
+                c.status ===
+                "Earned"
+        );
+
+
+    const totalCommission =
+        earned.reduce(
+            (sum, c) =>
+                sum +
+                Number(
+                    c.commission_amount ||
+                    0
+                ),
+            0
+        );
+
+
+    const totalVendor =
+        earned.reduce(
+            (sum, c) =>
+                sum +
+                Number(
+                    c.vendor_amount ||
+                    0
+                ),
+            0
+        );
+
+
+    document
+        .getElementById(
+            "totalCommissionDisplay"
+        )
+        .textContent =
+            money(
+                totalCommission
+            );
+
+
+    document
+        .getElementById(
+            "totalVendorEarningsDisplay"
+        )
+        .textContent =
+            money(
+                totalVendor
+            );
+
+
+    document
+        .getElementById(
+            "commissionOrdersDisplay"
+        )
+        .textContent =
+            earned.length;
+
+
+    document
+        .getElementById(
+            "dashboardCommission"
+        )
+        .textContent =
+            money(
+                totalCommission
+            );
+
+
+    document
+        .getElementById(
+            "dashboardVendorEarnings"
+        )
+        .textContent =
+            money(
+                totalVendor
+            );
+
+}
+
+
+/* =====================================================
+   REFRESH VENDOR COMMISSION BUTTON
+===================================================== */
+
+document
+    .getElementById(
+        "refreshVendorCommissionBtn"
+    )
+    .addEventListener(
+        "click",
+        async () => {
+
+            await loadVendorCommissions();
+
+            showMessage(
+                "Vendor commission refreshed."
+            );
+
+        }
+    );
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+document
+    .getElementById(
+        "logoutBtn"
+    )
+    .addEventListener(
+        "click",
+        async () => {
+
+            await db.auth.signOut();
+
+            window.location.href =
+                "admin-login.html";
+
+        }
+    );
+
+
+/* =====================================================
+   INITIAL LOAD
+===================================================== */
+
+async function init() {
+
+    const isAdmin =
+        await checkAdmin();
+
+
+    if (!isAdmin) {
+        return;
+    }
+
+
+    await loadCommissionSettings();
+
+    await loadRestaurants();
+
+    await loadVendors();
+
+    await loadOrders();
+
+    await loadCommissionData();
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
