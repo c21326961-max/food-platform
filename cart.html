@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Food Platform | Cart</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .cart-page {
+            max-width: 850px;
+            margin: auto;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #ff6b35;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page-title {
+            margin: 5px 0 15px;
+            font-size: 26px;
+        }
+
+        .restaurant-box,
+        .cart-card,
+        .summary-box,
+        .empty-box,
+        .warning-box {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,.06);
+        }
+
+        .restaurant-box {
+            padding: 14px;
+            margin-bottom: 15px;
+        }
+
+        .restaurant-label {
+            color: #777;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .restaurant-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .cart-card {
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .item-top {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .food-image,
+        .food-placeholder {
+            width: 82px;
+            height: 82px;
+            border-radius: 11px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .food-placeholder {
+            background: #f3f3f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .food-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .food-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .food-price {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .food-total {
+            color: #ff6b35;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .remove-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #dc2626;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .quantity-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 11px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .quantity-label {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .qty-minus {
+            background: #f1f1f1;
+        }
+
+        .qty-plus {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .quantity-number {
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .summary-box {
+            margin-top: 15px;
+            padding: 16px;
+        }
+
+        .summary-title {
+            margin: 0 0 14px;
+            font-size: 19px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+            margin-top: 14px;
+            padding-top: 14px;
+            font-size: 19px;
+        }
+
+        .total-price {
+            color: #ff6b35;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            margin-top: 16px;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #ff6b35;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .empty-box,
+        .warning-box {
+            padding: 28px 18px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .empty-box h2,
+        .warning-box h2 {
+            margin: 8px 0;
+            font-size: 20px;
+        }
+
+        .empty-box p,
+        .warning-box p {
+            color: #777;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .action-btn {
+            margin-top: 15px;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 9px;
+            background: #ff6b35;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .cart-page {
+                padding: 12px;
+                padding-bottom: 90px;
+            }
+
+            .page-title {
+                font-size: 23px;
+            }
+
+            .food-image,
+            .food-placeholder {
+                width: 72px;
+                height: 72px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-content">
+        <div class="logo">
+            Food Platform
+        </div>
+    </div>
+</header>
+
+<main class="cart-page">
+
+    <a href="index.html" class="back-link">
+        ← Continue Shopping
+    </a>
+
+    <h1 class="page-title">
+        Your Cart
+    </h1>
+
+    <!-- RESTAURANT -->
+
+    <div
+        id="restaurantBox"
+        class="restaurant-box"
+        style="display:none;"
+    >
+        <div class="restaurant-label">
+            RESTAURANT
+        </div>
+
+        <div
+            id="restaurantName"
+            class="restaurant-name"
+        ></div>
+    </div>
+
+    <!-- CART ITEMS -->
+
+    <div id="cartItems">
+        Loading cart...
+    </div>
+
+    <!-- SUMMARY -->
+
+    <div
+        id="cartSummary"
+        class="summary-box"
+        style="display:none;"
+    >
+
+        <h2 class="summary-title">
+            Order Summary
+        </h2>
+
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <strong id="subtotal">TSh 0</strong>
+        </div>
+
+        <div class="summary-row">
+            <span>Delivery Fee</span>
+            <strong id="deliveryFee">TSh 0</strong>
+        </div>
+
+        <div class="summary-total">
+            <strong>Total</strong>
+
+            <strong
+                id="total"
+                class="total-price"
+            >
+                TSh 0
+            </strong>
+        </div>
+
+        <button
+            class="checkout-btn"
+            onclick="goToCheckout()"
+        >
+            Proceed to Checkout
+        </button>
+
+    </div>
+
+    <!-- EMPTY CART -->
+
+    <div
+        id="emptyCart"
+        class="empty-box"
+        style="display:none;"
+    >
+
+        <h2>Your Cart is Empty</h2>
+
+        <p>
+            Add food from a restaurant to continue.
+        </p>
+
+        <button
+            class="action-btn"
+            onclick="location.href='index.html'"
+        >
+            Browse Food
+        </button>
+
+    </div>
+
+    <!-- DIFFERENT RESTAURANTS -->
+
+    <div
+        id="restaurantWarning"
+        class="warning-box"
+        style="display:none;"
+    >
+
+        <h2>Different Restaurants</h2>
+
+        <p>
+            Your cart contains food from different restaurants.
+            Please order from one restaurant at a time.
+        </p>
+
+        <button
+            class="action-btn"
+            onclick="clearCart()"
+        >
+            Clear Cart
+        </button>
+
+    </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+
+    <div
+        class="nav-item"
+        onclick="location.href='index.html'"
+    >
+        <span class="nav-icon">Home</span>
+        Home
+    </div>
+
+    <div
+        class="nav-item"
+        onclick="location.href='cart.html'"
+    >
+        <span class="nav-icon">Cart</span>
+        Cart
+    </div>
+
+    <div
+        class="nav-item"
+        onclick="location.href='my-orders.html'"
+    >
+        <span class="nav-icon">Orders</span>
+        Orders
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+    "https://ienquzigbawhvthnirtj.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+
+const db =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+let cart = [];
+let restaurant = null;
+
+
+/* =========================
+   LOAD CART
+========================= */
+
+async function loadCart() {
+
+    try {
+
+        const saved =
+            localStorage.getItem("foodCart");
+
+        cart =
+            saved
+                ? JSON.parse(saved)
+                : [];
+
+        if (!Array.isArray(cart)) {
+            cart = [];
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Cart loading error:",
+            error
+        );
+
+        cart = [];
+
+    }
+
+
+    /* NORMALIZE */
+
+    cart = cart.map(item => ({
+
+        menu_id:
+            item.menu_id ||
+            item.id ||
+            null,
+
+        restaurant_id:
+            item.restaurant_id ||
+            null,
+
+        food_name:
+            item.food_name ||
+            item.name ||
+            "Food Item",
+
+        price:
+            Number(item.price || 0),
+
+        quantity:
+            Number(item.quantity || 1),
+
+        image_url:
+            item.image_url ||
+            ""
+
+    }));
+
+
+    if (cart.length === 0) {
+
+        showEmptyCart();
+
+        return;
+
+    }
+
+
+    /* GET RESTAURANT IDs */
+
+    const restaurantIds =
+        [
+            ...new Set(
+                cart
+                    .map(item =>
+                        item.restaurant_id
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+
+    /* DIFFERENT RESTAURANTS */
+
+    if (restaurantIds.length > 1) {
+
+        showRestaurantWarning();
+
+        return;
+
+    }
+
+
+    /* LOAD RESTAURANT */
+
+    restaurant = null;
+
+    if (restaurantIds.length === 1) {
+
+        try {
+
+            const result =
+                await db
+                    .from("food_restaurants")
+                    .select("*")
+                    .eq(
+                        "id",
+                        restaurantIds[0]
+                    )
+                    .maybeSingle();
+
+            if (
+                !result.error &&
+                result.data
+            ) {
+
+                restaurant =
+                    result.data;
+
+            } else if (result.error) {
+
+                console.error(
+                    "Restaurant loading error:",
+                    result.error
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Restaurant request failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+    renderCart();
+
+}
+
+
+/* =========================
+   SHOW EMPTY
+========================= */
+
+function showEmptyCart() {
+
+    document.getElementById(
+        "cartItems"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "cartSummary"
+    ).style.display = "none";
+
+    document.getElementById(
+        "restaurantBox"
+    ).style.display = "none";
+
+    document.getElementById(
+        "restaurantWarning"
+    ).style.display = "none";
+
+    document.getElementById(
+        "emptyCart"
+    ).style.display = "block";
+
+}
+
+
+/* =========================
+   DIFFERENT RESTAURANTS
+========================= */
+
+function showRestaurantWarning() {
+
+    document.getElementById(
+        "cartItems"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "cartSummary"
+    ).style.display = "none";
+
+    document.getElementById(
+        "restaurantBox"
+    ).style.display = "none";
+
+    document.getElementById(
+        "emptyCart"
+    ).style.display = "none";
+
+    document.getElementById(
+        "restaurantWarning"
+    ).style.display = "block";
+
+}
+
+
+/* =========================
+   RENDER CART
+========================= */
+
+function renderCart() {
+
+    document.getElementById(
+        "emptyCart"
+    ).style.display = "none";
+
+    document.getElementById(
+        "restaurantWarning"
+    ).style.display = "none";
+
+    document.getElementById(
+        "cartSummary"
+    ).style.display = "block";
+
+
+    /* RESTAURANT */
+
+    if (restaurant) {
+
+        document.getElementById(
+            "restaurantBox"
+        ).style.display = "block";
+
+        document.getElementById(
+            "restaurantName"
+        ).textContent =
+            restaurant.name ||
+            "Restaurant";
+
+    } else {
+
+        document.getElementById(
+            "restaurantBox"
+        ).style.display = "none";
+
+    }
+
+
+    const container =
+        document.getElementById(
+            "cartItems"
+        );
+
+
+    container.innerHTML = "";
+
+
+    cart.forEach(
+        (item, index) => {
+
+            const itemTotal =
+                item.price *
+                item.quantity;
+
+
+            let imageHTML;
+
+
+            if (item.image_url) {
+
+                imageHTML = `
+                    <img
+                        src="${escapeHTML(item.image_url)}"
+                        alt="${escapeHTML(item.food_name)}"
+                        class="food-image"
+                        onerror="this.style.display='none'"
+                    >
+                `;
+
+            } else {
+
+                imageHTML = `
+                    <div class="food-placeholder">
+                        No image
+                    </div>
+                `;
+
+            }
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "cart-card";
+
+
+            card.innerHTML = `
+
+                <div class="item-top">
+
+                    ${imageHTML}
+
+                    <div class="food-info">
+
+                        <div class="food-name">
+                            ${escapeHTML(
+                                item.food_name
+                            )}
+                        </div>
+
+                        <div class="food-price">
+                            TSh ${item.price.toLocaleString()} each
+                        </div>
+
+                        <div class="food-total">
+                            TSh ${itemTotal.toLocaleString()}
+                        </div>
+
+                    </div>
+
+                    <button
+                        class="remove-btn"
+                        onclick="removeItem(${index})"
+                        title="Remove item"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="quantity-row">
+
+                    <span class="quantity-label">
+                        Quantity
+                    </span>
+
+                    <div class="quantity-controls">
+
+                        <button
+                            class="qty-btn qty-minus"
+                            onclick="changeQuantity(${index}, -1)"
+                        >
+                            −
+                        </button>
+
+                        <strong class="quantity-number">
+                            ${item.quantity}
+                        </strong>
+
+                        <button
+                            class="qty-btn qty-plus"
+                            onclick="changeQuantity(${index}, 1)"
+                        >
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(card);
+
+        }
+    );
+
+
+    calculateSummary();
+
+}
+
+
+/* =========================
+   QUANTITY
+========================= */
+
+function changeQuantity(
+    index,
+    change
+) {
+
+    if (!cart[index]) {
+        return;
+    }
+
+
+    cart[index].quantity =
+        Number(cart[index].quantity) +
+        change;
+
+
+    if (
+        cart[index].quantity <= 0
+    ) {
+
+        cart.splice(index, 1);
+
+    }
+
+
+    saveCart();
+
+}
+
+
+/* =========================
+   REMOVE ITEM
+========================= */
+
+function removeItem(index) {
+
+    if (!cart[index]) {
+        return;
+    }
+
+
+    cart.splice(index, 1);
+
+    saveCart();
+
+}
+
+
+/* =========================
+   CLEAR CART
+========================= */
+
+function clearCart() {
+
+    cart = [];
+
+    localStorage.removeItem(
+        "foodCart"
+    );
+
+    showEmptyCart();
+
+}
+
+
+/* =========================
+   SAVE CART
+========================= */
+
+function saveCart() {
+
+    localStorage.setItem(
+        "foodCart",
+        JSON.stringify(cart)
+    );
+
+
+    if (cart.length === 0) {
+
+        showEmptyCart();
+
+        return;
+
+    }
+
+
+    loadCart();
+
+}
+
+
+/* =========================
+   SUMMARY
+========================= */
+
+function calculateSummary() {
+
+    const subtotal =
+        cart.reduce(
+            (sum, item) => {
+
+                return sum +
+                    (
+                        Number(item.price) *
+                        Number(item.quantity)
+                    );
+
+            },
+            0
+        );
+
+
+    let deliveryFee = 0;
+
+
+    if (restaurant) {
+
+        if (
+            restaurant.delivery_available === true
+        ) {
+
+            deliveryFee =
+                Number(
+                    restaurant.delivery_fee ||
+                    0
+                );
+
+        } else {
+
+            deliveryFee = 0;
+
+        }
+
+    }
+
+
+    const total =
+        subtotal +
+        deliveryFee;
+
+
+    document.getElementById(
+        "subtotal"
+    ).textContent =
+        `TSh ${subtotal.toLocaleString()}`;
+
+
+    document.getElementById(
+        "deliveryFee"
+    ).textContent =
+        `TSh ${deliveryFee.toLocaleString()}`;
+
+
+    document.getElementById(
+        "total"
+    ).textContent =
+        `TSh ${total.toLocaleString()}`;
+
+}
+
+
+/* =========================
+   CHECKOUT
+========================= */
+
+function goToCheckout() {
+
+    if (cart.length === 0) {
+
+        alert(
+            "Your cart is empty."
+        );
+
+        return;
+
+    }
+
+
+    location.href =
+        "checkout.html";
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadCart();
+
+</script>
+
+</body>
+</html>

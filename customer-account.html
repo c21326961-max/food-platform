@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Account | Food Platform</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+    <style>
+
+        .page-header {
+            background: #ff6b35;
+            color: white;
+            padding: 25px 20px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .account-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #fff3e0;
+            color: #ff6b35;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .profile-name {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .profile-email {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-top: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #ff6b35;
+        }
+
+        .email-note {
+            margin-top: 6px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .save-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #ff6b35;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 13px;
+            border: 2px solid #dc2626;
+            border-radius: 10px;
+            background: white;
+            color: #dc2626;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .message {
+            display: none;
+            margin-top: 15px;
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #ecfdf5;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .login-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 22px;
+            background: #ff6b35;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+
+            .account-card {
+                padding: 17px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- HEADER -->
+
+<div class="page-header">
+
+    <h1>My Account</h1>
+
+    <p style="margin-top:8px;">
+        Manage your customer account.
+    </p>
+
+</div>
+
+
+
+<main class="container">
+
+
+    <!-- LOADING -->
+
+    <div id="loadingBox"
+         class="loading">
+
+        Loading your account...
+
+    </div>
+
+
+
+    <!-- ACCOUNT CONTENT -->
+
+    <div id="accountContent"
+         style="display:none;">
+
+
+        <!-- PROFILE -->
+
+        <section class="account-card">
+
+            <div id="avatar"
+                 class="profile-avatar">
+
+                C
+
+            </div>
+
+
+            <div id="profileName"
+                 class="profile-name">
+
+                Customer
+
+            </div>
+
+
+            <div id="profileEmail"
+                 class="profile-email">
+
+                -
+
+            </div>
+
+        </section>
+
+
+
+        <!-- PERSONAL INFORMATION -->
+
+        <section class="account-card">
+
+            <h2>
+                Personal Information
+            </h2>
+
+
+            <!-- FULL NAME -->
+
+            <div class="form-group">
+
+                <label for="fullName">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                >
+
+            </div>
+
+
+
+            <!-- PHONE -->
+
+            <div class="form-group">
+
+                <label for="phone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="Enter your phone number"
+                    autocomplete="tel"
+                >
+
+            </div>
+
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    readonly
+                >
+
+                <div class="email-note">
+                    Email is connected to your login account.
+                </div>
+
+            </div>
+
+
+
+            <button
+                id="saveBtn"
+                class="save-btn"
+                onclick="saveProfile()"
+            >
+
+                Save Changes
+
+            </button>
+
+
+
+            <div
+                id="message"
+                class="message"
+            ></div>
+
+        </section>
+
+
+
+        <!-- LOGOUT -->
+
+        <section class="account-card">
+
+            <h2 style="margin-bottom:15px;">
+                Account
+            </h2>
+
+
+            <button
+                class="logout-btn"
+                onclick="logout()"
+            >
+
+                Logout
+
+            </button>
+
+        </section>
+
+
+    </div>
+
+
+
+    <!-- LOGIN REQUIRED -->
+
+    <div
+        id="loginBox"
+        class="login-box"
+        style="display:none;"
+    >
+
+        <h2>
+            Login Required
+        </h2>
+
+
+        <p style="
+            margin-top:8px;
+            color:#777;
+        ">
+
+            Please login to manage your account.
+
+        </p>
+
+
+        <a
+            href="customer-login.html"
+            class="login-btn"
+        >
+
+            Login
+
+        </a>
+
+    </div>
+
+
+</main>
+
+
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+
+    <a href="index.html"
+       class="nav-item">
+
+        <span class="nav-icon">
+            Home
+        </span>
+
+        Home
+
+    </a>
+
+
+    <a href="my-orders.html"
+       class="nav-item">
+
+        <span class="nav-icon">
+            Orders
+        </span>
+
+        Orders
+
+    </a>
+
+
+    <a href="cart.html"
+       class="nav-item">
+
+        <span class="nav-icon">
+            Cart
+        </span>
+
+        Cart
+
+    </a>
+
+
+    <a href="customer-account.html"
+       class="nav-item">
+
+        <span class="nav-icon">
+            Account
+        </span>
+
+        Account
+
+    </a>
+
+</div>
+
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+/* ========================================
+   SUPABASE
+======================================== */
+
+const SUPABASE_URL =
+    "https://ienquzigbawhvthnirtj.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+
+
+const db =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+
+/* ========================================
+   ELEMENTS
+======================================== */
+
+const loadingBox =
+    document.getElementById(
+        "loadingBox"
+    );
+
+const accountContent =
+    document.getElementById(
+        "accountContent"
+    );
+
+const loginBox =
+    document.getElementById(
+        "loginBox"
+    );
+
+const profileName =
+    document.getElementById(
+        "profileName"
+    );
+
+const profileEmail =
+    document.getElementById(
+        "profileEmail"
+    );
+
+const avatar =
+    document.getElementById(
+        "avatar"
+    );
+
+const fullName =
+    document.getElementById(
+        "fullName"
+    );
+
+const phone =
+    document.getElementById(
+        "phone"
+    );
+
+const email =
+    document.getElementById(
+        "email"
+    );
+
+const saveBtn =
+    document.getElementById(
+        "saveBtn"
+    );
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+
+
+let currentUser = null;
+
+
+
+/* ========================================
+   SHOW MESSAGE
+======================================== */
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.textContent =
+        text;
+
+    message.className =
+        "message " +
+        type;
+
+    message.style.display =
+        "block";
+
+
+    setTimeout(function() {
+
+        message.style.display =
+            "none";
+
+    }, 4000);
+
+}
+
+
+
+/* ========================================
+   UPDATE PROFILE HEADER
+======================================== */
+
+function updateProfileHeader(
+    name,
+    userEmail
+) {
+
+    profileName.textContent =
+        name || "Customer";
+
+
+    profileEmail.textContent =
+        userEmail || "-";
+
+
+    email.value =
+        userEmail || "";
+
+
+    const firstLetter =
+        (name || "C")
+            .trim()
+            .charAt(0)
+            .toUpperCase();
+
+
+    avatar.textContent =
+        firstLetter;
+
+}
+
+
+
+/* ========================================
+   LOAD ACCOUNT
+======================================== */
+
+async function loadAccount() {
+
+    const {
+        data: {
+            user
+        },
+        error
+    } =
+        await db.auth.getUser();
+
+
+    if (error || !user) {
+
+        loadingBox.style.display =
+            "none";
+
+        loginBox.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    currentUser =
+        user;
+
+
+    const metadata =
+        user.user_metadata || {};
+
+
+    /*
+     * Get name and phone.
+     */
+
+    const name =
+        metadata.full_name ||
+        metadata.name ||
+        "";
+
+
+    const userPhone =
+        metadata.phone ||
+        "";
+
+
+    fullName.value =
+        name;
+
+
+    phone.value =
+        userPhone;
+
+
+    updateProfileHeader(
+        name,
+        user.email
+    );
+
+
+    loadingBox.style.display =
+        "none";
+
+
+    accountContent.style.display =
+        "block";
+
+}
+
+
+
+/* ========================================
+   SAVE PROFILE
+======================================== */
+
+async function saveProfile() {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    const name =
+        fullName.value.trim();
+
+
+    const userPhone =
+        phone.value.trim();
+
+
+    if (!name) {
+
+        showMessage(
+            "Please enter your full name.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!userPhone) {
+
+        showMessage(
+            "Please enter your phone number.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    saveBtn.disabled =
+        true;
+
+
+    saveBtn.textContent =
+        "Saving...";
+
+
+    try {
+
+        /* ================================
+           UPDATE AUTH PROFILE
+        ================================= */
+
+        const {
+            data,
+            error
+        } =
+            await db.auth.updateUser({
+
+                data: {
+
+                    full_name:
+                        name,
+
+                    phone:
+                        userPhone
+
+                }
+
+            });
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+
+        /* ================================
+           UPDATE HEADER
+        ================================= */
+
+        updateProfileHeader(
+            name,
+            currentUser.email
+        );
+
+
+
+        /* ================================
+           UPDATE FOOD VENDORS
+           ONLY IF A MATCH EXISTS
+        ================================= */
+
+        /*
+         * This does not create a vendor.
+         * It only updates a matching record.
+         */
+
+        await db
+            .from("food_vendors")
+            .update({
+
+                full_name:
+                    name,
+
+                phone:
+                    userPhone
+
+            })
+            .eq(
+                "id",
+                currentUser.id
+            );
+
+
+
+        showMessage(
+            "Profile updated successfully.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Profile update error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Failed to update profile.",
+            "error"
+        );
+
+    }
+
+
+    saveBtn.disabled =
+        false;
+
+
+    saveBtn.textContent =
+        "Save Changes";
+
+}
+
+
+
+/* ========================================
+   LOGOUT
+======================================== */
+
+async function logout() {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to logout?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await db.auth.signOut();
+
+
+    if (error) {
+
+        alert(
+            "Logout failed: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    window.location.href =
+        "customer-login.html";
+
+}
+
+
+
+/* ========================================
+   START
+======================================== */
+
+loadAccount();
+
+</script>
+
+
+</body>
+
+</html>

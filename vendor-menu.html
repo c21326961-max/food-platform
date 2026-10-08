@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Menu | Food Platform</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #f97316;
+            color: white;
+            padding: 16px;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .back-btn {
+            border: 0;
+            background: white;
+            color: #f97316;
+            padding: 9px 13px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 18px;
+        }
+
+        .restaurant-card,
+        .form-card,
+        .menu-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .restaurant-card h2 {
+            margin: 0 0 5px;
+            font-size: 21px;
+        }
+
+        .restaurant-card p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-card h2,
+        .menu-card h2 {
+            margin: 0 0 15px;
+            font-size: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 13px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            background: #f97316;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .success {
+            color: #15803d;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .food-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .food-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .food-body {
+            padding: 13px;
+        }
+
+        .food-body h3 {
+            margin: 0 0 6px;
+            font-size: 16px;
+        }
+
+        .food-description {
+            margin: 0 0 8px;
+            color: #666;
+            font-size: 13px;
+            min-height: 32px;
+        }
+
+        .food-category {
+            display: inline-block;
+            background: #fff7ed;
+            color: #c2410c;
+            padding: 4px 7px;
+            border-radius: 15px;
+            font-size: 11px;
+            margin-bottom: 9px;
+        }
+
+        .food-price {
+            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .available {
+            color: #15803d;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .unavailable {
+            color: #dc2626;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .food-actions {
+            display: flex;
+            gap: 7px;
+            margin-top: 10px;
+        }
+
+        .food-actions button {
+            flex: 1;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+        }
+
+        .preview {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 7px;
+            margin-top: 7px;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        @media (max-width: 850px) {
+
+            .menu-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 12px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .food-image {
+                height: 190px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="header-inner">
+
+        <h1>Manage Menu</h1>
+
+        <button
+            class="back-btn"
+            onclick="window.location.href='vendor-dashboard.html'"
+        >
+            Dashboard
+        </button>
+
+    </div>
+
+</header>
+
+
+<div class="container">
+
+    <!-- RESTAURANT -->
+
+    <div class="restaurant-card">
+
+        <h2 id="restaurantName">
+            Loading restaurant...
+        </h2>
+
+        <p id="restaurantAddress">
+            -
+        </p>
+
+    </div>
+
+
+    <!-- ADD / EDIT FOOD -->
+
+    <div class="form-card">
+
+        <h2 id="formTitle">
+            Add Food
+        </h2>
+
+        <form id="foodForm">
+
+            <div class="grid">
+
+                <div>
+
+                    <label>
+                        Food Name
+
+                        <input
+                            id="foodName"
+                            type="text"
+                            placeholder="Example: Chicken Chips"
+                            required
+                        >
+
+                    </label>
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Price
+
+                        <input
+                            id="foodPrice"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="5000"
+                            required
+                        >
+
+                    </label>
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Category
+
+                        <select id="foodCategory" required>
+
+                            <option value="">
+                                Select Category
+                            </option>
+
+                            <option value="Rice">
+                                Rice
+                            </option>
+
+                            <option value="Ugali">
+                                Ugali
+                            </option>
+
+                            <option value="Chips">
+                                Chips
+                            </option>
+
+                            <option value="Chicken">
+                                Chicken
+                            </option>
+
+                            <option value="Beef">
+                                Beef
+                            </option>
+
+                            <option value="Fish">
+                                Fish
+                            </option>
+
+                            <option value="Banana">
+                                Banana
+                            </option>
+
+                            <option value="Beans">
+                                Beans
+                            </option>
+
+                            <option value="Chapati">
+                                Chapati
+                            </option>
+
+                            <option value="Eggs">
+                                Eggs
+                            </option>
+
+                            <option value="Burger">
+                                Burger
+                            </option>
+
+                            <option value="Pizza">
+                                Pizza
+                            </option>
+
+                            <option value="Pasta">
+                                Pasta
+                            </option>
+
+                            <option value="Sandwich">
+                                Sandwich
+                            </option>
+
+                            <option value="Breakfast">
+                                Breakfast
+                            </option>
+
+                            <option value="Drinks">
+                                Drinks
+                            </option>
+
+                        </select>
+
+                    </label>
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Food Image
+
+                        <input
+                            id="foodImage"
+                            type="file"
+                            accept="image/*"
+                        >
+
+                        <img
+                            id="imagePreview"
+                            class="preview"
+                            alt="Preview"
+                        >
+
+                    </label>
+
+                </div>
+
+
+                <div class="full">
+
+                    <label>
+                        Description
+
+                        <textarea
+                            id="foodDescription"
+                            placeholder="Describe this food..."
+                        ></textarea>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <input
+                id="editingId"
+                type="hidden"
+            >
+
+
+            <button
+                class="btn btn-primary"
+                type="submit"
+                id="saveBtn"
+            >
+                Add Food
+            </button>
+
+
+            <button
+                class="btn btn-secondary"
+                type="button"
+                id="cancelBtn"
+                onclick="cancelEdit()"
+                style="display:none;"
+            >
+                Cancel Edit
+            </button>
+
+
+            <div
+                id="formMessage"
+                class="message"
+            ></div>
+
+        </form>
+
+    </div>
+
+
+    <!-- MENU -->
+
+    <div class="menu-card">
+
+        <h2>
+            Your Menu
+        </h2>
+
+        <div
+            id="menuContainer"
+            class="menu-grid"
+        >
+
+            <div class="loading">
+                Loading menu...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let currentUser = null;
+let vendor = null;
+let restaurant = null;
+let menuItems = [];
+
+
+/* =========================
+   AUTH
+========================= */
+
+async function checkAuth() {
+
+    const {
+        data: {
+            user
+        }
+    } = await db.auth.getUser();
+
+    if (!user) {
+
+        window.location.href =
+            "vendor-login.html";
+
+        return false;
+
+    }
+
+    currentUser = user;
+
+    return true;
+
+}
+
+
+/* =========================
+   LOAD VENDOR
+========================= */
+
+async function loadVendor() {
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_vendors")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+    if (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+        return false;
+
+    }
+
+    if (!data) {
+
+        alert("Vendor profile not found.");
+
+        await db.auth.signOut();
+
+        window.location.href =
+            "vendor-login.html";
+
+        return false;
+
+    }
+
+    vendor = data;
+
+    return true;
+
+}
+
+
+/* =========================
+   LOAD RESTAURANT
+========================= */
+
+async function loadRestaurant() {
+
+    if (!vendor.restaurant_id) {
+
+        document.getElementById(
+            "restaurantName"
+        ).textContent =
+            "No restaurant linked";
+
+        return false;
+
+    }
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_restaurants")
+        .select("*")
+        .eq("id", vendor.restaurant_id)
+        .maybeSingle();
+
+    if (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+        return false;
+
+    }
+
+    restaurant = data;
+
+    if (!restaurant) {
+
+        document.getElementById(
+            "restaurantName"
+        ).textContent =
+            "Restaurant not found";
+
+        return false;
+
+    }
+
+    document.getElementById(
+        "restaurantName"
+    ).textContent =
+        restaurant.name || "Restaurant";
+
+    document.getElementById(
+        "restaurantAddress"
+    ).textContent =
+        restaurant.address || "No address";
+
+    return true;
+
+}
+
+
+/* =========================
+   LOAD MENU
+========================= */
+
+async function loadMenu() {
+
+    const container =
+        document.getElementById(
+            "menuContainer"
+        );
+
+    if (!restaurant) {
+
+        container.innerHTML = `
+            <div class="empty">
+                No restaurant linked.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_menu")
+        .select("*")
+        .eq(
+            "restaurant_id",
+            restaurant.id
+        )
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
+
+    if (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+            <div class="empty">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+        return;
+
+    }
+
+    menuItems = data || [];
+
+    renderMenu();
+
+}
+
+
+/* =========================
+   RENDER MENU
+========================= */
+
+function renderMenu() {
+
+    const container =
+        document.getElementById(
+            "menuContainer"
+        );
+
+    if (!menuItems.length) {
+
+        container.innerHTML = `
+            <div class="empty">
+                No food items yet.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    container.innerHTML =
+        menuItems.map(item => {
+
+            const image =
+                item.image_url ||
+                "https://via.placeholder.com/600x400?text=Food";
+
+            const availability =
+                item.is_available !== false;
+
+            return `
+
+                <div class="food-item">
+
+                    <img
+                        class="food-image"
+                        src="${escapeHtml(image)}"
+                        alt="${escapeHtml(item.name)}"
+                        loading="lazy"
+                    >
+
+                    <div class="food-body">
+
+                        <h3>
+                            ${escapeHtml(item.name)}
+                        </h3>
+
+                        <p class="food-description">
+                            ${escapeHtml(
+                                item.description ||
+                                "No description"
+                            )}
+                        </p>
+
+                        <div class="food-category">
+                            ${escapeHtml(
+                                item.category ||
+                                "Other"
+                            )}
+                        </div>
+
+                        <div class="food-price">
+                            ${money(item.price)}
+                        </div>
+
+                        <div class="${
+                            availability
+                                ? "available"
+                                : "unavailable"
+                        }">
+
+                            ${
+                                availability
+                                    ? "Available"
+                                    : "Unavailable"
+                            }
+
+                        </div>
+
+
+                        <div class="food-actions">
+
+                            <button
+                                class="btn btn-secondary"
+                                onclick="editFood('${item.id}')"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                class="btn ${
+                                    availability
+                                        ? "btn-danger"
+                                        : "btn-primary"
+                                }"
+                                onclick="toggleAvailability(
+                                    '${item.id}',
+                                    ${availability}
+                                )"
+                            >
+
+                                ${
+                                    availability
+                                        ? "Disable"
+                                        : "Enable"
+                                }
+
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            class="food-actions"
+                        >
+
+                            <button
+                                class="btn btn-danger"
+                                onclick="deleteFood('${item.id}')"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================
+   ADD / EDIT FOOD
+========================= */
+
+document
+    .getElementById("foodForm")
+    .addEventListener(
+        "submit",
+        saveFood
+    );
+
+
+async function saveFood(event) {
+
+    event.preventDefault();
+
+    if (!restaurant) {
+
+        return;
+
+    }
+
+    const message =
+        document.getElementById(
+            "formMessage"
+        );
+
+    const saveBtn =
+        document.getElementById(
+            "saveBtn"
+        );
+
+    message.textContent =
+        "Saving...";
+
+    message.className =
+        "message";
+
+    saveBtn.disabled = true;
+
+
+    try {
+
+        const editingId =
+            document.getElementById(
+                "editingId"
+            ).value;
+
+
+        const name =
+            document.getElementById(
+                "foodName"
+            ).value.trim();
+
+        const description =
+            document.getElementById(
+                "foodDescription"
+            ).value.trim();
+
+        const price =
+            Number(
+                document.getElementById(
+                    "foodPrice"
+                ).value
+            );
+
+        const category =
+            document.getElementById(
+                "foodCategory"
+            ).value;
+
+
+        if (!name) {
+            throw new Error(
+                "Food name is required."
+            );
+        }
+
+        if (!price || price < 0) {
+            throw new Error(
+                "Enter a valid price."
+            );
+        }
+
+        if (!category) {
+            throw new Error(
+                "Select a category."
+            );
+        }
+
+
+        let imageUrl = null;
+
+
+        /* =====================
+           EXISTING IMAGE
+        ===================== */
+
+        if (editingId) {
+
+            const oldItem =
+                menuItems.find(
+                    item =>
+                        item.id === editingId
+                );
+
+            imageUrl =
+                oldItem?.image_url ||
+                null;
+
+        }
+
+
+        /* =====================
+           NEW IMAGE
+        ===================== */
+
+        const file =
+            document.getElementById(
+                "foodImage"
+            ).files[0];
+
+
+        if (file) {
+
+            const extension =
+                file.name
+                    .split(".")
+                    .pop()
+                    .toLowerCase();
+
+            const fileName =
+                currentUser.id +
+                "/" +
+                Date.now() +
+                "-" +
+                Math.random()
+                    .toString(36)
+                    .substring(2) +
+                "." +
+                extension;
+
+
+            const {
+                error: uploadError
+            } = await db.storage
+                .from("food-images")
+                .upload(
+                    fileName,
+                    file,
+                    {
+                        upsert: false
+                    }
+                );
+
+
+            if (uploadError) {
+
+                throw uploadError;
+
+            }
+
+
+            const {
+                data: publicData
+            } = db.storage
+                .from("food-images")
+                .getPublicUrl(
+                    fileName
+                );
+
+
+            imageUrl =
+                publicData.publicUrl;
+
+        }
+
+
+        const payload = {
+
+            name: name,
+
+            description:
+                description || null,
+
+            price: price,
+
+            category: category,
+
+            restaurant_id:
+                restaurant.id,
+
+            image_url:
+                imageUrl,
+
+            is_available: true
+
+        };
+
+
+        /* =====================
+           UPDATE
+        ===================== */
+
+        if (editingId) {
+
+            delete payload.restaurant_id;
+            delete payload.is_available;
+
+            const {
+                error
+            } = await db
+                .from("food_menu")
+                .update(payload)
+                .eq(
+                    "id",
+                    editingId
+                )
+                .eq(
+                    "restaurant_id",
+                    restaurant.id
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            message.textContent =
+                "Food updated successfully.";
+
+        }
+
+
+        /* =====================
+           INSERT
+        ===================== */
+
+        else {
+
+            const {
+                error
+            } = await db
+                .from("food_menu")
+                .insert(payload);
+
+            if (error) {
+                throw error;
+            }
+
+            message.textContent =
+                "Food added successfully.";
+
+        }
+
+
+        message.className =
+            "message success";
+
+
+        resetForm();
+
+        await loadMenu();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+            error.message ||
+            "Something went wrong.";
+
+        message.className =
+            "message error";
+
+    }
+
+    finally {
+
+        saveBtn.disabled = false;
+
+    }
+
+}
+
+
+/* =========================
+   EDIT FOOD
+========================= */
+
+function editFood(id) {
+
+    const item =
+        menuItems.find(
+            food => food.id === id
+        );
+
+    if (!item) {
+        return;
+    }
+
+    document.getElementById(
+        "editingId"
+    ).value = item.id;
+
+    document.getElementById(
+        "foodName"
+    ).value =
+        item.name || "";
+
+    document.getElementById(
+        "foodDescription"
+    ).value =
+        item.description || "";
+
+    document.getElementById(
+        "foodPrice"
+    ).value =
+        item.price || "";
+
+    document.getElementById(
+        "foodCategory"
+    ).value =
+        item.category || "";
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Edit Food";
+
+    document.getElementById(
+        "saveBtn"
+    ).textContent =
+        "Update Food";
+
+    document.getElementById(
+        "cancelBtn"
+    ).style.display =
+        "inline-block";
+
+
+    const preview =
+        document.getElementById(
+            "imagePreview"
+        );
+
+    if (item.image_url) {
+
+        preview.src =
+            item.image_url;
+
+        preview.style.display =
+            "block";
+
+    } else {
+
+        preview.style.display =
+            "none";
+
+    }
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =========================
+   CANCEL EDIT
+========================= */
+
+function cancelEdit() {
+
+    resetForm();
+
+}
+
+
+/* =========================
+   RESET FORM
+========================= */
+
+function resetForm() {
+
+    document
+        .getElementById("foodForm")
+        .reset();
+
+    document.getElementById(
+        "editingId"
+    ).value = "";
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Add Food";
+
+    document.getElementById(
+        "saveBtn"
+    ).textContent =
+        "Add Food";
+
+    document.getElementById(
+        "cancelBtn"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "imagePreview"
+    ).style.display =
+        "none";
+
+}
+
+
+/* =========================
+   IMAGE PREVIEW
+========================= */
+
+document.getElementById(
+    "foodImage"
+).addEventListener(
+    "change",
+    function () {
+
+        const file =
+            this.files[0];
+
+        const preview =
+            document.getElementById(
+                "imagePreview"
+            );
+
+        if (!file) {
+
+            preview.style.display =
+                "none";
+
+            return;
+
+        }
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            function (event) {
+
+                preview.src =
+                    event.target.result;
+
+                preview.style.display =
+                    "block";
+
+            };
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================
+   TOGGLE AVAILABILITY
+========================= */
+
+async function toggleAvailability(
+    id,
+    currentlyAvailable
+) {
+
+    const {
+        error
+    } = await db
+        .from("food_menu")
+        .update({
+            is_available:
+                !currentlyAvailable
+        })
+        .eq("id", id)
+        .eq(
+            "restaurant_id",
+            restaurant.id
+        );
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    await loadMenu();
+
+}
+
+
+/* =========================
+   DELETE FOOD
+========================= */
+
+async function deleteFood(id) {
+
+    const item =
+        menuItems.find(
+            food => food.id === id
+        );
+
+    if (!item) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Delete "${item.name}"?`
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const {
+        error
+    } = await db
+        .from("food_menu")
+        .delete()
+        .eq("id", id)
+        .eq(
+            "restaurant_id",
+            restaurant.id
+        );
+
+
+    if (error) {
+
+        alert(error.message);
+
+        return;
+
+    }
+
+
+    await loadMenu();
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function money(value) {
+
+    return "TSh " +
+        Number(value || 0)
+            .toLocaleString(
+                "en-TZ",
+                {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }
+            );
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+async function init() {
+
+    const authenticated =
+        await checkAuth();
+
+    if (!authenticated) {
+        return;
+    }
+
+
+    const vendorLoaded =
+        await loadVendor();
+
+    if (!vendorLoaded) {
+        return;
+    }
+
+
+    const restaurantLoaded =
+        await loadRestaurant();
+
+    if (!restaurantLoaded) {
+        return;
+    }
+
+
+    await loadMenu();
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>

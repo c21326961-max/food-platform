@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Profile | Food Platform</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .profile-icon {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background: #ff6b35;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-title {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-title h1 {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .profile-title p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #ff6b35;
+        }
+
+        .readonly {
+            background: #f1f1f1;
+        }
+
+        .location-button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #f3f4f6;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .location-button:hover {
+            background: #e5e7eb;
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: #ff6b35;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .save-button:hover {
+            background: #e85a28;
+        }
+
+        .logout-button {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            color: #d00;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .login-box {
+            background: white;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .login-button {
+            display: inline-block;
+            margin-top: 20px;
+            background: #ff6b35;
+            color: white;
+            text-decoration: none;
+            padding: 13px 25px;
+            border-radius: 10px;
+        }
+
+        .coordinates {
+            background: #f8f9fb;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-content">
+
+        <div class="logo">
+            🍽️ Food Platform
+        </div>
+
+        <div class="location">
+            👤 Customer Profile
+        </div>
+
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Loading -->
+    <div id="loading" class="profile-card">
+        <p style="text-align:center;">Loading profile...</p>
+    </div>
+
+
+    <!-- Login Required -->
+    <div id="loginRequired" class="login-box" style="display:none;">
+
+        <div style="font-size:55px;">
+            🔐
+        </div>
+
+        <h2>Login Required</h2>
+
+        <p style="margin-top:10px;color:#777;">
+            Please login to view your customer profile.
+        </p>
+
+        <a href="customer-login.html" class="login-button">
+            Login
+        </a>
+
+    </div>
+
+
+    <!-- Profile -->
+    <div id="profileSection" class="profile-card" style="display:none;">
+
+        <div class="profile-icon">
+            👤
+        </div>
+
+        <div class="profile-title">
+
+            <h1>My Profile</h1>
+
+            <p>
+                Manage your customer information
+            </p>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                id="fullName"
+                placeholder="Enter your full name"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Phone Number
+            </label>
+
+            <input
+                type="text"
+                id="phone"
+                placeholder="Enter your phone number"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Email
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                class="readonly"
+                readonly
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Delivery Address
+            </label>
+
+            <input
+                type="text"
+                id="address"
+                placeholder="Example: Keko Mwanga, Dar es Salaam"
+            >
+
+            <button
+                type="button"
+                class="location-button"
+                onclick="useMyLocation()"
+            >
+                📍 Use My Location
+            </button>
+
+            <div
+                id="coordinates"
+                class="coordinates"
+                style="display:none;"
+            ></div>
+
+        </div>
+
+
+        <button
+            class="save-button"
+            onclick="saveProfile()"
+        >
+            💾 Save Profile
+        </button>
+
+
+        <button
+            class="logout-button"
+            onclick="logout()"
+        >
+            🚪 Logout
+        </button>
+
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- Bottom Navigation -->
+
+<div class="bottom-nav">
+
+    <a
+        href="index.html"
+        class="nav-item"
+        style="text-decoration:none;color:#222;"
+    >
+        <span class="nav-icon">🏠</span>
+        Home
+    </a>
+
+
+    <a
+        href="cart.html"
+        class="nav-item"
+        style="text-decoration:none;color:#222;"
+    >
+        <span class="nav-icon">🛒</span>
+        Cart
+    </a>
+
+
+    <a
+        href="my-orders.html"
+        class="nav-item"
+        style="text-decoration:none;color:#222;"
+    >
+        <span class="nav-icon">📦</span>
+        Orders
+    </a>
+
+
+    <a
+        href="customer-profile.html"
+        class="nav-item"
+        style="text-decoration:none;color:#ff6b35;font-weight:bold;"
+    >
+        <span class="nav-icon">👤</span>
+        Profile
+    </a>
+
+</div>
+
+
+<!-- Supabase -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+
+<script>
+
+let currentUser = null;
+
+let latitude = null;
+let longitude = null;
+
+
+// ================================
+// LOAD PROFILE
+// ================================
+
+async function loadProfile() {
+
+    const loading = document.getElementById("loading");
+    const loginRequired = document.getElementById("loginRequired");
+    const profileSection = document.getElementById("profileSection");
+
+    const {
+        data: {
+            user
+        },
+        error
+    } = await supabaseClient.auth.getUser();
+
+
+    if (error || !user) {
+
+        loading.style.display = "none";
+
+        loginRequired.style.display = "block";
+
+        return;
+
+    }
+
+
+    currentUser = user;
+
+
+    // Hide loading
+
+    loading.style.display = "none";
+
+
+    // Show profile
+
+    profileSection.style.display = "block";
+
+
+    // Email
+
+    document.getElementById("email").value =
+        user.email || "";
+
+
+    // User metadata
+
+    const metadata = user.user_metadata || {};
+
+
+    document.getElementById("fullName").value =
+        metadata.full_name || "";
+
+
+    document.getElementById("phone").value =
+        metadata.phone || "";
+
+
+    document.getElementById("address").value =
+        metadata.address || "";
+
+
+    // Saved GPS
+
+    if (
+        metadata.latitude !== undefined &&
+        metadata.longitude !== undefined &&
+        metadata.latitude !== null &&
+        metadata.longitude !== null
+    ) {
+
+        latitude = Number(metadata.latitude);
+
+        longitude = Number(metadata.longitude);
+
+        showCoordinates();
+
+    }
+
+}
+
+
+// ================================
+// SAVE PROFILE
+// ================================
+
+async function saveProfile() {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    const fullName =
+        document.getElementById("fullName").value.trim();
+
+
+    const phone =
+        document.getElementById("phone").value.trim();
+
+
+    const address =
+        document.getElementById("address").value.trim();
+
+
+    const message =
+        document.getElementById("message");
+
+
+    if (!fullName) {
+
+        message.style.color = "red";
+
+        message.textContent =
+            "Please enter your full name.";
+
+        return;
+
+    }
+
+
+    if (!phone) {
+
+        message.style.color = "red";
+
+        message.textContent =
+            "Please enter your phone number.";
+
+        return;
+
+    }
+
+
+    if (!address) {
+
+        message.style.color = "red";
+
+        message.textContent =
+            "Please enter your delivery address.";
+
+        return;
+
+    }
+
+
+    message.style.color = "#555";
+
+    message.textContent =
+        "Saving profile...";
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient.auth.updateUser({
+
+        data: {
+
+            full_name: fullName,
+
+            phone: phone,
+
+            address: address,
+
+            latitude: latitude,
+
+            longitude: longitude,
+
+            role: "customer"
+
+        }
+
+    });
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.style.color = "red";
+
+        message.textContent =
+            "Failed to save profile: " +
+            error.message;
+
+        return;
+
+    }
+
+
+    message.style.color = "green";
+
+    message.textContent =
+        "✅ Profile saved successfully!";
+
+
+    currentUser = data.user;
+
+}
+
+
+// ================================
+// USE MY LOCATION
+// ================================
+
+function useMyLocation() {
+
+    const message =
+        document.getElementById("message");
+
+
+    if (!navigator.geolocation) {
+
+        message.style.color = "red";
+
+        message.textContent =
+            "GPS is not supported by this browser.";
+
+        return;
+
+    }
+
+
+    message.style.color = "#555";
+
+    message.textContent =
+        "📍 Detecting your location...";
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            latitude =
+                position.coords.latitude;
+
+
+            longitude =
+                position.coords.longitude;
+
+
+            showCoordinates();
+
+
+            message.style.color = "green";
+
+            message.textContent =
+                "✅ Location detected successfully. You can now save your profile.";
+
+        },
+
+        function(error) {
+
+            console.error(error);
+
+            message.style.color = "red";
+
+            message.textContent =
+                "Unable to detect your location. Please allow location access.";
+
+        },
+
+        {
+
+            enableHighAccuracy: true,
+
+            timeout: 10000,
+
+            maximumAge: 0
+
+        }
+
+    );
+
+}
+
+
+// ================================
+// SHOW COORDINATES
+// ================================
+
+function showCoordinates() {
+
+    const box =
+        document.getElementById("coordinates");
+
+
+    box.style.display = "block";
+
+
+    box.textContent =
+        "📍 Location saved: " +
+        latitude.toFixed(6) +
+        ", " +
+        longitude.toFixed(6);
+
+}
+
+
+// ================================
+// LOGOUT
+// ================================
+
+async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href =
+        "customer-login.html";
+
+}
+
+
+// ================================
+// START
+// ================================
+
+loadProfile();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vendor Login | Food Platform</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0 0 8px;
+            color: #222;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 15px;
+            margin-bottom: 18px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #ff6b35;
+        }
+
+        .login-btn {
+            width: 100%;
+            border: none;
+            background: #ff6b35;
+            color: white;
+            padding: 14px;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 13px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #ff6b35;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 55px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 10px;
+            top: 9px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        @media (max-width: 500px) {
+
+            .login-card {
+                padding: 22px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <div class="logo">
+                🔑
+            </div>
+
+            <h1>
+                Vendor Login
+            </h1>
+
+            <p class="subtitle">
+                Sign in to manage your restaurant
+            </p>
+
+
+            <div
+                id="message"
+                class="message"
+            ></div>
+
+
+            <form id="loginForm">
+
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                    autocomplete="email"
+                >
+
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password"
+                        required
+                        autocomplete="current-password"
+                    >
+
+                    <button
+                        type="button"
+                        class="show-password"
+                        id="showPassword"
+                    >
+                        👁️
+                    </button>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-btn"
+                    id="loginButton"
+                >
+                    🔑 Login
+                </button>
+
+
+            </form>
+
+
+            <a
+                href="index.html"
+                class="back-link"
+            >
+                ← Back to Food Platform
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =========================
+           SUPABASE
+        ========================= */
+
+        const SUPABASE_URL =
+            "https://ienquzigbawhvthnirtj.supabase.co";
+
+        const SUPABASE_KEY =
+            "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+
+
+        const db =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
+
+
+        /* =========================
+           ELEMENTS
+        ========================= */
+
+        const loginForm =
+            document.getElementById(
+                "loginForm"
+            );
+
+        const emailInput =
+            document.getElementById(
+                "email"
+            );
+
+        const passwordInput =
+            document.getElementById(
+                "password"
+            );
+
+        const loginButton =
+            document.getElementById(
+                "loginButton"
+            );
+
+        const messageBox =
+            document.getElementById(
+                "message"
+            );
+
+        const showPasswordButton =
+            document.getElementById(
+                "showPassword"
+            );
+
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        function showMessage(
+            text,
+            type
+        ) {
+
+            messageBox.textContent =
+                text;
+
+            messageBox.className =
+                "message " + type;
+
+        }
+
+
+        /* =========================
+           SHOW / HIDE PASSWORD
+        ========================= */
+
+        showPasswordButton.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    passwordInput.type ===
+                    "password"
+                ) {
+
+                    passwordInput.type =
+                        "text";
+
+                    showPasswordButton.textContent =
+                        "🙈";
+
+                } else {
+
+                    passwordInput.type =
+                        "password";
+
+                    showPasswordButton.textContent =
+                        "👁️";
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           LOGIN
+        ========================= */
+
+        loginForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const email =
+                    emailInput.value.trim();
+
+                const password =
+                    passwordInput.value;
+
+
+                if (
+                    !email ||
+                    !password
+                ) {
+
+                    showMessage(
+                        "Please enter your email and password.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                loginButton.disabled =
+                    true;
+
+                loginButton.textContent =
+                    "⏳ Logging in...";
+
+
+                showMessage(
+                    "Signing in...",
+                    "success"
+                );
+
+
+                try {
+
+                    const {
+                        data,
+                        error
+                    } =
+                        await db.auth.signInWithPassword({
+
+                            email:
+                                email,
+
+                            password:
+                                password
+
+                        });
+
+
+                    if (error) {
+
+                        console.error(
+                            "Login error:",
+                            error
+                        );
+
+                        showMessage(
+                            error.message,
+                            "error"
+                        );
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "🔑 Login";
+
+                        return;
+
+                    }
+
+
+                    if (
+                        !data ||
+                        !data.user
+                    ) {
+
+                        showMessage(
+                            "Login failed. Please try again.",
+                            "error"
+                        );
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "🔑 Login";
+
+                        return;
+
+                    }
+
+
+                    /* =========================
+                       CHECK VENDOR PROFILE
+                    ========================= */
+
+                    const {
+                        data: vendor,
+                        error: vendorError
+                    } =
+                        await db
+                            .from("food_vendors")
+                            .select("*")
+                            .eq(
+                                "id",
+                                data.user.id
+                            )
+                            .maybeSingle();
+
+
+                    if (vendorError) {
+
+                        console.error(
+                            "Vendor check error:",
+                            vendorError
+                        );
+
+                        await db.auth.signOut();
+
+                        showMessage(
+                            "Could not verify your vendor account.",
+                            "error"
+                        );
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "🔑 Login";
+
+                        return;
+
+                    }
+
+
+                    if (!vendor) {
+
+                        await db.auth.signOut();
+
+                        showMessage(
+                            "This account is not registered as a vendor.",
+                            "error"
+                        );
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "🔑 Login";
+
+                        return;
+
+                    }
+
+
+                    /* =========================
+                       SUCCESS
+                    ========================= */
+
+                    showMessage(
+                        "✅ Login successful. Opening dashboard...",
+                        "success"
+                    );
+
+
+                    setTimeout(
+                        function () {
+
+                            window.location.href =
+                                "vendor-dashboard.html";
+
+                        },
+                        700
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "Unexpected login error:",
+                        error
+                    );
+
+                    showMessage(
+                        "Something went wrong. Please try again.",
+                        "error"
+                    );
+
+                    loginButton.disabled =
+                        false;
+
+                    loginButton.textContent =
+                        "🔑 Login";
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

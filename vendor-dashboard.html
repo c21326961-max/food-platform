@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vendor Dashboard | Food Platform</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 235px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            padding: 20px 14px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 28px;
+            padding: 0 8px;
+        }
+
+        .nav-btn {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: #d1d5db;
+            padding: 12px 10px;
+            text-align: left;
+            border-radius: 7px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: #f97316;
+            color: white;
+        }
+
+        .main {
+            margin-left: 235px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 64px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .topbar h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .vendor-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #f97316;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 22px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            margin: 0 0 18px;
+            font-size: 22px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: white;
+            border-radius: 10px;
+            padding: 17px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .stat-value.orange {
+            color: #f97316;
+        }
+
+        .stat-value.green {
+            color: #16a34a;
+        }
+
+        .stat-value.red {
+            color: #dc2626;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .card h3 {
+            margin: 0 0 15px;
+            font-size: 17px;
+        }
+
+        .restaurant-profile {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .restaurant-logo {
+            width: 85px;
+            height: 85px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .restaurant-info h3 {
+            margin: 0 0 7px;
+            font-size: 21px;
+        }
+
+        .restaurant-info p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th,
+        td {
+            padding: 11px 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: bold;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .pending {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .confirmed {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .preparing {
+            background: #fefce8;
+            color: #a16207;
+        }
+
+        .ready {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .cancelled {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        select,
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 13px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            background: #f97316;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .success {
+            color: #15803d;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .commission-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .commission-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            padding: 16px;
+        }
+
+        .commission-item span {
+            display: block;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .commission-item strong {
+            font-size: 21px;
+        }
+
+        .commission-item.earnings strong {
+            color: #16a34a;
+        }
+
+        .commission-item.commission strong {
+            color: #dc2626;
+        }
+
+        .loading {
+            padding: 20px;
+            text-align: center;
+            color: #777;
+        }
+
+        @media (max-width: 900px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .commission-box {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 12px;
+            }
+
+            .brand {
+                margin-bottom: 10px;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 0 14px;
+            }
+
+            .content {
+                padding: 14px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 9px;
+            }
+
+            .stat {
+                padding: 13px;
+            }
+
+            .stat-value {
+                font-size: 19px;
+            }
+
+            .restaurant-profile {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">
+        Food Platform
+    </div>
+
+    <button class="nav-btn active" onclick="showSection('dashboard', this)">
+        Dashboard
+    </button>
+
+    <button class="nav-btn" onclick="showSection('orders', this)">
+        Orders
+    </button>
+
+    <button class="nav-btn" onclick="showSection('menu', this)">
+        Manage Menu
+    </button>
+
+    <button class="nav-btn" onclick="showSection('restaurant', this)">
+        Restaurant Profile
+    </button>
+
+    <button class="nav-btn" onclick="showSection('account', this)">
+        Account
+    </button>
+
+    <button class="nav-btn" onclick="logout()">
+        Logout
+    </button>
+
+</aside>
+
+
+<main class="main">
+
+    <header class="topbar">
+
+        <h2>Vendor Dashboard</h2>
+
+        <div class="vendor-user">
+
+            <div class="avatar" id="avatar">
+                V
+            </div>
+
+            <span id="vendorName">
+                Vendor
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <div class="content">
+
+        <!-- DASHBOARD -->
+
+        <section id="dashboard" class="section active">
+
+            <h1 class="section-title">
+                Dashboard
+            </h1>
+
+            <div class="stats">
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Total Orders
+                    </div>
+
+                    <div class="stat-value" id="totalOrders">
+                        0
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Pending Orders
+                    </div>
+
+                    <div class="stat-value orange" id="pendingOrders">
+                        0
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Preparing
+                    </div>
+
+                    <div class="stat-value" id="preparingOrders">
+                        0
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Ready Orders
+                    </div>
+
+                    <div class="stat-value green" id="readyOrders">
+                        0
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Sales & Commission
+                </h3>
+
+                <div class="commission-box">
+
+                    <div class="commission-item">
+
+                        <span>
+                            Total Sales
+                        </span>
+
+                        <strong id="vendorTotalSales">
+                            TSh 0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="commission-item commission">
+
+                        <span>
+                            Platform Commission
+                        </span>
+
+                        <strong id="vendorCommission">
+                            TSh 0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="commission-item earnings">
+
+                        <span>
+                            Your Earnings
+                        </span>
+
+                        <strong id="vendorEarnings">
+                            TSh 0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Restaurant
+                </h3>
+
+                <div class="restaurant-profile">
+
+                    <img
+                        id="restaurantLogo"
+                        class="restaurant-logo"
+                        src=""
+                        alt="Restaurant"
+                    >
+
+                    <div class="restaurant-info">
+
+                        <h3 id="restaurantName">
+                            Loading...
+                        </h3>
+
+                        <p id="restaurantDescription">
+                            -
+                        </p>
+
+                        <p id="restaurantPhone">
+                            -
+                        </p>
+
+                        <p id="restaurantAddress">
+                            -
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ORDERS -->
+
+        <section id="orders" class="section">
+
+            <h1 class="section-title">
+                Orders
+            </h1>
+
+            <div class="card">
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="ordersTable">
+
+                            <tr>
+                                <td colspan="5" class="loading">
+                                    Loading orders...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- MENU -->
+
+        <section id="menu" class="section">
+
+            <h1 class="section-title">
+                Manage Menu
+            </h1>
+
+            <div class="card">
+
+                <p>
+                    Manage your food items from the menu page.
+                </p>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="window.location.href='vendor-menu.html'"
+                >
+                    Open Menu Manager
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- RESTAURANT -->
+
+        <section id="restaurant" class="section">
+
+            <h1 class="section-title">
+                Restaurant Profile
+            </h1>
+
+            <div class="card">
+
+                <label>
+                    Restaurant Name
+                    <input id="editRestaurantName">
+                </label>
+
+                <label>
+                    Description
+                    <textarea id="editRestaurantDescription"></textarea>
+                </label>
+
+                <label>
+                    Phone
+                    <input id="editRestaurantPhone">
+                </label>
+
+                <label>
+                    Address
+                    <input id="editRestaurantAddress">
+                </label>
+
+                <label>
+                    Opening Time
+                    <input id="editOpening" type="time">
+                </label>
+
+                <label>
+                    Closing Time
+                    <input id="editClosing" type="time">
+                </label>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="saveRestaurant()"
+                >
+                    Save Restaurant
+                </button>
+
+                <div id="restaurantMessage" class="message"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ACCOUNT -->
+
+        <section id="account" class="section">
+
+            <h1 class="section-title">
+                Account
+            </h1>
+
+            <div class="card">
+
+                <label>
+                    Full Name
+                    <input id="accountName">
+                </label>
+
+                <label>
+                    Phone
+                    <input id="accountPhone">
+                </label>
+
+                <label>
+                    Email
+                    <input id="accountEmail" readonly>
+                </label>
+
+                <label>
+                    Business Name
+                    <input id="accountBusiness">
+                </label>
+
+                <label>
+                    Business Type
+                    <input id="accountBusinessType">
+                </label>
+
+                <label>
+                    Address
+                    <input id="accountAddress">
+                </label>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="saveAccount()"
+                >
+                    Save Changes
+                </button>
+
+                <div id="accountMessage" class="message"></div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script>
+
+let vendorUser = null;
+let vendor = null;
+let restaurant = null;
+let vendorOrders = [];
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function money(value) {
+
+    return "TSh " + Number(value || 0).toLocaleString(
+        "en-TZ",
+        {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }
+    );
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function statusClass(status) {
+
+    return String(status || "")
+        .toLowerCase()
+        .replace(/\s+/g, "");
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function showSection(sectionId, button) {
+
+    document
+        .querySelectorAll(".section")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+    document
+        .getElementById(sectionId)
+        .classList.add("active");
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+    if (button) {
+        button.classList.add("active");
+    }
+
+}
+
+
+/* =========================
+   AUTH
+========================= */
+
+async function checkVendor() {
+
+    const {
+        data: {
+            user
+        }
+    } = await db.auth.getUser();
+
+    if (!user) {
+
+        window.location.href = "vendor-login.html";
+
+        return false;
+
+    }
+
+    vendorUser = user;
+
+    return true;
+
+}
+
+
+/* =========================
+   LOAD VENDOR
+========================= */
+
+async function loadVendor() {
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_vendors")
+        .select("*")
+        .eq("id", vendorUser.id)
+        .maybeSingle();
+
+    if (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+        return false;
+
+    }
+
+    if (!data) {
+
+        alert("Vendor profile not found.");
+
+        await db.auth.signOut();
+
+        window.location.href = "vendor-login.html";
+
+        return false;
+
+    }
+
+    vendor = data;
+
+    document.getElementById("vendorName").textContent =
+        vendor.full_name ||
+        vendor.business_name ||
+        "Vendor";
+
+    document.getElementById("avatar").textContent =
+        (
+            vendor.full_name ||
+            vendor.business_name ||
+            "V"
+        ).charAt(0).toUpperCase();
+
+    return true;
+
+}
+
+
+/* =========================
+   LOAD RESTAURANT
+========================= */
+
+async function loadRestaurant() {
+
+    if (!vendor.restaurant_id) {
+
+        document.getElementById("restaurantName").textContent =
+            "No restaurant linked";
+
+        return;
+
+    }
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_restaurants")
+        .select("*")
+        .eq("id", vendor.restaurant_id)
+        .maybeSingle();
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+
+    }
+
+    restaurant = data;
+
+    if (!restaurant) {
+        return;
+    }
+
+    document.getElementById("restaurantName").textContent =
+        restaurant.name || "Restaurant";
+
+    document.getElementById("restaurantDescription").textContent =
+        restaurant.description || "No description";
+
+    document.getElementById("restaurantPhone").textContent =
+        restaurant.phone || "No phone";
+
+    document.getElementById("restaurantAddress").textContent =
+        restaurant.address || "No address";
+
+    const logo =
+        restaurant.logo_url ||
+        restaurant.image_url ||
+        "";
+
+    if (logo) {
+
+        document.getElementById("restaurantLogo").src = logo;
+
+    } else {
+
+        document.getElementById("restaurantLogo").style.display =
+            "none";
+
+    }
+
+
+    document.getElementById("editRestaurantName").value =
+        restaurant.name || "";
+
+    document.getElementById("editRestaurantDescription").value =
+        restaurant.description || "";
+
+    document.getElementById("editRestaurantPhone").value =
+        restaurant.phone || "";
+
+    document.getElementById("editRestaurantAddress").value =
+        restaurant.address || "";
+
+    document.getElementById("editOpening").value =
+        restaurant.opening_time || restaurant.opening || "";
+
+    document.getElementById("editClosing").value =
+        restaurant.closing_time || restaurant.closing || "";
+
+}
+
+
+/* =========================
+   LOAD ORDERS
+========================= */
+
+async function loadOrders() {
+
+    if (!vendor.restaurant_id) {
+
+        return;
+
+    }
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_orders")
+        .select("*")
+        .eq("restaurant_id", vendor.restaurant_id)
+        .order("created_at", {
+            ascending: false
+        });
+
+    if (error) {
+
+        console.error("Orders:", error);
+
+        document.getElementById("ordersTable").innerHTML = `
+            <tr>
+                <td colspan="5" class="loading">
+                    ${escapeHtml(error.message)}
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+    vendorOrders = data || [];
+
+    renderOrders();
+
+    updateOrderStats();
+
+}
+
+
+/* =========================
+   RENDER ORDERS
+========================= */
+
+function renderOrders() {
+
+    const tbody =
+        document.getElementById("ordersTable");
+
+    if (!vendorOrders.length) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="loading">
+                    No orders found.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+    tbody.innerHTML = vendorOrders.map(order => {
+
+        const status = order.status || "Pending";
+
+        return `
+            <tr>
+
+                <td>
+                    <strong>
+                        ${escapeHtml(order.order_number || "-")}
+                    </strong>
+                </td>
+
+                <td>
+                    ${escapeHtml(order.customer_name || "-")}
+                </td>
+
+                <td>
+                    ${money(order.total)}
+                </td>
+
+                <td>
+                    <span class="status ${statusClass(status)}">
+                        ${escapeHtml(status)}
+                    </span>
+                </td>
+
+                <td>
+
+                    <select
+                        onchange="changeOrderStatus('${order.id}', this.value)"
+                    >
+
+                        <option
+                            value="Pending"
+                            ${status === "Pending" ? "selected" : ""}
+                        >
+                            Pending
+                        </option>
+
+                        <option
+                            value="Confirmed"
+                            ${status === "Confirmed" ? "selected" : ""}
+                        >
+                            Confirmed
+                        </option>
+
+                        <option
+                            value="Preparing"
+                            ${status === "Preparing" ? "selected" : ""}
+                        >
+                            Preparing
+                        </option>
+
+                        <option
+                            value="Ready"
+                            ${status === "Ready" ? "selected" : ""}
+                        >
+                            Ready
+                        </option>
+
+                        <option
+                            value="Cancelled"
+                            ${status === "Cancelled" ? "selected" : ""}
+                        >
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+}
+
+
+/* =========================
+   ORDER STATS
+========================= */
+
+function updateOrderStats() {
+
+    const total =
+        vendorOrders.length;
+
+    const pending =
+        vendorOrders.filter(
+            order => order.status === "Pending"
+        ).length;
+
+    const preparing =
+        vendorOrders.filter(
+            order => order.status === "Preparing"
+        ).length;
+
+    const ready =
+        vendorOrders.filter(
+            order => order.status === "Ready"
+        ).length;
+
+    document.getElementById("totalOrders").textContent =
+        total;
+
+    document.getElementById("pendingOrders").textContent =
+        pending;
+
+    document.getElementById("preparingOrders").textContent =
+        preparing;
+
+    document.getElementById("readyOrders").textContent =
+        ready;
+
+}
+
+
+/* =========================
+   CHANGE ORDER STATUS
+========================= */
+
+async function changeOrderStatus(orderId, newStatus) {
+
+    const {
+        error
+    } = await db
+        .from("food_orders")
+        .update({
+            status: newStatus
+        })
+        .eq("id", orderId)
+        .eq("restaurant_id", vendor.restaurant_id);
+
+    if (error) {
+
+        alert(error.message);
+
+        await loadOrders();
+
+        return;
+
+    }
+
+    await loadOrders();
+
+    await loadCommission();
+
+}
+
+
+/* =========================
+   LOAD COMMISSION
+========================= */
+
+async function loadCommission() {
+
+    const {
+        data,
+        error
+    } = await db.rpc(
+        "get_my_vendor_commission_summary"
+    );
+
+    if (error) {
+
+        console.error(
+            "Vendor commission:",
+            error
+        );
+
+        document.getElementById(
+            "vendorTotalSales"
+        ).textContent = "TSh 0";
+
+        document.getElementById(
+            "vendorCommission"
+        ).textContent = "TSh 0";
+
+        document.getElementById(
+            "vendorEarnings"
+        ).textContent = "TSh 0";
+
+        return;
+
+    }
+
+    const row = data && data.length
+        ? data[0]
+        : null;
+
+    if (!row) {
+
+        return;
+
+    }
+
+    document.getElementById(
+        "vendorTotalSales"
+    ).textContent =
+        money(row.total_sales);
+
+    document.getElementById(
+        "vendorCommission"
+    ).textContent =
+        money(row.total_commission);
+
+    document.getElementById(
+        "vendorEarnings"
+    ).textContent =
+        money(row.vendor_earnings);
+
+}
+
+
+/* =========================
+   SAVE RESTAURANT
+========================= */
+
+async function saveRestaurant() {
+
+    if (!restaurant) {
+
+        return;
+
+    }
+
+    const message =
+        document.getElementById("restaurantMessage");
+
+    message.textContent = "Saving...";
+    message.className = "message";
+
+    const updates = {
+
+        name:
+            document.getElementById(
+                "editRestaurantName"
+            ).value.trim(),
+
+        description:
+            document.getElementById(
+                "editRestaurantDescription"
+            ).value.trim(),
+
+        phone:
+            document.getElementById(
+                "editRestaurantPhone"
+            ).value.trim(),
+
+        address:
+            document.getElementById(
+                "editRestaurantAddress"
+            ).value.trim(),
+
+        opening_time:
+            document.getElementById(
+                "editOpening"
+            ).value || null,
+
+        closing_time:
+            document.getElementById(
+                "editClosing"
+            ).value || null
+
+    };
+
+    const {
+        error
+    } = await db
+        .from("food_restaurants")
+        .update(updates)
+        .eq("id", restaurant.id);
+
+    if (error) {
+
+        message.textContent =
+            error.message;
+
+        message.className =
+            "message error";
+
+        return;
+
+    }
+
+    message.textContent =
+        "Restaurant updated successfully.";
+
+    message.className =
+        "message success";
+
+    await loadRestaurant();
+
+}
+
+
+/* =========================
+   LOAD ACCOUNT
+========================= */
+
+async function loadAccount() {
+
+    const metadata =
+        vendorUser.user_metadata || {};
+
+    document.getElementById(
+        "accountName"
+    ).value =
+        metadata.full_name ||
+        vendor.full_name ||
+        "";
+
+    document.getElementById(
+        "accountPhone"
+    ).value =
+        metadata.phone ||
+        vendor.phone ||
+        "";
+
+    document.getElementById(
+        "accountEmail"
+    ).value =
+        vendorUser.email ||
+        vendor.email ||
+        "";
+
+    document.getElementById(
+        "accountBusiness"
+    ).value =
+        vendor.business_name ||
+        "";
+
+    document.getElementById(
+        "accountBusinessType"
+    ).value =
+        vendor.business_type ||
+        "";
+
+    document.getElementById(
+        "accountAddress"
+    ).value =
+        vendor.address ||
+        "";
+
+}
+
+
+/* =========================
+   SAVE ACCOUNT
+========================= */
+
+async function saveAccount() {
+
+    const message =
+        document.getElementById("accountMessage");
+
+    message.textContent = "Saving...";
+    message.className = "message";
+
+    const fullName =
+        document.getElementById(
+            "accountName"
+        ).value.trim();
+
+    const phone =
+        document.getElementById(
+            "accountPhone"
+        ).value.trim();
+
+    const businessName =
+        document.getElementById(
+            "accountBusiness"
+        ).value.trim();
+
+    const businessType =
+        document.getElementById(
+            "accountBusinessType"
+        ).value.trim();
+
+    const address =
+        document.getElementById(
+            "accountAddress"
+        ).value.trim();
+
+
+    const {
+        error: authError
+    } = await db.auth.updateUser({
+
+        data: {
+            full_name: fullName,
+            phone: phone
+        }
+
+    });
+
+    if (authError) {
+
+        message.textContent =
+            authError.message;
+
+        message.className =
+            "message error";
+
+        return;
+
+    }
+
+
+    const {
+        error: vendorError
+    } = await db
+        .from("food_vendors")
+        .update({
+
+            full_name: fullName,
+            phone: phone,
+            business_name: businessName,
+            business_type: businessType,
+            address: address
+
+        })
+        .eq("id", vendorUser.id);
+
+
+    if (vendorError) {
+
+        message.textContent =
+            vendorError.message;
+
+        message.className =
+            "message error";
+
+        return;
+
+    }
+
+
+    vendor.full_name = fullName;
+    vendor.phone = phone;
+    vendor.business_name = businessName;
+    vendor.business_type = businessType;
+    vendor.address = address;
+
+
+    document.getElementById(
+        "vendorName"
+    ).textContent =
+        fullName ||
+        businessName ||
+        "Vendor";
+
+    document.getElementById(
+        "avatar"
+    ).textContent =
+        (
+            fullName ||
+            businessName ||
+            "V"
+        ).charAt(0).toUpperCase();
+
+
+    message.textContent =
+        "Account updated successfully.";
+
+    message.className =
+        "message success";
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout() {
+
+    await db.auth.signOut();
+
+    window.location.href =
+        "vendor-login.html";
+
+}
+
+
+/* =========================
+   REALTIME ORDERS
+========================= */
+
+function subscribeToOrders() {
+
+    if (!vendor || !vendor.restaurant_id) {
+        return;
+    }
+
+    db.channel(
+        "vendor-orders-" + vendor.restaurant_id
+    )
+    .on(
+        "postgres_changes",
+        {
+            event: "*",
+            schema: "public",
+            table: "food_orders",
+            filter:
+                "restaurant_id=eq." +
+                vendor.restaurant_id
+        },
+        async () => {
+
+            await loadOrders();
+            await loadCommission();
+
+        }
+    )
+    .subscribe();
+
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+async function init() {
+
+    const authenticated =
+        await checkVendor();
+
+    if (!authenticated) {
+        return;
+    }
+
+    const vendorLoaded =
+        await loadVendor();
+
+    if (!vendorLoaded) {
+        return;
+    }
+
+    await loadRestaurant();
+
+    await loadOrders();
+
+    await loadCommission();
+
+    await loadAccount();
+
+    subscribeToOrders();
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>

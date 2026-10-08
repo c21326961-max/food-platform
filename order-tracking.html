@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Track Order | Food Platform</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f7f7f7;
+            font-family: Arial, sans-serif;
+            color: #222;
+        }
+
+        .tracking-header {
+            background: #ff6b35;
+            color: white;
+            padding: 15px 18px;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .tracking-header h1 {
+            margin: 12px 0 0;
+            font-size: 22px;
+        }
+
+        .tracking-container {
+            max-width: 680px;
+            margin: 15px auto;
+            padding: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.07);
+        }
+
+        .order-number-box {
+            background: #fff3ed;
+            border: 1px solid #ffd8c7;
+        }
+
+        .order-number-box strong {
+            color: #ff6b35;
+        }
+
+        .current-status {
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 40px;
+        }
+
+        .status-title {
+            font-size: 23px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-top: 6px;
+        }
+
+        .status-description {
+            color: #666;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .timeline-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 18px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            background: #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            font-size: 17px;
+        }
+
+        .timeline-item.completed .timeline-icon {
+            background: #22c55e;
+            color: white;
+        }
+
+        .timeline-item.active .timeline-icon {
+            background: #ff6b35;
+            color: white;
+            box-shadow: 0 0 0 4px #ffe1d5;
+        }
+
+        .timeline-item.cancelled .timeline-icon {
+            background: #dc2626;
+            color: white;
+            box-shadow: 0 0 0 4px #fee2e2;
+        }
+
+        .timeline-content h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .timeline-content p {
+            margin: 4px 0 0;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 18px;
+            top: 38px;
+            bottom: 0;
+            width: 2px;
+            background: #e5e5e5;
+            z-index: 1;
+        }
+
+        .timeline-item.completed .timeline-line {
+            background: #22c55e;
+        }
+
+        .info-title {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 9px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+        }
+
+        .info-value {
+            text-align: right;
+            color: #555;
+        }
+
+        .total-box {
+            background: #fff3ed;
+            padding: 13px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-top: 12px;
+        }
+
+        .refresh-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #ff6b35;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .refresh-btn:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+        .cancelled-box {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .success-message {
+            background: #ecfdf5;
+            color: #166534;
+            padding: 10px;
+            border-radius: 9px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 13px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+
+            .tracking-container {
+                padding: 8px;
+                margin-top: 10px;
+            }
+
+            .tracking-header {
+                padding: 13px 15px;
+            }
+
+            .tracking-header h1 {
+                font-size: 20px;
+            }
+
+            .card {
+                padding: 14px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .info-value {
+                text-align: left;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<header class="tracking-header">
+
+    <a href="order-confirmation.html" class="back-link">
+        ← Back
+    </a>
+
+    <h1>Track Your Order</h1>
+
+</header>
+
+
+<main class="tracking-container">
+
+    <div id="loadingBox" class="loading">
+        Loading order...
+    </div>
+
+
+    <div id="errorBox"
+         class="error-box"
+         style="display:none;">
+    </div>
+
+
+    <div id="successMessage"
+         class="success-message">
+    </div>
+
+
+    <div id="orderContent"
+         style="display:none;">
+
+        <!-- ORDER NUMBER -->
+
+        <div class="card order-number-box">
+
+            Order Number:
+
+            <strong id="orderNumber">
+                -
+            </strong>
+
+        </div>
+
+
+        <!-- CURRENT STATUS -->
+
+        <div class="card current-status">
+
+            <div class="status-icon"
+                 id="statusIcon">
+                ⏳
+            </div>
+
+            <div class="status-title"
+                 id="statusTitle">
+                Pending
+            </div>
+
+            <div class="status-description"
+                 id="statusDescription">
+                Your order is waiting for confirmation.
+            </div>
+
+            <div id="cancelledMessage"></div>
+
+        </div>
+
+
+        <!-- TIMELINE -->
+
+        <div class="card">
+
+            <div class="timeline-title">
+                Order Progress
+            </div>
+
+            <div id="timelineContainer"></div>
+
+        </div>
+
+
+        <!-- CUSTOMER -->
+
+        <div class="card">
+
+            <h2 class="info-title">
+                Customer Information
+            </h2>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Name
+                </span>
+
+                <span class="info-value"
+                      id="customerName">
+                    -
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Phone
+                </span>
+
+                <span class="info-value"
+                      id="customerPhone">
+                    -
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Delivery
+                </span>
+
+                <span class="info-value"
+                      id="deliveryType">
+                    -
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Location
+                </span>
+
+                <span class="info-value"
+                      id="deliveryLocation">
+                    -
+                </span>
+
+            </div>
+
+
+            <div class="total-box">
+
+                Total:
+
+                TSh
+
+                <span id="orderTotal">
+                    0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- REFRESH -->
+
+        <button id="refreshButton"
+                class="refresh-btn">
+
+            Refresh Order
+
+        </button>
+
+    </div>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+    /* =========================
+       SUPABASE
+    ========================= */
+
+    const SUPABASE_URL =
+        "https://ienquzigbawhvthnirtj.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+
+    const db =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+    /* =========================
+       ORDER PROGRESS
+    ========================= */
+
+    const progressStatuses = [
+
+        {
+            name: "Pending",
+            icon: "⏳",
+            description:
+                "Your order is waiting for restaurant confirmation."
+        },
+
+        {
+            name: "Confirmed",
+            icon: "✓",
+            description:
+                "The restaurant has confirmed your order."
+        },
+
+        {
+            name: "Preparing",
+            icon: "P",
+            description:
+                "Your food is being prepared."
+        },
+
+        {
+            name: "Ready",
+            icon: "R",
+            description:
+                "Your food is ready for pickup or collection."
+        }
+
+    ];
+
+
+    /* =========================
+       VARIABLES
+    ========================= */
+
+    let currentOrderStatus = null;
+
+    let isLoading = false;
+
+
+    /* =========================
+       MONEY
+    ========================= */
+
+    function formatMoney(value) {
+
+        return Number(value || 0)
+            .toLocaleString("en-US");
+
+    }
+
+
+    /* =========================
+       GET ORDER IDENTIFIER
+    ========================= */
+
+    function getOrderIdentifier() {
+
+        const orderId =
+            localStorage.getItem("lastOrderId");
+
+        const orderNumber =
+            localStorage.getItem("lastOrderNumber");
+
+
+        return {
+            orderId,
+            orderNumber
+        };
+
+    }
+
+
+    /* =========================
+       DISPLAY STATUS
+    ========================= */
+
+    function displayStatus(status) {
+
+        const normalizedStatus =
+            String(status || "Pending")
+                .trim()
+                .toLowerCase();
+
+
+        let statusInfo =
+            progressStatuses.find(function(item) {
+
+                return item.name.toLowerCase() ===
+                       normalizedStatus;
+
+            });
+
+
+        /* =========================
+           CANCELLED
+        ========================= */
+
+        if (normalizedStatus === "cancelled") {
+
+            document.getElementById(
+                "statusIcon"
+            ).textContent = "X";
+
+
+            document.getElementById(
+                "statusTitle"
+            ).textContent = "Cancelled";
+
+
+            document.getElementById(
+                "statusDescription"
+            ).textContent =
+                "This order has been cancelled by the restaurant.";
+
+
+            const cancelledMessage =
+                document.getElementById(
+                    "cancelledMessage"
+                );
+
+
+            cancelledMessage.innerHTML = "";
+
+
+            const box =
+                document.createElement("div");
+
+
+            box.className =
+                "cancelled-box";
+
+
+            box.textContent =
+                "This order has been cancelled by the restaurant.";
+
+
+            cancelledMessage.appendChild(box);
+
+
+            renderTimeline(-1);
+
+            return;
+
+        }
+
+
+        /* =========================
+           UNKNOWN STATUS
+        ========================= */
+
+        if (!statusInfo) {
+
+            statusInfo =
+                progressStatuses[0];
+
+        }
+
+
+        document.getElementById(
+            "statusIcon"
+        ).textContent =
+            statusInfo.icon;
+
+
+        document.getElementById(
+            "statusTitle"
+        ).textContent =
+            statusInfo.name;
+
+
+        document.getElementById(
+            "statusDescription"
+        ).textContent =
+            statusInfo.description;
+
+
+        document.getElementById(
+            "cancelledMessage"
+        ).innerHTML = "";
+
+
+        const currentIndex =
+            progressStatuses.findIndex(
+                function(item) {
+
+                    return item.name.toLowerCase() ===
+                           statusInfo.name.toLowerCase();
+
+                }
+            );
+
+
+        renderTimeline(currentIndex);
+
+    }
+
+
+    /* =========================
+       TIMELINE
+    ========================= */
+
+    function renderTimeline(currentIndex) {
+
+        const container =
+            document.getElementById(
+                "timelineContainer"
+            );
+
+
+        container.innerHTML = "";
+
+
+        progressStatuses.forEach(
+            function(status, index) {
+
+                const item =
+                    document.createElement("div");
+
+
+                item.className =
+                    "timeline-item";
+
+
+                if (currentIndex === -1) {
+
+                    item.classList.add(
+                        "cancelled"
+                    );
+
+                } else {
+
+                    if (index < currentIndex) {
+
+                        item.classList.add(
+                            "completed"
+                        );
+
+                    }
+
+
+                    if (index === currentIndex) {
+
+                        item.classList.add(
+                            "active"
+                        );
+
+                    }
+
+                }
+
+
+                const icon =
+                    document.createElement("div");
+
+
+                icon.className =
+                    "timeline-icon";
+
+
+                icon.textContent =
+                    status.icon;
+
+
+                const content =
+                    document.createElement("div");
+
+
+                content.className =
+                    "timeline-content";
+
+
+                const title =
+                    document.createElement("h3");
+
+
+                title.textContent =
+                    status.name;
+
+
+                const description =
+                    document.createElement("p");
+
+
+                description.textContent =
+                    status.description;
+
+
+                content.appendChild(title);
+
+                content.appendChild(description);
+
+
+                item.appendChild(icon);
+
+                item.appendChild(content);
+
+
+                if (
+                    index <
+                    progressStatuses.length - 1
+                ) {
+
+                    const line =
+                        document.createElement("div");
+
+
+                    line.className =
+                        "timeline-line";
+
+
+                    item.appendChild(line);
+
+                }
+
+
+                container.appendChild(item);
+
+            }
+        );
+
+
+        /* =========================
+           CANCELLED ITEM
+        ========================= */
+
+        if (currentIndex === -1) {
+
+            const item =
+                document.createElement("div");
+
+
+            item.className =
+                "timeline-item cancelled";
+
+
+            const icon =
+                document.createElement("div");
+
+
+            icon.className =
+                "timeline-icon";
+
+
+            icon.textContent =
+                "X";
+
+
+            const content =
+                document.createElement("div");
+
+
+            content.className =
+                "timeline-content";
+
+
+            const title =
+                document.createElement("h3");
+
+
+            title.textContent =
+                "Cancelled";
+
+
+            const description =
+                document.createElement("p");
+
+
+            description.textContent =
+                "This order was cancelled by the restaurant.";
+
+
+            content.appendChild(title);
+
+            content.appendChild(description);
+
+
+            item.appendChild(icon);
+
+            item.appendChild(content);
+
+
+            container.appendChild(item);
+
+        }
+
+    }
+
+
+    /* =========================
+       DISPLAY ORDER
+    ========================= */
+
+    function displayOrder(order) {
+
+        document.getElementById(
+            "orderNumber"
+        ).textContent =
+            order.order_number || "-";
+
+
+        document.getElementById(
+            "customerName"
+        ).textContent =
+            order.customer_name || "-";
+
+
+        document.getElementById(
+            "customerPhone"
+        ).textContent =
+            order.customer_phone || "-";
+
+
+        document.getElementById(
+            "deliveryLocation"
+        ).textContent =
+            order.delivery_location || "-";
+
+
+        document.getElementById(
+            "deliveryType"
+        ).textContent =
+            order.delivery_type === "pickup"
+                ? "Pickup"
+                : "Delivery";
+
+
+        document.getElementById(
+            "orderTotal"
+        ).textContent =
+            formatMoney(order.total);
+
+
+        const newStatus =
+            String(
+                order.status || "Pending"
+            ).trim();
+
+
+        /* =========================
+           DETECT STATUS CHANGE
+        ========================= */
+
+        if (
+            currentOrderStatus !== null &&
+            currentOrderStatus.toLowerCase() !==
+            newStatus.toLowerCase()
+        ) {
+
+            showMessage(
+                "Order status updated to " +
+                newStatus
+            );
+
+        }
+
+
+        currentOrderStatus =
+            newStatus;
+
+
+        displayStatus(newStatus);
+
+    }
+
+
+    /* =========================
+       SUCCESS MESSAGE
+    ========================= */
+
+    function showMessage(message) {
+
+        const box =
+            document.getElementById(
+                "successMessage"
+            );
+
+
+        box.textContent =
+            message;
+
+
+        box.style.display =
+            "block";
+
+
+        setTimeout(function() {
+
+            box.style.display =
+                "none";
+
+        }, 3000);
+
+    }
+
+
+    /* =========================
+       LOAD ORDER
+    ========================= */
+
+    async function loadOrder() {
+
+        if (isLoading) {
+
+            return;
+
+        }
+
+
+        isLoading = true;
+
+
+        const refreshButton =
+            document.getElementById(
+                "refreshButton"
+            );
+
+
+        const loadingBox =
+            document.getElementById(
+                "loadingBox"
+            );
+
+
+        const orderContent =
+            document.getElementById(
+                "orderContent"
+            );
+
+
+        const errorBox =
+            document.getElementById(
+                "errorBox"
+            );
+
+
+        try {
+
+            refreshButton.disabled =
+                true;
+
+
+            refreshButton.textContent =
+                "Loading...";
+
+
+            errorBox.style.display =
+                "none";
+
+
+            const {
+                orderId,
+                orderNumber
+            } =
+                getOrderIdentifier();
+
+
+            if (!orderId && !orderNumber) {
+
+                throw new Error(
+                    "No order found. Please place an order first."
+                );
+
+            }
+
+
+            let query =
+                db
+                    .from("food_orders")
+                    .select("*");
+
+
+            /*
+             * FIRST TRY ORDER ID
+             */
+
+            if (orderId) {
+
+                query =
+                    query.eq(
+                        "id",
+                        orderId
+                    );
+
+            } else {
+
+                query =
+                    query.eq(
+                        "order_number",
+                        orderNumber
+                    );
+
+            }
+
+
+            const {
+                data,
+                error
+            } =
+                await query.maybeSingle();
+
+
+            if (error) {
+
+                throw error;
+
+            }
+
+
+            if (!data) {
+
+                throw new Error(
+                    "Order not found."
+                );
+
+            }
+
+
+            /*
+             * IMPORTANT:
+             * data.status comes directly
+             * from food_orders.
+             */
+
+            displayOrder(data);
+
+
+            loadingBox.style.display =
+                "none";
+
+
+            orderContent.style.display =
+                "block";
+
+
+        } catch (error) {
+
+            console.error(
+                "Order tracking error:",
+                error
+            );
+
+
+            loadingBox.style.display =
+                "none";
+
+
+            orderContent.style.display =
+                "none";
+
+
+            errorBox.style.display =
+                "block";
+
+
+            errorBox.textContent =
+                error.message ||
+                "Unable to load order.";
+
+        } finally {
+
+            isLoading =
+                false;
+
+
+            refreshButton.disabled =
+                false;
+
+
+            refreshButton.textContent =
+                "Refresh Order";
+
+        }
+
+    }
+
+
+    /* =========================
+       REFRESH BUTTON
+    ========================= */
+
+    document
+        .getElementById(
+            "refreshButton"
+        )
+        .addEventListener(
+            "click",
+            loadOrder
+        );
+
+
+    /* =========================
+       START
+    ========================= */
+
+    loadOrder();
+
+</script>
+
+</body>
+</html>

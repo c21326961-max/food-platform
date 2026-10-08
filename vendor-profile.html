@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vendor Setup | Food Platform</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        .header {
+            background: #ff6b35;
+            color: white;
+            padding: 18px 20px;
+        }
+
+        .header h1 {
+            font-size: 21px;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: .9;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,.06);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .card-description {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            padding: 11px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input {
+            height: 44px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #ff6b35;
+        }
+
+        input[readonly] {
+            background: #f3f3f3;
+            color: #777;
+        }
+
+        .image-box {
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .preview {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 7px;
+            background: #eee;
+            margin-bottom: 10px;
+        }
+
+        .logo-preview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            background: #eee;
+            margin-bottom: 10px;
+        }
+
+        .file-input {
+            border: none;
+            padding: 0;
+            height: auto;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #ffe5e5;
+            color: #b00020;
+        }
+
+        .success {
+            background: #e7f7ed;
+            color: #187a3d;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background: #ff6b35;
+            color: white;
+            flex: 1;
+        }
+
+        .logout-btn {
+            background: #eee;
+            color: #333;
+        }
+
+        button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .required {
+            color: #d00;
+        }
+
+        @media (max-width: 650px) {
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <h1>Complete Your Vendor Profile</h1>
+
+    <p>
+        Enter your personal and restaurant information before accessing your dashboard.
+    </p>
+
+</header>
+
+
+<div class="container">
+
+    <div id="message" class="message"></div>
+
+
+    <!-- VENDOR INFORMATION -->
+
+    <div class="card">
+
+        <h2>Vendor Information</h2>
+
+        <p class="card-description">
+            Your personal information
+        </p>
+
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>
+                    Full Name <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="fullName"
+                    placeholder="Your full name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Phone Number <span class="required">*</span>
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="Your phone number"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field full">
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    readonly
+                >
+
+            </div>
+
+
+            <div class="field full">
+
+                <label>Business Address</label>
+
+                <textarea
+                    id="vendorAddress"
+                    placeholder="Enter your business/home address"
+                ></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BUSINESS INFORMATION -->
+
+    <div class="card">
+
+        <h2>Restaurant Information</h2>
+
+        <p class="card-description">
+            Information customers will see when they find your restaurant.
+        </p>
+
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>
+                    Restaurant Name <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="restaurantName"
+                    placeholder="Example: Mama John's Food"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Restaurant Phone
+                </label>
+
+                <input
+                    type="tel"
+                    id="restaurantPhone"
+                    placeholder="Restaurant phone"
+                >
+
+            </div>
+
+
+            <div class="field full">
+
+                <label>Restaurant Description</label>
+
+                <textarea
+                    id="restaurantDescription"
+                    placeholder="Tell customers about your restaurant..."
+                ></textarea>
+
+            </div>
+
+
+            <div class="field full">
+
+                <label>
+                    Restaurant Address <span class="required">*</span>
+                </label>
+
+                <textarea
+                    id="restaurantAddress"
+                    placeholder="Example: Keko, Dar es Salaam"
+                    required
+                ></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESTAURANT IMAGES -->
+
+    <div class="card">
+
+        <h2>Restaurant Images</h2>
+
+        <p class="card-description">
+            Add a cover image and restaurant logo.
+        </p>
+
+
+        <div class="grid">
+
+            <div class="field">
+
+                <label>Restaurant Cover Image</label>
+
+                <div class="image-box">
+
+                    <img
+                        id="coverPreview"
+                        class="preview"
+                        src="https://via.placeholder.com/600x300?text=Restaurant+Cover"
+                    >
+
+                    <input
+                        type="file"
+                        id="coverImage"
+                        class="file-input"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>Restaurant Logo</label>
+
+                <div class="image-box">
+
+                    <img
+                        id="logoPreview"
+                        class="logo-preview"
+                        src="https://via.placeholder.com/200?text=Logo"
+                    >
+
+                    <input
+                        type="file"
+                        id="logoImage"
+                        class="file-input"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="actions">
+
+            <button
+                class="logout-btn"
+                id="logoutBtn"
+                type="button"
+            >
+                Logout
+            </button>
+
+            <button
+                class="save-btn"
+                id="completeBtn"
+                type="button"
+            >
+                Complete Setup
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+    "https://ienquzigbawhvthnirtj.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+
+const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+let currentUser = null;
+let currentVendor = null;
+let currentRestaurant = null;
+
+
+const message = document.getElementById("message");
+const completeBtn = document.getElementById("completeBtn");
+
+
+function showMessage(text, type = "error") {
+
+    message.textContent = text;
+
+    message.className =
+        "message " + type;
+
+    message.style.display = "block";
+
+}
+
+
+function hideMessage() {
+
+    message.style.display = "none";
+
+}
+
+
+function getExtension(file) {
+
+    const type = file.type;
+
+    if (type === "image/png") return "png";
+
+    if (type === "image/webp") return "webp";
+
+    if (type === "image/gif") return "gif";
+
+    return "jpg";
+
+}
+
+
+async function uploadImage(file, folder) {
+
+    if (!file) {
+        return null;
+    }
+
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif"
+    ];
+
+
+    if (!allowedTypes.includes(file.type)) {
+
+        throw new Error(
+            "Only JPG, PNG, WEBP and GIF images are allowed."
+        );
+
+    }
+
+
+    if (file.size > 5 * 1024 * 1024) {
+
+        throw new Error(
+            "Image size must be 5MB or less."
+        );
+
+    }
+
+
+    const extension = getExtension(file);
+
+
+    const randomPart =
+        typeof crypto !== "undefined" &&
+        crypto.randomUUID
+            ? crypto.randomUUID()
+            : Date.now().toString();
+
+
+    const path =
+        folder +
+        "/" +
+        currentUser.id +
+        "-" +
+        randomPart +
+        "." +
+        extension;
+
+
+    const {
+        error
+    } = await db
+        .storage
+        .from("food-images")
+        .upload(
+            path,
+            file,
+            {
+                contentType: file.type,
+                upsert: false
+            }
+        );
+
+
+    if (error) {
+
+        throw new Error(
+            "Image upload failed: " +
+            error.message
+        );
+
+    }
+
+
+    const {
+        data
+    } = db
+        .storage
+        .from("food-images")
+        .getPublicUrl(path);
+
+
+    return data.publicUrl;
+
+}
+
+
+/*
+ * LOAD CURRENT USER
+ */
+
+async function loadProfile() {
+
+    hideMessage();
+
+
+    const {
+        data,
+        error
+    } = await db.auth.getUser();
+
+
+    if (error || !data.user) {
+
+        window.location.href = "vendor-login.html";
+
+        return;
+
+    }
+
+
+    currentUser = data.user;
+
+
+    /*
+     * Load vendor record
+     */
+
+    const {
+        data: vendor,
+        error: vendorError
+    } = await db
+        .from("food_vendors")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+
+    if (vendorError) {
+
+        console.error(vendorError);
+
+        showMessage(
+            "Unable to load vendor information: " +
+            vendorError.message
+        );
+
+        return;
+
+    }
+
+
+    currentVendor = vendor;
+
+
+    /*
+     * Fill vendor information
+     */
+
+    document.getElementById("fullName").value =
+        vendor?.full_name ||
+        currentUser.user_metadata?.full_name ||
+        "";
+
+    document.getElementById("phone").value =
+        vendor?.phone ||
+        currentUser.user_metadata?.phone ||
+        "";
+
+    document.getElementById("email").value =
+        currentUser.email || "";
+
+    document.getElementById("vendorAddress").value =
+        vendor?.address || "";
+
+
+    /*
+     * If vendor already has restaurant,
+     * load it for editing.
+     */
+
+    if (vendor?.restaurant_id) {
+
+        const {
+            data: restaurant,
+            error: restaurantError
+        } = await db
+            .from("food_restaurants")
+            .select("*")
+            .eq("id", vendor.restaurant_id)
+            .maybeSingle();
+
+
+        if (!restaurantError && restaurant) {
+
+            currentRestaurant = restaurant;
+
+            fillRestaurant(restaurant);
+
+        }
+
+    }
+
+}
+
+
+/*
+ * Fill restaurant form
+ */
+
+function fillRestaurant(restaurant) {
+
+    document.getElementById("restaurantName").value =
+        restaurant.name || "";
+
+    document.getElementById("restaurantPhone").value =
+        restaurant.phone || "";
+
+    document.getElementById("restaurantDescription").value =
+        restaurant.description || "";
+
+    document.getElementById("restaurantAddress").value =
+        restaurant.address || "";
+
+
+    if (restaurant.image_url) {
+
+        document.getElementById("coverPreview").src =
+            restaurant.image_url;
+
+    }
+
+
+    if (restaurant.logo_url) {
+
+        document.getElementById("logoPreview").src =
+            restaurant.logo_url;
+
+    }
+
+}
+
+
+/*
+ * Image previews
+ */
+
+document
+    .getElementById("coverImage")
+    .addEventListener("change", function() {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+        document.getElementById("coverPreview").src =
+            URL.createObjectURL(file);
+
+    });
+
+
+document
+    .getElementById("logoImage")
+    .addEventListener("change", function() {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+        document.getElementById("logoPreview").src =
+            URL.createObjectURL(file);
+
+    });
+
+
+/*
+ * COMPLETE SETUP
+ */
+
+completeBtn.addEventListener("click", async function() {
+
+    hideMessage();
+
+
+    const fullName =
+        document.getElementById("fullName")
+        .value
+        .trim();
+
+    const phone =
+        document.getElementById("phone")
+        .value
+        .trim();
+
+    const vendorAddress =
+        document.getElementById("vendorAddress")
+        .value
+        .trim();
+
+    const restaurantName =
+        document.getElementById("restaurantName")
+        .value
+        .trim();
+
+    const restaurantPhone =
+        document.getElementById("restaurantPhone")
+        .value
+        .trim();
+
+    const restaurantDescription =
+        document.getElementById("restaurantDescription")
+        .value
+        .trim();
+
+    const restaurantAddress =
+        document.getElementById("restaurantAddress")
+        .value
+        .trim();
+
+    const coverFile =
+        document.getElementById("coverImage").files[0];
+
+    const logoFile =
+        document.getElementById("logoImage").files[0];
+
+
+    if (!fullName) {
+
+        showMessage("Please enter your full name.");
+
+        return;
+
+    }
+
+
+    if (!phone) {
+
+        showMessage("Please enter your phone number.");
+
+        return;
+
+    }
+
+
+    if (!restaurantName) {
+
+        showMessage("Please enter restaurant name.");
+
+        return;
+
+    }
+
+
+    if (!restaurantAddress) {
+
+        showMessage("Please enter restaurant address.");
+
+        return;
+
+    }
+
+
+    completeBtn.disabled = true;
+
+    completeBtn.textContent =
+        "Saving Information...";
+
+
+    try {
+
+        /*
+         * Upload cover image
+         */
+
+        let coverUrl =
+            currentRestaurant?.image_url || null;
+
+
+        if (coverFile) {
+
+            coverUrl = await uploadImage(
+                coverFile,
+                "restaurant-covers"
+            );
+
+        }
+
+
+        /*
+         * Upload logo
+         */
+
+        let logoUrl =
+            currentRestaurant?.logo_url || null;
+
+
+        if (logoFile) {
+
+            logoUrl = await uploadImage(
+                logoFile,
+                "restaurant-logos"
+            );
+
+        }
+
+
+        /*
+         * Create or update restaurant
+         */
+
+        let restaurantId =
+            currentRestaurant?.id || null;
+
+
+        if (restaurantId) {
+
+            const updateData = {
+
+                name: restaurantName,
+
+                phone: restaurantPhone,
+
+                description: restaurantDescription,
+
+                address: restaurantAddress,
+
+                image_url: coverUrl
+
+            };
+
+
+            /*
+             * logo_url may or may not exist.
+             */
+
+            if (logoUrl) {
+
+                updateData.logo_url = logoUrl;
+
+            }
+
+
+            let {
+                error: updateError
+            } = await db
+                .from("food_restaurants")
+                .update(updateData)
+                .eq("id", restaurantId);
+
+
+            /*
+             * If logo_url does not exist,
+             * retry without it.
+             */
+
+            if (
+                updateError &&
+                updateError.message
+                    .toLowerCase()
+                    .includes("logo_url")
+            ) {
+
+                delete updateData.logo_url;
+
+
+                const retry =
+                    await db
+                        .from("food_restaurants")
+                        .update(updateData)
+                        .eq("id", restaurantId);
+
+
+                updateError = retry.error;
+
+            }
+
+
+            if (updateError) {
+
+                throw updateError;
+
+            }
+
+        } else {
+
+            const insertData = {
+
+                name: restaurantName,
+
+                phone: restaurantPhone,
+
+                description: restaurantDescription,
+
+                address: restaurantAddress,
+
+                image_url: coverUrl,
+
+                is_open: true,
+
+                delivery_available: true,
+
+                rating: 0
+
+            };
+
+
+            if (logoUrl) {
+
+                insertData.logo_url = logoUrl;
+
+            }
+
+
+            let {
+                data: newRestaurant,
+                error: insertError
+            } = await db
+                .from("food_restaurants")
+                .insert(insertData)
+                .select()
+                .single();
+
+
+            /*
+             * Retry without logo_url
+             * if that column does not exist.
+             */
+
+            if (
+                insertError &&
+                insertError.message
+                    .toLowerCase()
+                    .includes("logo_url")
+            ) {
+
+                delete insertData.logo_url;
+
+
+                const retry =
+                    await db
+                        .from("food_restaurants")
+                        .insert(insertData)
+                        .select()
+                        .single();
+
+
+                newRestaurant = retry.data;
+                insertError = retry.error;
+
+            }
+
+
+            if (insertError) {
+
+                throw insertError;
+
+            }
+
+
+            currentRestaurant =
+                newRestaurant;
+
+            restaurantId =
+                newRestaurant.id;
+
+        }
+
+
+        /*
+         * Update vendor information
+         */
+
+        const {
+            error: vendorUpdateError
+        } = await db
+            .from("food_vendors")
+            .update({
+
+                full_name: fullName,
+
+                phone: phone,
+
+                address: vendorAddress,
+
+                business_name: restaurantName,
+
+                business_type: "Restaurant",
+
+                restaurant_id: restaurantId
+
+            })
+            .eq("id", currentUser.id);
+
+
+        if (vendorUpdateError) {
+
+            throw vendorUpdateError;
+
+        }
+
+
+        /*
+         * Update Auth metadata
+         */
+
+        const {
+            error: authError
+        } = await db.auth.updateUser({
+
+            data: {
+
+                full_name: fullName,
+
+                phone: phone,
+
+                business_name: restaurantName
+
+            }
+
+        });
+
+
+        if (authError) {
+
+            console.warn(
+                "Auth metadata update warning:",
+                authError
+            );
+
+        }
+
+
+        showMessage(
+            "Your vendor profile has been completed successfully.",
+            "success"
+        );
+
+
+        setTimeout(() => {
+
+            window.location.href =
+                "vendor-dashboard.html";
+
+        }, 900);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        let errorMessage =
+            error.message ||
+            "Unable to save vendor profile.";
+
+
+        if (
+            errorMessage
+                .toLowerCase()
+                .includes("permission denied")
+        ) {
+
+            errorMessage =
+                "Database permission denied. Please check your Supabase permissions.";
+
+        }
+
+
+        showMessage(errorMessage);
+
+
+        completeBtn.disabled = false;
+
+        completeBtn.textContent =
+            "Complete Setup";
+
+    }
+
+});
+
+
+/*
+ * LOGOUT
+ */
+
+document
+    .getElementById("logoutBtn")
+    .addEventListener("click", async function() {
+
+        await db.auth.signOut();
+
+        window.location.href =
+            "vendor-login.html";
+
+    });
+
+
+/*
+ * Start
+ */
+
+loadProfile();
+
+</script>
+
+</body>
+</html>

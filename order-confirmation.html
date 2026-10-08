@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Order Confirmation | Food Platform</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+    <style>
+
+        .status-box {
+            margin-top: 15px;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .status-message {
+            margin-top: 12px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .status-updated {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #16a34a;
+            font-weight: bold;
+            display: none;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-confirmed {
+            background: #ecfdf5;
+            color: #166534;
+        }
+
+        .status-preparing {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .status-ready {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<header>
+
+    <div class="header-content">
+
+        <div class="logo">
+            🍽️ Food Platform
+        </div>
+
+        <div class="location">
+            Order Received
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+
+    <!-- SUCCESS -->
+
+    <div style="
+        background:white;
+        padding:30px 20px;
+        border-radius:20px;
+        text-align:center;
+        box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    ">
+
+        <div style="
+            font-size:70px;
+        ">
+            ✅
+        </div>
+
+
+        <h1 style="
+            margin-top:10px;
+        ">
+            Order Received!
+        </h1>
+
+
+        <p style="
+            margin-top:10px;
+            color:#666;
+        ">
+            Thank you! Your order has been received
+            and is waiting for confirmation.
+        </p>
+
+
+        <div style="
+            margin-top:20px;
+            background:#fff7ed;
+            padding:15px;
+            border-radius:12px;
+        ">
+
+            <div style="
+                color:#777;
+                font-size:14px;
+            ">
+                Order Number
+            </div>
+
+
+            <strong
+                id="orderNumber"
+                style="
+                display:block;
+                margin-top:5px;
+                font-size:22px;
+                color:#ff6b35;
+                ">
+
+                Loading...
+
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CUSTOMER INFORMATION -->
+
+    <section style="
+        margin-top:20px;
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    ">
+
+        <h2>
+            👤 Customer Information
+        </h2>
+
+
+        <div style="margin-top:15px;">
+
+            <strong>Name</strong>
+
+            <p
+                id="customerName"
+                style="
+                margin-top:5px;
+                color:#666;
+                ">
+            </p>
+
+        </div>
+
+
+        <div style="margin-top:15px;">
+
+            <strong>Phone</strong>
+
+            <p
+                id="customerPhone"
+                style="
+                margin-top:5px;
+                color:#666;
+                ">
+            </p>
+
+        </div>
+
+
+        <div style="margin-top:15px;">
+
+            <strong>Location</strong>
+
+            <p
+                id="customerLocation"
+                style="
+                margin-top:5px;
+                color:#666;
+                ">
+            </p>
+
+        </div>
+
+
+        <div style="margin-top:15px;">
+
+            <strong>Delivery Type</strong>
+
+            <p
+                id="deliveryType"
+                style="
+                margin-top:5px;
+                color:#666;
+                ">
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ORDER ITEMS -->
+
+    <section style="
+        margin-top:20px;
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    ">
+
+        <h2>
+            🍴 Ordered Food
+        </h2>
+
+
+        <div
+            id="orderItems"
+            style="
+            margin-top:15px;
+            ">
+        </div>
+
+    </section>
+
+
+
+    <!-- ORDER SUMMARY -->
+
+    <section style="
+        margin-top:20px;
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    ">
+
+        <h2>
+            🛒 Order Summary
+        </h2>
+
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-top:15px;
+        ">
+
+            <span>
+                Subtotal
+            </span>
+
+            <strong id="subtotal">
+                TSh 0
+            </strong>
+
+        </div>
+
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-top:10px;
+        ">
+
+            <span>
+                Delivery Fee
+            </span>
+
+            <strong id="deliveryFee">
+                TSh 0
+            </strong>
+
+        </div>
+
+
+        <hr style="
+            margin:18px 0;
+            border:none;
+            border-top:1px solid #ddd;
+        ">
+
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-top:15px;
+            font-size:21px;
+        ">
+
+            <strong>
+                Total
+            </strong>
+
+            <strong id="total">
+                TSh 0
+            </strong>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ORDER STATUS -->
+
+    <section style="
+        margin-top:20px;
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        text-align:center;
+        box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    ">
+
+        <h2>
+            📦 Order Status
+        </h2>
+
+
+        <div
+            id="orderStatus"
+            class="status-box">
+
+            Pending
+
+        </div>
+
+
+        <p
+            id="statusMessage"
+            class="status-message">
+
+            Your order is waiting for restaurant confirmation.
+
+        </p>
+
+
+        <div
+            id="statusUpdated"
+            class="status-updated">
+
+            Order status updated.
+
+        </div>
+
+    </section>
+
+
+
+    <!-- BACK TO HOME -->
+
+    <button
+        onclick="window.location.href='index.html'"
+        style="
+        margin-top:25px;
+        width:100%;
+        padding:16px;
+        border:none;
+        border-radius:12px;
+        background:#ff6b35;
+        color:white;
+        font-size:17px;
+        font-weight:bold;
+        cursor:pointer;
+        ">
+
+        🏠 Back to Home
+
+    </button>
+
+
+
+    <!-- TRACK ORDER -->
+
+    <button
+        onclick="trackOrder()"
+        style="
+        margin-top:12px;
+        width:100%;
+        padding:16px;
+        border:2px solid #ff6b35;
+        border-radius:12px;
+        background:white;
+        color:#ff6b35;
+        font-size:17px;
+        font-weight:bold;
+        cursor:pointer;
+        ">
+
+        📦 Track Order
+
+    </button>
+
+
+</main>
+
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+/* ========================================
+   SUPABASE
+======================================== */
+
+const SUPABASE_URL =
+    "https://ienquzigbawhvthnirtj.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+
+
+const db =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+
+/* ========================================
+   LAST ORDER
+======================================== */
+
+const lastOrder =
+    JSON.parse(
+        localStorage.getItem("lastOrder")
+    );
+
+
+let currentStatus = null;
+
+
+
+/* ========================================
+   FORMAT PRICE
+======================================== */
+
+function formatPrice(price) {
+
+    return Number(price || 0)
+        .toLocaleString("en-US");
+
+}
+
+
+
+/* ========================================
+   STATUS INFORMATION
+======================================== */
+
+function getStatusInfo(status) {
+
+    const normalized =
+        String(status || "Pending")
+            .trim()
+            .toLowerCase();
+
+
+    if (normalized === "confirmed") {
+
+        return {
+            title: "Confirmed",
+            message:
+                "The restaurant has confirmed your order.",
+            className: "status-confirmed"
+        };
+
+    }
+
+
+    if (normalized === "preparing") {
+
+        return {
+            title: "Preparing",
+            message:
+                "Your food is being prepared.",
+            className: "status-preparing"
+        };
+
+    }
+
+
+    if (normalized === "ready") {
+
+        return {
+            title: "Ready",
+            message:
+                "Your food is ready for pickup or collection.",
+            className: "status-ready"
+        };
+
+    }
+
+
+    if (normalized === "cancelled") {
+
+        return {
+            title: "Cancelled",
+            message:
+                "This order has been cancelled by the restaurant.",
+            className: "status-cancelled"
+        };
+
+    }
+
+
+    return {
+        title: "Pending",
+        message:
+            "Your order is waiting for restaurant confirmation.",
+        className: ""
+    };
+
+}
+
+
+
+/* ========================================
+   UPDATE STATUS UI
+======================================== */
+
+function updateStatusUI(status) {
+
+    const statusBox =
+        document.getElementById(
+            "orderStatus"
+        );
+
+
+    const statusMessage =
+        document.getElementById(
+            "statusMessage"
+        );
+
+
+    const updated =
+        document.getElementById(
+            "statusUpdated"
+        );
+
+
+    const info =
+        getStatusInfo(status);
+
+
+    statusBox.textContent =
+        info.title;
+
+
+    statusBox.className =
+        "status-box " +
+        info.className;
+
+
+    statusMessage.textContent =
+        info.message;
+
+
+    /*
+     * Show update message only
+     * when status actually changes.
+     */
+
+    if (
+        currentStatus !== null &&
+        currentStatus.toLowerCase() !==
+        info.title.toLowerCase()
+    ) {
+
+        updated.textContent =
+            "Order status updated to " +
+            info.title;
+
+
+        updated.style.display =
+            "block";
+
+
+        setTimeout(function() {
+
+            updated.style.display =
+                "none";
+
+        }, 4000);
+
+    }
+
+
+    currentStatus =
+        info.title;
+
+}
+
+
+
+/* ========================================
+   LOAD ORDER FROM SUPABASE
+======================================== */
+
+async function loadOrderStatus() {
+
+    if (!lastOrder) {
+
+        return;
+
+    }
+
+
+    let order = null;
+
+
+    /*
+     * FIRST: use order ID
+     */
+
+    if (lastOrder.id) {
+
+        const result =
+            await db
+                .from("food_orders")
+                .select("*")
+                .eq(
+                    "id",
+                    lastOrder.id
+                )
+                .maybeSingle();
+
+
+        if (result.error) {
+
+            console.error(
+                "Order status error:",
+                result.error
+            );
+
+            return;
+
+        }
+
+
+        order =
+            result.data;
+
+    }
+
+
+    /*
+     * FALLBACK:
+     * use order number
+     */
+
+    if (!order && lastOrder.order_number) {
+
+        const result =
+            await db
+                .from("food_orders")
+                .select("*")
+                .eq(
+                    "order_number",
+                    lastOrder.order_number
+                )
+                .maybeSingle();
+
+
+        if (result.error) {
+
+            console.error(
+                "Order number error:",
+                result.error
+            );
+
+            return;
+
+        }
+
+
+        order =
+            result.data;
+
+    }
+
+
+    if (!order) {
+
+        console.error(
+            "Order not found."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * THIS IS THE IMPORTANT PART
+     *
+     * Status comes directly from
+     * food_orders.status
+     */
+
+    updateStatusUI(
+        order.status
+    );
+
+}
+
+
+
+/* ========================================
+   CUSTOMER + SUMMARY
+======================================== */
+
+function loadStoredOrderInfo() {
+
+    if (!lastOrder) {
+
+        document.getElementById(
+            "orderNumber"
+        ).textContent =
+            "No order found";
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "orderNumber"
+    ).textContent =
+        lastOrder.order_number || "-";
+
+
+    document.getElementById(
+        "customerName"
+    ).textContent =
+        lastOrder.customer_name || "-";
+
+
+    document.getElementById(
+        "customerPhone"
+    ).textContent =
+        lastOrder.customer_phone || "-";
+
+
+    document.getElementById(
+        "customerLocation"
+    ).textContent =
+        lastOrder.delivery_location || "-";
+
+
+    document.getElementById(
+        "deliveryType"
+    ).textContent =
+        lastOrder.delivery_type === "delivery"
+            ? "🛵 Delivery"
+            : "🏪 Pickup";
+
+
+    document.getElementById(
+        "subtotal"
+    ).textContent =
+        "TSh " +
+        formatPrice(
+            lastOrder.subtotal
+        );
+
+
+    document.getElementById(
+        "deliveryFee"
+    ).textContent =
+        "TSh " +
+        formatPrice(
+            lastOrder.delivery_fee
+        );
+
+
+    document.getElementById(
+        "total"
+    ).textContent =
+        "TSh " +
+        formatPrice(
+            lastOrder.total
+        );
+
+}
+
+
+
+/* ========================================
+   LOAD ORDER ITEMS
+======================================== */
+
+async function loadOrderItems(orderId) {
+
+    const container =
+        document.getElementById(
+            "orderItems"
+        );
+
+
+    if (!orderId) {
+
+        container.innerHTML = `
+            <p style="
+                color:#777;
+                padding:10px 0;
+            ">
+                Order items not found.
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await db
+            .from("food_order_items")
+            .select("*")
+            .eq(
+                "order_id",
+                orderId
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Order Items Error:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <p style="
+                color:#c00;
+                padding:10px 0;
+            ">
+                Failed to load ordered food.
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    if (!data ||
+        data.length === 0) {
+
+        container.innerHTML = `
+            <p style="
+                color:#777;
+                padding:10px 0;
+            ">
+                No ordered food found.
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    data.forEach(function(item) {
+
+        const itemTotal =
+            Number(item.price || 0) *
+            Number(item.quantity || 0);
+
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+
+        row.style.cssText = `
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:15px;
+            padding:14px 0;
+            border-bottom:1px solid #eee;
+        `;
+
+
+        row.innerHTML = `
+
+            <div style="flex:1;">
+
+                <strong>
+                    ${item.food_name || "Food"}
+                </strong>
+
+                <div style="
+                    margin-top:5px;
+                    color:#777;
+                    font-size:14px;
+                ">
+
+                    TSh ${formatPrice(item.price)}
+                    ×
+                    ${item.quantity}
+
+                </div>
+
+            </div>
+
+
+            <strong style="
+                white-space:nowrap;
+            ">
+
+                TSh ${formatPrice(itemTotal)}
+
+            </strong>
+
+        `;
+
+
+        container.appendChild(
+            row
+        );
+
+    });
+
+}
+
+
+
+/* ========================================
+   TRACK ORDER
+======================================== */
+
+function trackOrder() {
+
+    window.location.href =
+        "order-tracking.html";
+
+}
+
+
+
+/* ========================================
+   REALTIME STATUS
+======================================== */
+
+function subscribeToOrder() {
+
+    if (!lastOrder ||
+        !lastOrder.id) {
+
+        return;
+
+    }
+
+
+    db
+        .channel(
+            "order-status-" +
+            lastOrder.id
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "UPDATE",
+                schema: "public",
+                table: "food_orders",
+                filter:
+                    "id=eq." +
+                    lastOrder.id
+            },
+            function(payload) {
+
+                console.log(
+                    "Order updated:",
+                    payload.new
+                );
+
+
+                /*
+                 * Immediately update the
+                 * Order Status section.
+                 */
+
+                updateStatusUI(
+                    payload.new.status
+                );
+
+            }
+        )
+        .subscribe();
+
+}
+
+
+
+/* ========================================
+   START
+======================================== */
+
+async function startPage() {
+
+    loadStoredOrderInfo();
+
+
+    if (lastOrder) {
+
+        await loadOrderItems(
+            lastOrder.id
+        );
+
+
+        /*
+         * Get current status directly
+         * from Supabase.
+         */
+
+        await loadOrderStatus();
+
+
+        /*
+         * Listen for vendor changes.
+         */
+
+        subscribeToOrder();
+
+    }
+
+}
+
+
+startPage();
+
+</script>
+
+
+</body>
+
+</html>

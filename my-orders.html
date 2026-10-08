@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Orders | Food Platform</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #f97316;
+            color: white;
+            padding: 15px;
+        }
+
+        .header-inner {
+            max-width: 900px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .home-btn {
+            background: white;
+            color: #f97316;
+            border: 0;
+            border-radius: 7px;
+            padding: 8px 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .page-title {
+            margin: 5px 0 15px;
+            font-size: 22px;
+        }
+
+        .order-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .order-number {
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .restaurant {
+            color: #666;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .pending {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .confirmed {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .preparing {
+            background: #fefce8;
+            color: #a16207;
+        }
+
+        .ready {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .cancelled {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .order-info {
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            margin: 10px 0;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+
+        .label {
+            color: #777;
+        }
+
+        .total {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #f97316;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .empty {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 35px 20px;
+            text-align: center;
+            color: #777;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #c2410c;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 58px;
+            background: white;
+            border-top: 1px solid #ddd;
+            display: flex;
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .bottom-nav a.active {
+            color: #f97316;
+        }
+
+        @media (max-width: 500px) {
+
+            .container {
+                padding: 12px;
+                padding-bottom: 75px;
+            }
+
+            .order-top {
+                align-items: flex-start;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="header-inner">
+
+        <h1>My Orders</h1>
+
+        <button
+            class="home-btn"
+            onclick="window.location.href='index.html'"
+        >
+            Home
+        </button>
+
+    </div>
+
+</header>
+
+
+<div class="container">
+
+    <h2 class="page-title">
+        Order History
+    </h2>
+
+    <div id="ordersContainer">
+
+        <div class="loading">
+            Loading orders...
+        </div>
+
+    </div>
+
+</div>
+
+
+<nav class="bottom-nav">
+
+    <a href="index.html">
+        Home
+    </a>
+
+    <a href="cart.html">
+        Cart
+    </a>
+
+    <a
+        href="my-orders.html"
+        class="active"
+    >
+        Orders
+    </a>
+
+    <a href="customer-account.html">
+        Account
+    </a>
+
+</nav>
+
+
+<script>
+
+let currentUser = null;
+let orders = [];
+
+
+/* =========================
+   AUTH
+========================= */
+
+async function checkAuth() {
+
+    const {
+        data: {
+            user
+        }
+    } = await db.auth.getUser();
+
+    if (!user) {
+
+        window.location.href =
+            "customer-login.html";
+
+        return false;
+
+    }
+
+    currentUser = user;
+
+    return true;
+
+}
+
+
+/* =========================
+   LOAD ORDERS
+========================= */
+
+async function loadOrders() {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    const {
+        data,
+        error
+    } = await db
+        .from("food_orders")
+        .select("*")
+        .eq(
+            "customer_id",
+            currentUser.id
+        )
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+            <div class="empty">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    orders = data || [];
+
+    renderOrders();
+
+}
+
+
+/* =========================
+   RENDER ORDERS
+========================= */
+
+function renderOrders() {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    if (!orders.length) {
+
+        container.innerHTML = `
+            <div class="empty">
+
+                <h3>
+                    No orders yet
+                </h3>
+
+                <p>
+                    Your orders will appear here.
+                </p>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="window.location.href='index.html'"
+                    style="max-width:180px;"
+                >
+                    Browse Food
+                </button>
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        orders.map(order => {
+
+            const status =
+                order.status || "Pending";
+
+            return `
+
+                <div
+                    class="order-card"
+                    id="order-${escapeHtml(order.id)}"
+                >
+
+                    <div class="order-top">
+
+                        <div>
+
+                            <div class="order-number">
+                                ${escapeHtml(
+                                    order.order_number ||
+                                    "Order"
+                                )}
+                            </div>
+
+                            <div class="restaurant">
+                                Restaurant:
+                                ${escapeHtml(
+                                    order.restaurant_name ||
+                                    "Food Platform"
+                                )}
+                            </div>
+
+                        </div>
+
+
+                        <span
+                            class="status ${statusClass(status)}"
+                        >
+                            ${escapeHtml(status)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="order-info">
+
+                        <div class="row">
+
+                            <span class="label">
+                                Customer
+                            </span>
+
+                            <span>
+                                ${escapeHtml(
+                                    order.customer_name ||
+                                    "-"
+                                )}
+                            </span>
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <span class="label">
+                                Delivery
+                            </span>
+
+                            <span>
+                                ${escapeHtml(
+                                    order.delivery_type ||
+                                    "-"
+                                )}
+                            </span>
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <span class="label">
+                                Location
+                            </span>
+
+                            <span>
+                                ${escapeHtml(
+                                    order.delivery_location ||
+                                    "-"
+                                )}
+                            </span>
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <span class="label">
+                                Total
+                            </span>
+
+                            <span class="total">
+                                ${money(order.total)}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="actions">
+
+                        <button
+                            class="btn btn-secondary"
+                            onclick="trackOrder(
+                                '${escapeHtml(order.order_number || "")}',
+                                '${escapeHtml(order.id)}'
+                            )"
+                        >
+                            Track Order
+                        </button>
+
+
+                        <button
+                            class="btn btn-primary"
+                            onclick="orderAgain(
+                                '${escapeHtml(order.id)}'
+                            )"
+                        >
+                            Order Again
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="message"
+                        id="message-${escapeHtml(order.id)}"
+                    ></div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================
+   TRACK ORDER
+========================= */
+
+function trackOrder(
+    orderNumber,
+    orderId
+) {
+
+    if (orderNumber) {
+
+        window.location.href =
+            "order-tracking.html?order=" +
+            encodeURIComponent(orderNumber) +
+            "&id=" +
+            encodeURIComponent(orderId);
+
+        return;
+
+    }
+
+
+    window.location.href =
+        "order-tracking.html?id=" +
+        encodeURIComponent(orderId);
+
+}
+
+
+/* =========================
+   ORDER AGAIN
+========================= */
+
+async function orderAgain(orderId) {
+
+    const message =
+        document.getElementById(
+            "message-" + orderId
+        );
+
+
+    message.textContent =
+        "Checking menu...";
+
+
+    const {
+        data: order,
+        error: orderError
+    } = await db
+        .from("food_orders")
+        .select("*")
+        .eq("id", orderId)
+        .eq(
+            "customer_id",
+            currentUser.id
+        )
+        .maybeSingle();
+
+
+    if (orderError) {
+
+        message.textContent =
+            orderError.message;
+
+        return;
+
+    }
+
+
+    if (!order) {
+
+        message.textContent =
+            "Order not found.";
+
+        return;
+
+    }
+
+
+    if (!order.restaurant_id) {
+
+        message.textContent =
+            "This order cannot be repeated because its restaurant is not linked.";
+
+        return;
+
+    }
+
+
+    /* =========================
+       LOAD OLD ORDER ITEMS
+    ========================= */
+
+    const {
+        data: oldItems,
+        error: itemError
+    } = await db
+        .from("food_order_items")
+        .select("*")
+        .eq(
+            "order_id",
+            order.id
+        );
+
+
+    if (itemError) {
+
+        message.textContent =
+            itemError.message;
+
+        return;
+
+    }
+
+
+    if (!oldItems || !oldItems.length) {
+
+        message.textContent =
+            "This order has no food items.";
+
+        return;
+
+    }
+
+
+    /* =========================
+       LOAD CURRENT RESTAURANT
+    ========================= */
+
+    const {
+        data: restaurant,
+        error: restaurantError
+    } = await db
+        .from("food_restaurants")
+        .select("*")
+        .eq(
+            "id",
+            order.restaurant_id
+        )
+        .maybeSingle();
+
+
+    if (restaurantError) {
+
+        message.textContent =
+            restaurantError.message;
+
+        return;
+
+    }
+
+
+    if (!restaurant) {
+
+        message.textContent =
+            "This restaurant is no longer available.";
+
+        return;
+
+    }
+
+
+    /* =========================
+       LOAD CURRENT MENU ITEMS
+    ========================= */
+
+    const menuIds =
+        oldItems
+            .map(item => item.menu_id)
+            .filter(Boolean);
+
+
+    if (!menuIds.length) {
+
+        message.textContent =
+            "No valid menu items found.";
+
+        return;
+
+    }
+
+
+    const {
+        data: currentMenu,
+        error: menuError
+    } = await db
+        .from("food_menu")
+        .select(
+            "id, restaurant_id, name, price, image_url, is_available"
+        )
+        .eq(
+            "restaurant_id",
+            order.restaurant_id
+        )
+        .in(
+            "id",
+            menuIds
+        );
+
+
+    if (menuError) {
+
+        message.textContent =
+            menuError.message;
+
+        return;
+
+    }
+
+
+    const menuMap =
+        new Map(
+            (currentMenu || []).map(
+                item => [
+                    item.id,
+                    item
+                ]
+            )
+        );
+
+
+    /* =========================
+       BUILD NEW CART
+    ========================= */
+
+    const cart = [];
+
+    const unavailableItems = [];
+
+
+    oldItems.forEach(oldItem => {
+
+        const currentItem =
+            menuMap.get(
+                oldItem.menu_id
+            );
+
+
+        if (!currentItem) {
+
+            unavailableItems.push(
+                oldItem.food_name
+            );
+
+            return;
+
+        }
+
+
+        if (
+            currentItem.is_available === false
+        ) {
+
+            unavailableItems.push(
+                currentItem.name
+            );
+
+            return;
+
+        }
+
+
+        cart.push({
+
+            menu_id:
+                currentItem.id,
+
+            restaurant_id:
+                currentItem.restaurant_id,
+
+            food_name:
+                currentItem.name,
+
+            price:
+                Number(
+                    currentItem.price || 0
+                ),
+
+            quantity:
+                Number(
+                    oldItem.quantity || 1
+                ),
+
+            image_url:
+                currentItem.image_url ||
+                ""
+
+        });
+
+    });
+
+
+    /* =========================
+       NOTHING AVAILABLE
+    ========================= */
+
+    if (!cart.length) {
+
+        message.textContent =
+            "None of the food items from this order are currently available.";
+
+        return;
+
+    }
+
+
+    /* =========================
+       SAVE CART
+    ========================= */
+
+    localStorage.setItem(
+        "foodCart",
+        JSON.stringify(cart)
+    );
+
+
+    localStorage.setItem(
+        "cartRestaurantId",
+        restaurant.id
+    );
+
+
+    /* =========================
+       SAVE ORDER AGAIN INFO
+    ========================= */
+
+    localStorage.setItem(
+        "orderAgainRestaurant",
+        JSON.stringify({
+            id: restaurant.id,
+            name: restaurant.name
+        })
+    );
+
+
+    /* =========================
+       MESSAGE
+    ========================= */
+
+    if (unavailableItems.length) {
+
+        localStorage.setItem(
+            "orderAgainMessage",
+            unavailableItems.join(", ")
+        );
+
+    } else {
+
+        localStorage.removeItem(
+            "orderAgainMessage"
+        );
+
+    }
+
+
+    /* =========================
+       GO TO CART
+    ========================= */
+
+    window.location.href =
+        "cart.html";
+
+}
+
+
+/* =========================
+   REALTIME STATUS
+========================= */
+
+function subscribeToOrders() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    db.channel(
+        "customer-orders-" +
+        currentUser.id
+    )
+
+    .on(
+        "postgres_changes",
+        {
+            event: "UPDATE",
+            schema: "public",
+            table: "food_orders",
+            filter:
+                "customer_id=eq." +
+                currentUser.id
+        },
+        payload => {
+
+            const index =
+                orders.findIndex(
+                    order =>
+                        order.id ===
+                        payload.new.id
+                );
+
+
+            if (index === -1) {
+                return;
+            }
+
+
+            orders[index] = {
+                ...orders[index],
+                ...payload.new
+            };
+
+
+            const status =
+                payload.new.status ||
+                "Pending";
+
+
+            const card =
+                document.getElementById(
+                    "order-" +
+                    payload.new.id
+                );
+
+
+            if (!card) {
+
+                renderOrders();
+
+                return;
+
+            }
+
+
+            const statusElement =
+                card.querySelector(
+                    ".status"
+                );
+
+
+            if (statusElement) {
+
+                statusElement.className =
+                    "status " +
+                    statusClass(status);
+
+                statusElement.textContent =
+                    status;
+
+            }
+
+        }
+    )
+
+    .subscribe();
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function money(value) {
+
+    return "TSh " +
+        Number(value || 0)
+            .toLocaleString(
+                "en-TZ",
+                {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }
+            );
+
+}
+
+
+function statusClass(status) {
+
+    return String(status || "")
+        .toLowerCase()
+        .replace(/\s+/g, "");
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+async function init() {
+
+    const authenticated =
+        await checkAuth();
+
+    if (!authenticated) {
+        return;
+    }
+
+
+    await loadOrders();
+
+
+    subscribeToOrders();
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
