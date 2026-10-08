@@ -1,13 +1,24 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
-    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Food Platform</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="./manifest.json">
 
     <meta
         name="theme-color"
-        content="#f97316"
+        content="#f4511e"
     >
 
     <meta
@@ -24,15 +35,6 @@
         name="apple-mobile-web-app-status-bar-style"
         content="default"
     >
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Food Platform</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -57,6 +59,32 @@
         button,
         input {
             font-family: inherit;
+        }
+
+
+        /* =====================================
+           INSTALL APP BUTTON
+        ===================================== */
+
+        .install-app-btn {
+            display: none;
+            position: fixed;
+            right: 15px;
+            bottom: 20px;
+            z-index: 9999;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 17px;
+            background: #f4511e;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.25);
+            cursor: pointer;
+        }
+
+        .install-app-btn:hover {
+            opacity: .92;
         }
 
 
@@ -554,6 +582,11 @@
                 height: 100px;
             }
 
+            .install-app-btn {
+                bottom: 18px;
+                right: 12px;
+            }
+
         }
 
     </style>
@@ -562,6 +595,18 @@
 
 
 <body>
+
+
+<!-- =====================================
+     INSTALL APP BUTTON
+===================================== -->
+
+<button
+    id="installAppBtn"
+    class="install-app-btn"
+>
+    Install App
+</button>
 
 
 <!-- =====================================
@@ -767,9 +812,7 @@
 <main class="container">
 
 
-    <!-- =====================================
-         CATEGORIES
-    ===================================== -->
+    <!-- CATEGORIES -->
 
     <section class="section">
 
@@ -798,115 +841,67 @@
                 All
             </button>
 
-            <button
-                class="category"
-                data-category="Rice"
-            >
+            <button class="category" data-category="Rice">
                 Rice
             </button>
 
-            <button
-                class="category"
-                data-category="Ugali"
-            >
+            <button class="category" data-category="Ugali">
                 Ugali
             </button>
 
-            <button
-                class="category"
-                data-category="Chips"
-            >
+            <button class="category" data-category="Chips">
                 Chips
             </button>
 
-            <button
-                class="category"
-                data-category="Chicken"
-            >
+            <button class="category" data-category="Chicken">
                 Chicken
             </button>
 
-            <button
-                class="category"
-                data-category="Beef"
-            >
+            <button class="category" data-category="Beef">
                 Beef
             </button>
 
-            <button
-                class="category"
-                data-category="Fish"
-            >
+            <button class="category" data-category="Fish">
                 Fish
             </button>
 
-            <button
-                class="category"
-                data-category="Banana"
-            >
+            <button class="category" data-category="Banana">
                 Banana
             </button>
 
-            <button
-                class="category"
-                data-category="Beans"
-            >
+            <button class="category" data-category="Beans">
                 Beans
             </button>
 
-            <button
-                class="category"
-                data-category="Chapati"
-            >
+            <button class="category" data-category="Chapati">
                 Chapati
             </button>
 
-            <button
-                class="category"
-                data-category="Eggs"
-            >
+            <button class="category" data-category="Eggs">
                 Eggs
             </button>
 
-            <button
-                class="category"
-                data-category="Burger"
-            >
+            <button class="category" data-category="Burger">
                 Burger
             </button>
 
-            <button
-                class="category"
-                data-category="Pizza"
-            >
+            <button class="category" data-category="Pizza">
                 Pizza
             </button>
 
-            <button
-                class="category"
-                data-category="Pasta"
-            >
+            <button class="category" data-category="Pasta">
                 Pasta
             </button>
 
-            <button
-                class="category"
-                data-category="Sandwich"
-            >
+            <button class="category" data-category="Sandwich">
                 Sandwich
             </button>
 
-            <button
-                class="category"
-                data-category="Breakfast"
-            >
+            <button class="category" data-category="Breakfast">
                 Breakfast
             </button>
 
-            <button
-                class="category"
-                data-category="Drinks"
-            >
+            <button class="category" data-category="Drinks">
                 Drinks
             </button>
 
@@ -915,9 +910,7 @@
     </section>
 
 
-    <!-- =====================================
-         RESTAURANTS
-    ===================================== -->
+    <!-- RESTAURANTS -->
 
     <section class="section">
 
@@ -948,9 +941,7 @@
     </section>
 
 
-    <!-- =====================================
-         FOOD
-    ===================================== -->
+    <!-- FOOD -->
 
     <section class="section">
 
@@ -995,17 +986,12 @@
     const SUPABASE_KEY =
         "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
 
-
     const db =
         window.supabase.createClient(
             SUPABASE_URL,
             SUPABASE_KEY
         );
 
-
-    /* =====================================
-       DATA
-    ===================================== */
 
     let restaurants = [];
 
@@ -1019,66 +1005,38 @@
 
     let userLongitude = null;
 
-    const restaurantById =
-        new Map();
+    const restaurantById = new Map();
 
-    const categoryRestaurants =
-        new Map();
+    const categoryRestaurants = new Map();
 
-
-    /* =====================================
-       ELEMENTS
-    ===================================== */
 
     const restaurantsEl =
-        document.getElementById(
-            "restaurants"
-        );
+        document.getElementById("restaurants");
 
     const foodGridEl =
-        document.getElementById(
-            "foodGrid"
-        );
+        document.getElementById("foodGrid");
 
     const restaurantCountEl =
-        document.getElementById(
-            "restaurantCount"
-        );
+        document.getElementById("restaurantCount");
 
     const foodCountEl =
-        document.getElementById(
-            "foodCount"
-        );
+        document.getElementById("foodCount");
 
     const searchInput =
-        document.getElementById(
-            "searchInput"
-        );
+        document.getElementById("searchInput");
 
     const searchBtn =
-        document.getElementById(
-            "searchBtn"
-        );
+        document.getElementById("searchBtn");
 
     const locationBtn =
-        document.getElementById(
-            "locationBtn"
-        );
+        document.getElementById("locationBtn");
 
     const locationStatus =
-        document.getElementById(
-            "locationStatus"
-        );
+        document.getElementById("locationStatus");
 
     const categoryResultText =
-        document.getElementById(
-            "categoryResultText"
-        );
+        document.getElementById("categoryResultText");
 
-
-    /* =====================================
-       HELPERS
-    ===================================== */
 
     function normalize(value) {
 
@@ -1121,13 +1079,11 @@
 
         const dLat =
             (lat2 - lat1) *
-            Math.PI /
-            180;
+            Math.PI / 180;
 
         const dLon =
             (lon2 - lon1) *
-            Math.PI /
-            180;
+            Math.PI / 180;
 
         const a =
             Math.sin(dLat / 2) *
@@ -1198,10 +1154,6 @@
     }
 
 
-    /* =====================================
-       CATEGORY MATCHING
-    ===================================== */
-
     function categoryMatches(
         itemCategory,
         selectedCategory
@@ -1242,1062 +1194,5 @@
 
             chips: [
                 "chips",
-                "chipsi",
-                "chips mayai",
-                "chipsi mayai"
-            ],
-
-            chicken: [
-                "chicken",
-                "kuku"
-            ],
-
-            beef: [
-                "beef",
-                "nyama",
-                "nyama beef",
-                "nyama choma",
-                "mishikaki"
-            ],
-
-            fish: [
-                "fish",
-                "samaki",
-                "dagaa"
-            ],
-
-            banana: [
-                "banana",
-                "ndizi"
-            ],
-
-            beans: [
-                "beans",
-                "maharage"
-            ],
-
-            chapati: [
-                "chapati"
-            ],
-
-            eggs: [
-                "eggs",
-                "egg",
-                "mayai"
-            ],
-
-            burger: [
-                "burger",
-                "burgers"
-            ],
-
-            pizza: [
-                "pizza"
-            ],
-
-            pasta: [
-                "pasta",
-                "spaghetti",
-                "macaroni"
-            ],
-
-            sandwich: [
-                "sandwich",
-                "sandwiches"
-            ],
-
-            breakfast: [
-                "breakfast",
-                "chai",
-                "tea",
-                "mandazi",
-                "vitumbua"
-            ],
-
-            drinks: [
-                "drinks",
-                "drink",
-                "juice",
-                "soda",
-                "water",
-                "maji",
-                "coffee",
-                "kahawa",
-                "chai"
-            ]
-
-        };
-
-        const possibleValues =
-            groups[selected];
-
-        if (!possibleValues) {
-            return false;
-        }
-
-        return possibleValues.includes(
-            item
-        );
-
-    }
-
-
-    /* =====================================
-       CATEGORY CACHE
-    ===================================== */
-
-    function buildCategoryCache() {
-
-        categoryRestaurants.clear();
-
-        const categories = [
-
-            "Rice",
-            "Ugali",
-            "Chips",
-            "Chicken",
-            "Beef",
-            "Fish",
-            "Banana",
-            "Beans",
-            "Chapati",
-            "Eggs",
-            "Burger",
-            "Pizza",
-            "Pasta",
-            "Sandwich",
-            "Breakfast",
-            "Drinks"
-
-        ];
-
-        for (
-            const item of menuItems
-        ) {
-
-            if (!item.restaurant_id) {
-                continue;
-            }
-
-            for (
-                const category of categories
-            ) {
-
-                if (
-                    categoryMatches(
-                        item.category,
-                        category
-                    )
-                ) {
-
-                    if (
-                        !categoryRestaurants.has(
-                            category
-                        )
-                    ) {
-
-                        categoryRestaurants.set(
-                            category,
-                            new Set()
-                        );
-
-                    }
-
-                    categoryRestaurants
-                        .get(category)
-                        .add(
-                            item.restaurant_id
-                        );
-
-                }
-
-            }
-
-        }
-
-    }
-
-
-    /* =====================================
-       LOAD DATA
-    ===================================== */
-
-    async function loadData() {
-
-        restaurantsEl.innerHTML =
-            `
-            <div class="loading">
-                Loading restaurants...
-            </div>
-            `;
-
-        foodGridEl.innerHTML =
-            `
-            <div class="loading">
-                Loading food...
-            </div>
-            `;
-
-        try {
-
-            const restaurantResult =
-                await db
-                    .from("food_restaurants")
-                    .select("*");
-
-            if (
-                restaurantResult.error
-            ) {
-                throw restaurantResult.error;
-            }
-
-            const menuResult =
-                await db
-                    .from("food_menu")
-                    .select("*");
-
-            if (
-                menuResult.error
-            ) {
-                throw menuResult.error;
-            }
-
-            restaurants =
-                restaurantResult.data || [];
-
-            menuItems =
-                menuResult.data || [];
-
-            restaurantById.clear();
-
-            restaurants.forEach(
-                restaurant => {
-
-                    restaurantById.set(
-                        restaurant.id,
-                        restaurant
-                    );
-
-                }
-            );
-
-            buildCategoryCache();
-
-            renderAll();
-
-        } catch (error) {
-
-            console.error(
-                "LOAD ERROR:",
-                error
-            );
-
-            restaurantsEl.innerHTML =
-                `
-                <div class="error">
-                    Failed to load restaurants.
-                    <br><br>
-                    ${escapeHTML(
-                        error.message ||
-                        "Unknown error"
-                    )}
-                </div>
-                `;
-
-            foodGridEl.innerHTML =
-                `
-                <div class="error">
-                    Failed to load food.
-                </div>
-                `;
-
-        }
-
-    }
-
-
-    /* =====================================
-       FILTER RESTAURANTS
-    ===================================== */
-
-    function getFilteredRestaurants() {
-
-        const search =
-            normalize(
-                searchInput.value
-            );
-
-        let result =
-            restaurants.filter(
-                restaurant => {
-
-                    const name =
-                        normalize(
-                            restaurant.name
-                        );
-
-                    const description =
-                        normalize(
-                            restaurant.description
-                        );
-
-                    const address =
-                        normalize(
-                            restaurant.address
-                        );
-
-                    const searchMatch =
-                        !search ||
-                        name.includes(search) ||
-                        description.includes(search) ||
-                        address.includes(search);
-
-                    if (!searchMatch) {
-                        return false;
-                    }
-
-                    if (
-                        currentCategory !== "All"
-                    ) {
-
-                        const set =
-                            categoryRestaurants.get(
-                                currentCategory
-                            );
-
-                        if (
-                            !set ||
-                            !set.has(
-                                restaurant.id
-                            )
-                        ) {
-
-                            return false;
-
-                        }
-
-                    }
-
-                    const distance =
-                        getRestaurantDistance(
-                            restaurant
-                        );
-
-                    if (
-                        currentDistance !== "all" &&
-                        distance !== null
-                    ) {
-
-                        const maxDistance =
-                            Number(
-                                currentDistance
-                            ) / 1000;
-
-                        if (
-                            distance >
-                            maxDistance
-                        ) {
-
-                            return false;
-
-                        }
-
-                    }
-
-                    return true;
-
-                }
-            );
-
-        result.sort(
-            (a, b) => {
-
-                const distanceA =
-                    getRestaurantDistance(a);
-
-                const distanceB =
-                    getRestaurantDistance(b);
-
-                if (
-                    distanceA !== null &&
-                    distanceB !== null
-                ) {
-
-                    return (
-                        distanceA -
-                        distanceB
-                    );
-
-                }
-
-                if (
-                    distanceA !== null
-                ) {
-                    return -1;
-                }
-
-                if (
-                    distanceB !== null
-                ) {
-                    return 1;
-                }
-
-                return String(
-                    a.name || ""
-                ).localeCompare(
-                    String(
-                        b.name || ""
-                    )
-                );
-
-            }
-        );
-
-        return result;
-
-    }
-
-
-    /* =====================================
-       FILTER FOOD
-    ===================================== */
-
-    function getFilteredFood() {
-
-        const search =
-            normalize(
-                searchInput.value
-            );
-
-        let result =
-            menuItems.filter(
-                item => {
-
-                    const restaurant =
-                        restaurantById.get(
-                            item.restaurant_id
-                        );
-
-                    if (!restaurant) {
-                        return false;
-                    }
-
-                    if (
-                        currentCategory !== "All" &&
-                        !categoryMatches(
-                            item.category,
-                            currentCategory
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
-                    const name =
-                        normalize(
-                            item.name
-                        );
-
-                    const description =
-                        normalize(
-                            item.description
-                        );
-
-                    const restaurantName =
-                        normalize(
-                            restaurant.name
-                        );
-
-                    const searchMatch =
-                        !search ||
-                        name.includes(search) ||
-                        description.includes(search) ||
-                        restaurantName.includes(search);
-
-                    if (!searchMatch) {
-                        return false;
-                    }
-
-                    const distance =
-                        getRestaurantDistance(
-                            restaurant
-                        );
-
-                    if (
-                        currentDistance !== "all" &&
-                        distance !== null
-                    ) {
-
-                        const maxDistance =
-                            Number(
-                                currentDistance
-                            ) / 1000;
-
-                        if (
-                            distance >
-                            maxDistance
-                        ) {
-
-                            return false;
-
-                        }
-
-                    }
-
-                    return true;
-
-                }
-            );
-
-        result.sort(
-            (a, b) => {
-
-                const restaurantA =
-                    restaurantById.get(
-                        a.restaurant_id
-                    );
-
-                const restaurantB =
-                    restaurantById.get(
-                        b.restaurant_id
-                    );
-
-                const distanceA =
-                    getRestaurantDistance(
-                        restaurantA
-                    );
-
-                const distanceB =
-                    getRestaurantDistance(
-                        restaurantB
-                    );
-
-                if (
-                    distanceA !== null &&
-                    distanceB !== null
-                ) {
-
-                    return (
-                        distanceA -
-                        distanceB
-                    );
-
-                }
-
-                if (
-                    distanceA !== null
-                ) {
-                    return -1;
-                }
-
-                if (
-                    distanceB !== null
-                ) {
-                    return 1;
-                }
-
-                return 0;
-
-            }
-        );
-
-        return result;
-
-    }
-
-
-    /* =====================================
-       RENDER RESTAURANTS
-    ===================================== */
-
-    function renderRestaurants() {
-
-        const result =
-            getFilteredRestaurants();
-
-        restaurantCountEl.textContent =
-            `${result.length} restaurant${
-                result.length === 1
-                    ? ""
-                    : "s"
-            }`;
-
-        if (!result.length) {
-
-            restaurantsEl.innerHTML =
-                `
-                <div class="empty">
-                    No restaurants found.
-                </div>
-                `;
-
-            return;
-
-        }
-
-        restaurantsEl.innerHTML =
-            result.map(
-                restaurant => {
-
-                    const distance =
-                        getRestaurantDistance(
-                            restaurant
-                        );
-
-                    let distanceText =
-                        "";
-
-                    if (
-                        distance !== null
-                    ) {
-
-                        if (
-                            distance < 1
-                        ) {
-
-                            distanceText =
-                                `${Math.round(
-                                    distance * 1000
-                                )} m`;
-
-                        } else {
-
-                            distanceText =
-                                `${distance.toFixed(
-                                    1
-                                )} km`;
-
-                        }
-
-                    }
-
-                    const set =
-                        categoryRestaurants.get(
-                            currentCategory
-                        );
-
-                    const priority =
-                        currentCategory !== "All" &&
-                        set &&
-                        set.has(
-                            restaurant.id
-                        );
-
-                    const image =
-                        restaurant.image_url ||
-                        restaurant.logo_url ||
-                        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=700&q=80";
-
-                    return `
-
-                        <article
-                            class="restaurant-card ${
-                                priority
-                                    ? "priority-restaurant"
-                                    : ""
-                            }"
-                        >
-
-                            <img
-                                class="restaurant-image"
-                                src="${escapeHTML(
-                                    image
-                                )}"
-                                alt="${escapeHTML(
-                                    restaurant.name
-                                )}"
-                                loading="lazy"
-                            >
-
-                            <div class="restaurant-content">
-
-                                <h3 class="restaurant-name">
-                                    ${escapeHTML(
-                                        restaurant.name
-                                    )}
-                                </h3>
-
-                                <p class="restaurant-description">
-                                    ${escapeHTML(
-                                        restaurant.description ||
-                                        "Good food and quality service."
-                                    )}
-                                </p>
-
-                                <div class="restaurant-meta">
-
-                                    <span>
-                                        Rating:
-                                        ${
-                                            restaurant.rating ||
-                                            "New"
-                                        }
-                                    </span>
-
-                                    <span>
-                                        ${
-                                            distanceText
-                                        }
-                                    </span>
-
-                                </div>
-
-                                <a
-                                    class="restaurant-link"
-                                    href="restaurant.html?id=${encodeURIComponent(
-                                        restaurant.id
-                                    )}"
-                                >
-                                    View Menu
-                                </a>
-
-                            </div>
-
-                        </article>
-
-                    `;
-
-                }
-            ).join("");
-
-    }
-
-
-    /* =====================================
-       RENDER FOOD
-    ===================================== */
-
-    function renderFood() {
-
-        const result =
-            getFilteredFood();
-
-        foodCountEl.textContent =
-            `${result.length} item${
-                result.length === 1
-                    ? ""
-                    : "s"
-            }`;
-
-        if (!result.length) {
-
-            foodGridEl.innerHTML =
-                `
-                <div class="empty">
-                    No food found.
-                </div>
-                `;
-
-            return;
-
-        }
-
-        foodGridEl.innerHTML =
-            result.map(
-                item => {
-
-                    const restaurant =
-                        restaurantById.get(
-                            item.restaurant_id
-                        );
-
-                    if (!restaurant) {
-                        return "";
-                    }
-
-                    const image =
-                        item.image_url ||
-                        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80";
-
-                    return `
-
-                        <article class="food-card">
-
-                            <img
-                                class="food-image"
-                                src="${escapeHTML(
-                                    image
-                                )}"
-                                alt="${escapeHTML(
-                                    item.name
-                                )}"
-                                loading="lazy"
-                            >
-
-                            <div class="food-content">
-
-                                <h3 class="food-name">
-                                    ${escapeHTML(
-                                        item.name
-                                    )}
-                                </h3>
-
-                                <div class="food-restaurant">
-                                    ${escapeHTML(
-                                        restaurant.name
-                                    )}
-                                </div>
-
-                                <div class="food-price">
-                                    TSh ${
-                                        formatPrice(
-                                            item.price
-                                        )
-                                    }
-                                </div>
-
-                            </div>
-
-                        </article>
-
-                    `;
-
-                }
-            ).join("");
-
-    }
-
-
-    /* =====================================
-       RENDER ALL
-    ===================================== */
-
-    function renderAll() {
-
-        categoryResultText.textContent =
-            currentCategory === "All"
-                ? "All food"
-                : currentCategory;
-
-        renderRestaurants();
-
-        renderFood();
-
-    }
-
-
-    /* =====================================
-       CATEGORY BUTTONS
-    ===================================== */
-
-    document
-        .querySelectorAll(".category")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    currentCategory =
-                        button.dataset.category;
-
-                    document
-                        .querySelectorAll(
-                            ".category"
-                        )
-                        .forEach(item => {
-
-                            item.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-                    button.classList.add(
-                        "active"
-                    );
-
-                    renderAll();
-
-                }
-            );
-
-        });
-
-
-    /* =====================================
-       DISTANCE BUTTONS
-    ===================================== */
-
-    document
-        .querySelectorAll(
-            ".distance-btn"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    currentDistance =
-                        button.dataset.distance;
-
-                    document
-                        .querySelectorAll(
-                            ".distance-btn"
-                        )
-                        .forEach(item => {
-
-                            item.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-                    button.classList.add(
-                        "active"
-                    );
-
-                    renderAll();
-
-                }
-            );
-
-        });
-
-
-    /* =====================================
-       SEARCH
-    ===================================== */
-
-    searchInput.addEventListener(
-        "input",
-        () => {
-
-            renderAll();
-
-        }
-    );
-
-
-    searchBtn.addEventListener(
-        "click",
-        () => {
-
-            renderAll();
-
-        }
-    );
-
-
-    /* =====================================
-       LOCATION
-    ===================================== */
-
-    locationBtn.addEventListener(
-        "click",
-        () => {
-
-            if (
-                !navigator.geolocation
-            ) {
-
-                locationStatus.textContent =
-                    "Location is not supported.";
-
-                return;
-
-            }
-
-            locationStatus.textContent =
-                "Getting your location...";
-
-            navigator.geolocation.getCurrentPosition(
-
-                position => {
-
-                    userLatitude =
-                        position.coords.latitude;
-
-                    userLongitude =
-                        position.coords.longitude;
-
-                    locationStatus.textContent =
-                        "Location active";
-
-                    renderAll();
-
-                },
-
-                error => {
-
-                    console.error(
-                        error
-                    );
-
-                    locationStatus.textContent =
-                        "Unable to get location.";
-
-                },
-
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
-                }
-
-            );
-
-        }
-    );
-
-
-    /* =====================================
-       START
-    ===================================== */
-
-    loadData();
-
-</script>
-
-
-<!-- =====================================
-     SERVICE WORKER / PWA
-===================================== -->
-
-<script>
-
-    if (
-        "serviceWorker" in navigator
-    ) {
-
-        window.addEventListener(
-            "load",
-            () => {
-
-                navigator.serviceWorker
-                    .register(
-                        "./service-worker.js"
-                    )
-                    .then(
-                        () => {
-
-                            console.log(
-                                "Food Platform app ready"
-                            );
-
-                        }
-                    )
-                    .catch(
-                        error => {
-
-                            console.error(
-                                "Service Worker error:",
-                                error
-                            );
-
-                        }
-                    );
-
-            }
-        );
-
-    }
-
-</script>
-
-
-</body>
-
-</html>
+                "
+```
