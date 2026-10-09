@@ -1,53 +1,147 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b35">
     <title>Create Account | Food Platform</title>
     <link rel="stylesheet" href="style.css">
 
     <style>
-        .auth-box {
+        * {
             box-sizing: border-box;
-            max-width: 450px;
-            margin: 40px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 5px 20px rgba(0,0,0,.08);
         }
 
-        .auth-box h1 { margin-bottom: 8px; }
+        body {
+            margin: 0;
+            background: #f7f8fa;
+            font-family: Arial, sans-serif;
+        }
 
-        .auth-box > p {
+        .page-header {
+            background: #ff6b35;
+            color: white;
+            padding: 18px 15px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .language-bar {
+            max-width: 500px;
+            margin: 18px auto 0;
+            padding: 0 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .language-bar select {
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .container {
+            padding: 0 15px 35px;
+        }
+
+        .auth-box {
+            max-width: 450px;
+            margin: 15px auto;
+            background: white;
+            padding: 28px 24px;
+            border-radius: 18px;
+            box-shadow: 0 5px 25px rgba(0,0,0,.07);
+        }
+
+        .register-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #fff0e9;
+            color: #ff6b35;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 0 auto 15px;
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            margin: 0 0 10px;
+            color: #222;
+        }
+
+        .intro {
             color: #777;
+            text-align: center;
+            line-height: 1.6;
             margin-bottom: 25px;
         }
 
-        .form-group { margin-bottom: 18px; }
+        .form-group {
+            margin-bottom: 18px;
+        }
 
         .form-group label {
             display: block;
-            margin-bottom: 7px;
+            margin-bottom: 8px;
             font-weight: bold;
+            color: #333;
         }
 
         .form-group input {
-            box-sizing: border-box;
             width: 100%;
             padding: 14px;
             border: 1px solid #ddd;
             border-radius: 10px;
             font-size: 16px;
             outline: none;
+            background: white;
         }
 
-        .form-group input:focus { border-color: #ff6b35; }
+        .form-group input:focus {
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255,107,53,.12);
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
+            padding-right: 85px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #ff6b35;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 8px 4px;
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: #777;
+            margin-top: 7px;
+        }
 
         .register-btn {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: none;
             border-radius: 10px;
             background: #ff6b35;
@@ -55,98 +149,153 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: .2s;
+        }
+
+        .register-btn:hover {
+            background: #ed5725;
         }
 
         .register-btn:disabled {
-            opacity: .6;
+            opacity: .65;
             cursor: wait;
         }
 
         .message {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 10px;
             display: none;
+            margin-top: 15px;
+            padding: 13px;
+            border-radius: 10px;
+            line-height: 1.6;
             overflow-wrap: anywhere;
+            font-size: 14px;
         }
 
         .error {
             background: #ffebee;
-            color: #c62828;
+            color: #b71c1c;
         }
 
         .success {
             background: #e8f5e9;
-            color: #2e7d32;
+            color: #1b5e20;
         }
 
         .login-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 22px;
+            line-height: 1.8;
+            color: #666;
         }
 
-        .login-link a {
+        .login-link a,
+        .home-link {
             color: #ff6b35;
             font-weight: bold;
             text-decoration: none;
+        }
+
+        .home-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 480px) {
+            .auth-box {
+                padding: 24px 18px;
+            }
+
+            .page-header h1 {
+                font-size: 22px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="page-header">
-        <h1>Food Platform</h1>
+    <header class="page-header">
+        <h1>🍽️ Food Platform</h1>
+    </header>
+
+    <div class="language-bar">
+        <select id="languageSelect" aria-label="Select language">
+            <option value="en">🇬🇧 English</option>
+            <option value="sw">🇹🇿 Kiswahili</option>
+        </select>
     </div>
 
     <main class="container">
-        <div class="auth-box">
-            <h1>Create Account</h1>
-            <p>Create your customer account to order food.</p>
+        <section class="auth-box">
+            <div class="register-icon">👤</div>
+
+            <h2 id="pageTitle">Create Account</h2>
+
+            <p class="intro" id="introText">
+                Create your customer account to order food.
+            </p>
 
             <form id="registerForm">
                 <div class="form-group">
-                    <label for="fullName">Full Name</label>
+                    <label for="fullName" id="nameLabel">Full Name</label>
                     <input
                         type="text"
                         id="fullName"
                         placeholder="Enter your full name"
                         autocomplete="name"
+                        maxlength="100"
                         required
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="phone">Phone Number</label>
+                    <label for="phone" id="phoneLabel">Phone Number</label>
                     <input
                         type="tel"
                         id="phone"
                         placeholder="Enter your phone number"
                         autocomplete="tel"
+                        maxlength="25"
                         required
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Email</label>
+                    <label for="email" id="emailLabel">Email Address</label>
                     <input
                         type="email"
                         id="email"
                         placeholder="Enter your email"
                         autocomplete="email"
+                        maxlength="254"
                         required
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="Create a password"
-                        minlength="6"
-                        autocomplete="new-password"
-                        required
-                    >
+                    <label for="password" id="passwordLabel">Password</label>
+
+                    <div class="password-wrap">
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Create a password"
+                            minlength="6"
+                            maxlength="72"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            id="showPassword"
+                        >Show</button>
+                    </div>
+
+                    <div class="password-hint" id="passwordHint">
+                        Use at least 6 characters.
+                    </div>
                 </div>
 
                 <button
@@ -158,24 +307,133 @@
                 </button>
             </form>
 
-            <div id="errorMessage" class="message error" role="alert"></div>
-            <div id="successMessage" class="message success" role="status"></div>
+            <div
+                id="errorMessage"
+                class="message error"
+                role="alert"
+                aria-live="polite"
+            ></div>
+
+            <div
+                id="successMessage"
+                class="message success"
+                role="status"
+                aria-live="polite"
+            ></div>
 
             <div class="login-link">
-                Already have an account?
-                <a href="customer-login.html">Login</a>
+                <span id="loginText">Already have an account?</span>
+                <a href="customer-login.html" id="loginLink">Login</a>
             </div>
-        </div>
+
+            <a href="index.html" class="home-link" id="homeLink">
+                ← Back to Home
+            </a>
+        </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
 
     <script>
+        const translations = {
+            en: {
+                title: "Create Account",
+                intro: "Create your customer account to order food.",
+                name: "Full Name",
+                namePlaceholder: "Enter your full name",
+                phone: "Phone Number",
+                phonePlaceholder: "Enter your phone number",
+                email: "Email Address",
+                emailPlaceholder: "Enter your email",
+                password: "Password",
+                passwordPlaceholder: "Create a password",
+                show: "Show",
+                hide: "Hide",
+                passwordHint: "Use at least 6 characters.",
+                register: "Create Account",
+                creating: "Creating account...",
+                loginText: "Already have an account?",
+                loginLink: "Login",
+                home: "← Back to Home",
+                required: "Please complete all fields.",
+                invalidName: "Please enter your full name.",
+                invalidPhone: "Please enter a valid phone number.",
+                invalidEmail: "Please enter a valid email address.",
+                shortPassword: "Password must contain at least 6 characters.",
+                longPassword: "Password is too long. Please use a shorter password.",
+                noClient: "Supabase connection was not found. Check supabase.js.",
+                success: "Account created successfully. Redirecting to the home page...",
+                confirmEmail: "Account created. Check your email to confirm your account, then log in.",
+                alreadyRegistered: "This email may already be registered. Try logging in instead.",
+                weakPassword: "Password is too weak. Please choose a stronger password.",
+                network: "Cannot connect to the server. Check your internet connection.",
+                failed: "Registration failed. Please try again.",
+                loginFailed: "Account was created, but automatic login could not be completed. Please log in.",
+                rateLimit: "Too many attempts. Please wait a while and try again."
+            },
+            sw: {
+                title: "Fungua Akaunti",
+                intro: "Fungua akaunti ya mteja ili kuagiza chakula.",
+                name: "Jina Kamili",
+                namePlaceholder: "Weka jina lako kamili",
+                phone: "Namba ya Simu",
+                phonePlaceholder: "Weka namba yako ya simu",
+                email: "Barua Pepe",
+                emailPlaceholder: "Weka barua pepe yako",
+                password: "Nenosiri",
+                passwordPlaceholder: "Tengeneza nenosiri",
+                show: "Onyesha",
+                hide: "Ficha",
+                passwordHint: "Tumia angalau herufi au alama 6.",
+                register: "Fungua Akaunti",
+                creating: "Akaunti inatengenezwa...",
+                loginText: "Tayari una akaunti?",
+                loginLink: "Ingia",
+                home: "← Rudi Mwanzo",
+                required: "Tafadhali jaza sehemu zote.",
+                invalidName: "Tafadhali weka jina lako kamili.",
+                invalidPhone: "Tafadhali weka namba sahihi ya simu.",
+                invalidEmail: "Tafadhali weka barua pepe sahihi.",
+                shortPassword: "Nenosiri lazima liwe na angalau herufi au alama 6.",
+                longPassword: "Nenosiri ni refu sana. Tafadhali tumia nenosiri fupi zaidi.",
+                noClient: "Muunganisho wa Supabase haujapatikana. Kagua supabase.js.",
+                success: "Akaunti imetengenezwa. Inakuelekeza kwenye ukurasa wa mwanzo...",
+                confirmEmail: "Akaunti imetengenezwa. Kagua barua pepe yako kuthibitisha akaunti, kisha ingia.",
+                alreadyRegistered: "Huenda barua pepe hii tayari imesajiliwa. Jaribu kuingia.",
+                weakPassword: "Nenosiri ni dhaifu. Tafadhali chagua nenosiri imara zaidi.",
+                network: "Imeshindikana kuunganisha na seva. Kagua intaneti yako.",
+                failed: "Usajili umeshindikana. Tafadhali jaribu tena.",
+                loginFailed: "Akaunti imetengenezwa, lakini kuingia moja kwa moja kumeshindikana. Tafadhali ingia.",
+                rateLimit: "Umejaribu mara nyingi. Subiri kidogo kisha ujaribu tena."
+            }
+        };
+
         const registerForm = document.getElementById("registerForm");
         const registerBtn = document.getElementById("registerBtn");
         const errorMessage = document.getElementById("errorMessage");
         const successMessage = document.getElementById("successMessage");
+        const passwordInput = document.getElementById("password");
+        const showPasswordBtn = document.getElementById("showPassword");
+        const languageSelect = document.getElementById("languageSelect");
+
+        let language = localStorage.getItem("foodLanguage") || "en";
+
+        function getSupabaseClient() {
+            if (typeof db !== "undefined" && db && db.auth) {
+                return db;
+            }
+
+            if (
+                typeof supabaseClient !== "undefined" &&
+                supabaseClient &&
+                supabaseClient.auth
+            ) {
+                return supabaseClient;
+            }
+
+            return null;
+        }
 
         function showError(message) {
             errorMessage.textContent = message;
@@ -183,41 +441,120 @@
             successMessage.style.display = "none";
         }
 
-        registerForm.addEventListener("submit", async function(event) {
-            event.preventDefault();
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = "block";
+            errorMessage.style.display = "none";
+        }
 
+        function clearMessages() {
             errorMessage.style.display = "none";
             successMessage.style.display = "none";
+        }
+
+        function updateLanguage() {
+            const t = translations[language] || translations.en;
+
+            document.documentElement.lang = language;
+
+            document.getElementById("pageTitle").textContent = t.title;
+            document.getElementById("introText").textContent = t.intro;
+
+            document.getElementById("nameLabel").textContent = t.name;
+            document.getElementById("fullName").placeholder = t.namePlaceholder;
+
+            document.getElementById("phoneLabel").textContent = t.phone;
+            document.getElementById("phone").placeholder = t.phonePlaceholder;
+
+            document.getElementById("emailLabel").textContent = t.email;
+            document.getElementById("email").placeholder = t.emailPlaceholder;
+
+            document.getElementById("passwordLabel").textContent = t.password;
+            passwordInput.placeholder = t.passwordPlaceholder;
+
+            showPasswordBtn.textContent =
+                passwordInput.type === "password" ? t.show : t.hide;
+
+            document.getElementById("passwordHint").textContent = t.passwordHint;
+            document.getElementById("loginText").textContent = t.loginText;
+            document.getElementById("loginLink").textContent = t.loginLink;
+            document.getElementById("homeLink").textContent = t.home;
+
+            if (!registerBtn.disabled) {
+                registerBtn.textContent = t.register;
+            }
+
+            languageSelect.value = language;
+        }
+
+        languageSelect.addEventListener("change", function() {
+            language = this.value;
+            localStorage.setItem("foodLanguage", language);
+            updateLanguage();
+            clearMessages();
+        });
+
+        showPasswordBtn.addEventListener("click", function() {
+            passwordInput.type =
+                passwordInput.type === "password" ? "text" : "password";
+
+            updateLanguage();
+        });
+
+        registerForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            clearMessages();
+
+            const t = translations[language] || translations.en;
 
             const fullName = document.getElementById("fullName").value.trim();
             const phone = document.getElementById("phone").value.trim();
             const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value;
+            const password = passwordInput.value;
 
             if (!fullName || !phone || !email || !password) {
-                showError("Please complete all fields.");
+                showError(t.required);
+                return;
+            }
+
+            if (fullName.length < 2) {
+                showError(t.invalidName);
+                return;
+            }
+
+            if (!/^[+0-9()\s-]{7,25}$/.test(phone)) {
+                showError(t.invalidPhone);
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError(t.invalidEmail);
                 return;
             }
 
             if (password.length < 6) {
-                showError("Password must contain at least 6 characters.");
+                showError(t.shortPassword);
                 return;
             }
 
-            // supabase.js in this project creates the client as db.
-            if (typeof db === "undefined" || !db.auth) {
-                showError(
-                    "Supabase client was not found. Check that supabase.js loads correctly."
-                );
-                console.error("Supabase client db is missing.");
+            if (password.length > 72) {
+                showError(t.longPassword);
+                return;
+            }
+
+            const client = getSupabaseClient();
+
+            if (!client) {
+                showError(t.noClient);
+                console.error("Supabase client not found. Check supabase.js.");
                 return;
             }
 
             registerBtn.disabled = true;
-            registerBtn.textContent = "Creating account...";
+            registerBtn.textContent = t.creating;
 
             try {
-                const { data, error } = await db.auth.signUp({
+                const { data, error } = await client.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -233,46 +570,69 @@
                     throw error;
                 }
 
-                if (!data.user) {
-                    throw new Error("Account could not be created. Please try again.");
+                if (!data || !data.user) {
+                    throw new Error("Account could not be created.");
                 }
-
-                if (!data.session) {
-                    successMessage.textContent =
-                        "Account created. Check your email to confirm your account, then log in.";
-                    successMessage.style.display = "block";
-                    registerForm.reset();
-                    return;
-                }
-
-                successMessage.textContent =
-                    "Account created successfully. Opening your account...";
-                successMessage.style.display = "block";
 
                 registerForm.reset();
 
-                window.setTimeout(function() {
-                    window.location.assign("index.html");
-                }, 1000);
+                if (!data.session) {
+                    showSuccess(t.confirmEmail);
+                    return;
+                }
+
+                showSuccess(t.success);
+
+                // Preserve the existing workflow and database.
+                window.location.assign("index.html");
 
             } catch (error) {
                 console.error("Customer registration error:", error);
 
-                let message = error && error.message
-                    ? error.message
-                    : "Registration failed. Please try again.";
+                const message = String(error?.message || "").toLowerCase();
+                let friendlyMessage = t.failed;
 
-                if (message.toLowerCase().includes("already registered")) {
-                    message = "This email is already registered. Please log in instead.";
+                if (
+                    message.includes("already registered") ||
+                    message.includes("already been registered") ||
+                    message.includes("user already exists")
+                ) {
+                    friendlyMessage = t.alreadyRegistered;
+                } else if (
+                    message.includes("password") &&
+                    (
+                        message.includes("weak") ||
+                        message.includes("strength") ||
+                        message.includes("easy to guess")
+                    )
+                ) {
+                    friendlyMessage = t.weakPassword;
+                } else if (
+                    message.includes("rate limit") ||
+                    message.includes("too many requests")
+                ) {
+                    friendlyMessage = t.rateLimit;
+                } else if (
+                    message.includes("failed to fetch") ||
+                    message.includes("network") ||
+                    message.includes("fetch")
+                ) {
+                    friendlyMessage = t.network;
+                } else if (error?.message) {
+                    // Preserve useful Supabase error details.
+                    friendlyMessage = error.message;
                 }
 
-                showError(message);
+                showError(friendlyMessage);
 
             } finally {
                 registerBtn.disabled = false;
-                registerBtn.textContent = "Create Account";
+                registerBtn.textContent = t.register;
             }
         });
+
+        updateLanguage();
     </script>
 </body>
 </html>
+```
