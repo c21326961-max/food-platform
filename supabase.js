@@ -1,28 +1,11 @@
-
 (function () {
-    "use strict";
+    const url = "https://ienquzigbawhvthnirtj.supabase.co";
+    const key = "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
 
-    const SUPABASE_URL = "https://ienquzigbawhvthnirtj.supabase.co";
-
-    const SUPABASE_KEY = "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
-
-    function initializeSupabase() {
-        if (!window.supabase || typeof window.supabase.createClient !== "function") {
-            console.error("Supabase library haijapakia.");
-            return;
-        }
-
-        if (window.db && window.db.auth) {
-            return;
-        }
-
-        window.db = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
-
-        console.log("Supabase client imeandaliwa.");
+    if (!window.supabase) {
+        console.error("Supabase library haijapakia.");
+        return;
     }
 
-    initializeSupabase();
+    window.db = window.supabase.createClient(url, key);
 })();
