@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Restaurant | Food Platform</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .restaurant-hero {
+            background: #ff6b35;
+            color: white;
+            padding: 20px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        #languageSelect {
+            border: 1px solid rgba(255,255,255,.55);
+            background: rgba(255,255,255,.15);
+            color: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        #languageSelect option {
+            color: #222;
+            background: white;
+        }
+
+        .toast-message {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            background: #222;
+            color: white;
+            padding: 11px 16px;
+            border-radius: 10px;
+            z-index: 1000;
+            box-shadow: 0 5px 18px rgba(0,0,0,.22);
+            max-width: calc(100% - 32px);
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .restaurant-cover {
+            width: 100%;
+            max-height: 240px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-top: 15px;
+            display: block;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .restaurant-title {
+            margin-top: 14px;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .restaurant-description {
+            margin-top: 7px;
+            line-height: 1.5;
+            opacity: .95;
+        }
+
+        .restaurant-details {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .detail {
+            background: rgba(255,255,255,.16);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 13px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0,0,0,.07);
+        }
+
+        .food-image {
+            width: 100%;
+            height: 175px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .food-placeholder {
+            width: 100%;
+            height: 175px;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 15px;
+        }
+
+        .food-info {
+            padding: 14px;
+        }
+
+        .food-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .food-description {
+            margin-top: 6px;
+            color: #777;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .food-category {
+            margin-top: 7px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .food-price {
+            margin-top: 9px;
+            color: #ff6b35;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .availability {
+            display: inline-block;
+            margin-top: 9px;
+            padding: 5px 8px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .available {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .cart-button {
+            width: 100%;
+            margin-top: 12px;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            background: #ff6b35;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .cart-button:hover {
+            opacity: .9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px 15px;
+            color: #777;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px 15px;
+            background: white;
+            border-radius: 12px;
+            color: #777;
+        }
+
+        .cart-count {
+            position: fixed;
+            right: 18px;
+            bottom: 70px;
+            background: #ff6b35;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 25px;
+            box-shadow: 0 4px 14px rgba(0,0,0,.18);
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .restaurant-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: white;
+            margin-top: 14px;
+            border: 3px solid rgba(255,255,255,.8);
+        }
+
+        @media (max-width: 600px) {
+
+            .restaurant-title {
+                font-size: 23px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .food-image,
+            .food-placeholder {
+                height: 190px;
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+<header class="restaurant-hero">
+
+    <div class="header-content">
+
+        <div class="top-actions">
+            <a href="index.html" class="back-link" id="backLink">← Back</a>
+            <select id="languageSelect" aria-label="Choose language">
+                <option value="en">English</option>
+                <option value="sw">Kiswahili</option>
+            </select>
+        </div>
+
+        <img
+            id="restaurantLogo"
+            class="restaurant-logo"
+            style="display:none;"
+            alt="Restaurant logo"
+        >
+
+        <div
+            id="restaurantName"
+            class="restaurant-title"
+        >
+            Loading restaurant...
+        </div>
+
+        <div
+            id="restaurantDescription"
+            class="restaurant-description"
+        >
+            Loading...
+        </div>
+
+        <div
+            id="restaurantDetails"
+            class="restaurant-details"
+        ></div>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="menu-header">
+
+        <h2 class="section-title" style="margin:0;">
+            <span id="menuHeading">Menu</span>
+        </h2>
+
+    </div>
+
+
+    <div id="menuContainer">
+
+        <div class="loading">
+            Loading menu...
+        </div>
+
+    </div>
+
+</main>
+
+
+<div
+    id="cartButton"
+    class="cart-count"
+    onclick="goToCart()"
+>
+    <span id="cartLabel">Cart</span>
+    <span id="cartCount">0</span>
+</div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://ienquzigbawhvthnirtj.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+
+const db =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =====================================================
+   LANGUAGE (English / Kiswahili)
+===================================================== */
+const languageSelect = document.getElementById("languageSelect");
+const translations = {
+    en: {
+        back: "← Back", menu: "Menu", cart: "Cart",
+        loadingRestaurant: "Loading restaurant...", loading: "Loading...",
+        restaurantNotFound: "Restaurant not found",
+        restaurantIdMissing: t("restaurantIdMissing"),
+        failedRestaurant: "Failed to load restaurant",
+        restaurantDoesNotExist: t("restaurantDoesNotExist"),
+        unableRestaurant: "Unable to load restaurant",
+        delicious: t("delicious"),
+        rating: "Rating", delivery: "Delivery", pickup: t("pickup"),
+        loadingMenu: t("loadingMenu"), failedMenu: "Failed to load menu.",
+        noFood: t("noFood"), food: t("food"),
+        noDescription: t("noDescription"), category: "Category",
+        available: "Available", addToCart: "Add to Cart",
+        unavailable: t("unavailable"),
+        anotherRestaurant: "Your cart already contains food from another restaurant. Please complete or clear that cart first.",
+        added: "added to cart"
+    },
+    sw: {
+        back: "← Rudi", menu: "Menyu", cart: "Kikapu",
+        loadingRestaurant: "Inapakia mgahawa...", loading: "Inapakia...",
+        restaurantNotFound: "Mgahawa haujapatikana",
+        restaurantIdMissing: "Kitambulisho cha mgahawa hakipo.",
+        failedRestaurant: "Imeshindwa kupakia mgahawa",
+        restaurantDoesNotExist: "Mgahawa huu haupo.",
+        unableRestaurant: "Haiwezekani kupakia mgahawa",
+        delicious: "Chakula kitamu karibu nawe.",
+        rating: "Ukadiriaji", delivery: "Usafirishaji", pickup: "Kuchukua chakula mwenyewe",
+        loadingMenu: "Inapakia menyu...", failedMenu: "Imeshindwa kupakia menyu.",
+        noFood: "Hakuna chakula kinachopatikana kwa sasa.", food: "Chakula",
+        noDescription: "Hakuna maelezo.", category: "Aina",
+        available: "Kinapatikana", addToCart: "Weka Kikapuni",
+        unavailable: "Chakula hiki hakipatikani kwa sasa.",
+        anotherRestaurant: "Kikapu chako tayari kina chakula kutoka mgahawa mwingine. Tafadhali kamilisha au futa kikapu hicho kwanza.",
+        added: "kimeongezwa kikapuni"
+    }
+};
+let currentLanguage = localStorage.getItem("foodLanguage") || "en";
+if (!["en", "sw"].includes(currentLanguage)) currentLanguage = "en";
+if (languageSelect) {
+    languageSelect.value = currentLanguage;
+    languageSelect.addEventListener("change", () => {
+        currentLanguage = languageSelect.value;
+        localStorage.setItem("foodLanguage", currentLanguage);
+        applyLanguage();
+        renderRestaurant();
+        if (menuData.length) renderMenu();
+    });
+}
+function t(key) {
+    return (translations[currentLanguage] && translations[currentLanguage][key]) ||
+           translations.en[key] || key;
+}
+function applyLanguage() {
+    document.documentElement.lang = currentLanguage;
+    const back = document.getElementById("backLink");
+    const menuHeading = document.getElementById("menuHeading");
+    const cartLabel = document.getElementById("cartLabel");
+    if (back) back.textContent = t("back");
+    if (menuHeading) menuHeading.textContent = t("menu");
+    if (cartLabel) cartLabel.textContent = t("cart");
+}
+function showToast(message) {
+    let toast = document.getElementById("toastMessage");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toastMessage";
+        toast.className = "toast-message";
+        toast.setAttribute("role", "status");
+        toast.setAttribute("aria-live", "polite");
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.hidden = false;
+    if (showToast.hideTimer) clearTimeout(showToast.hideTimer);
+    showToast.hideTimer = setTimeout(() => { toast.hidden = true; }, 2200);
+}
+applyLanguage();
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let restaurantId = null;
+
+let restaurantData = null;
+
+let menuData = [];
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const restaurantName =
+    document.getElementById(
+        "restaurantName"
+    );
+
+const restaurantDescription =
+    document.getElementById(
+        "restaurantDescription"
+    );
+
+const restaurantDetails =
+    document.getElementById(
+        "restaurantDetails"
+    );
+
+const restaurantLogo =
+    document.getElementById(
+        "restaurantLogo"
+    );
+
+const menuContainer =
+    document.getElementById(
+        "menuContainer"
+    );
+
+const cartCount =
+    document.getElementById(
+        "cartCount"
+    );
+
+
+/* =====================================================
+   GET RESTAURANT ID
+===================================================== */
+
+function getRestaurantId() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    return params.get("id");
+
+}
+
+
+/* =====================================================
+   LOAD RESTAURANT
+===================================================== */
+
+async function loadRestaurant() {
+
+    restaurantId =
+        getRestaurantId();
+
+
+    if (!restaurantId) {
+
+        restaurantName.textContent =
+            t("restaurantNotFound");
+
+        restaurantDescription.textContent =
+            "";
+
+        menuContainer.innerHTML = `
+            <div class="error-box">
+                Restaurant ID is missing.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await db
+            .from("food_restaurants")
+            .select("*")
+            .eq("id", restaurantId)
+            .maybeSingle();
+
+
+        if (error) {
+
+            console.error(
+                "Restaurant error:",
+                error
+            );
+
+            restaurantName.textContent =
+                t("failedRestaurant");
+
+            restaurantDescription.textContent =
+                "";
+
+            menuContainer.innerHTML = `
+                <div class="error-box">
+                    ${escapeHTML(error.message)}
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        if (!data) {
+
+            restaurantName.textContent =
+                t("restaurantNotFound");
+
+            restaurantDescription.textContent =
+                "";
+
+            menuContainer.innerHTML = `
+                <div class="error-box">
+                    This restaurant does not exist.
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        restaurantData =
+            data;
+
+
+        renderRestaurant();
+
+
+        await loadMenu();
+
+    } catch (error) {
+
+        console.error(
+            "Unexpected error:",
+            error
+        );
+
+        restaurantName.textContent =
+            t("unableRestaurant");
+
+        restaurantDescription.textContent =
+            "";
+
+        menuContainer.innerHTML = `
+            <div class="error-box">
+                ${escapeHTML(error.message)}
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   RENDER RESTAURANT
+===================================================== */
+
+function renderRestaurant() {
+
+    restaurantName.textContent =
+        restaurantData.name ||
+        "Restaurant";
+
+
+    restaurantDescription.textContent =
+        restaurantData.description ||
+        t("delicious");
+
+
+    restaurantDetails.innerHTML =
+        "";
+
+
+    /*
+     * LOGO
+     */
+
+    if (restaurantData.logo_url) {
+
+        restaurantLogo.src =
+            restaurantData.logo_url;
+
+        restaurantLogo.style.display =
+            "block";
+
+    }
+
+
+    /*
+     * RATING
+     */
+
+    if (
+        restaurantData.rating !== null &&
+        restaurantData.rating !== undefined
+    ) {
+
+        addDetail(
+            t("rating") + " " +
+            Number(
+                restaurantData.rating
+            ).toFixed(1)
+        );
+
+    }
+
+
+    /*
+     * ADDRESS
+     */
+
+    if (restaurantData.address) {
+
+        addDetail(
+            restaurantData.address
+        );
+
+    }
+
+
+    /*
+     * PHONE
+     */
+
+    if (restaurantData.phone) {
+
+        addDetail(
+            restaurantData.phone
+        );
+
+    }
+
+
+    /*
+     * OPENING HOURS
+     */
+
+    if (
+        restaurantData.opening_time &&
+        restaurantData.closing_time
+    ) {
+
+        addDetail(
+            restaurantData.opening_time +
+            " - " +
+            restaurantData.closing_time
+        );
+
+    }
+
+
+    /*
+     * DELIVERY
+     */
+
+    if (restaurantData.delivery_available) {
+
+        addDetail(
+            t("delivery") + " TSh " +
+            Number(
+                restaurantData.delivery_fee || 0
+            ).toLocaleString()
+        );
+
+    } else {
+
+        addDetail(
+            t("pickup")
+        );
+
+    }
+
+
+}
+
+
+/* =====================================================
+   ADD DETAIL
+===================================================== */
+
+function addDetail(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "detail";
+
+    div.textContent =
+        text;
+
+    restaurantDetails.appendChild(
+        div
+    );
+
+}
+
+
+/* =====================================================
+   LOAD MENU
+===================================================== */
+
+async function loadMenu() {
+
+    menuContainer.innerHTML = `
+        <div class="loading">
+            Loading menu...
+        </div>
+    `;
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await db
+            .from("food_menu")
+            .select("*")
+            .eq(
+                "restaurant_id",
+                restaurantId
+            )
+            .eq(
+                "is_available",
+                true
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Menu error:",
+                error
+            );
+
+            menuContainer.innerHTML = `
+                <div class="error-box">
+                    Failed to load menu.<br>
+                    ${escapeHTML(error.message)}
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        menuData =
+            data || [];
+
+
+        if (menuData.length === 0) {
+
+            menuContainer.innerHTML = `
+                <div class="empty">
+                    No food available right now.
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        renderMenu();
+
+    } catch (error) {
+
+        console.error(
+            "Unexpected menu error:",
+            error
+        );
+
+        menuContainer.innerHTML = `
+            <div class="error-box">
+                ${escapeHTML(error.message)}
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   RENDER MENU
+===================================================== */
+
+function renderMenu() {
+
+    menuContainer.innerHTML =
+        '<div class="menu-grid"></div>';
+
+
+    const grid =
+        menuContainer.querySelector(
+            ".menu-grid"
+        );
+
+
+    menuData.forEach(
+        function(food) {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "food-card";
+
+
+            /*
+             * IMAGE
+             */
+
+            if (food.image_url) {
+
+                const image =
+                    document.createElement("img");
+
+                image.className =
+                    "food-image";
+
+                image.src =
+                    food.image_url;
+
+                image.alt =
+                    food.name || t("food");
+
+                image.onerror =
+                    function() {
+
+                        this.style.display =
+                            "none";
+
+                        const placeholder =
+                            document.createElement(
+                                "div"
+                            );
+
+                        placeholder.className =
+                            "food-placeholder";
+
+                        placeholder.textContent =
+                            t("food");
+
+                        this.parentNode.insertBefore(
+                            placeholder,
+                            this.nextSibling
+                        );
+
+                    };
+
+                card.appendChild(
+                    image
+                );
+
+            } else {
+
+                const placeholder =
+                    document.createElement(
+                        "div"
+                    );
+
+                placeholder.className =
+                    "food-placeholder";
+
+                placeholder.textContent =
+                    t("food");
+
+                card.appendChild(
+                    placeholder
+                );
+
+            }
+
+
+            /*
+             * INFO
+             */
+
+            const info =
+                document.createElement("div");
+
+            info.className =
+                "food-info";
+
+
+            const name =
+                document.createElement("div");
+
+            name.className =
+                "food-name";
+
+            name.textContent =
+                food.name ||
+                t("food");
+
+
+            const description =
+                document.createElement("div");
+
+            description.className =
+                "food-description";
+
+            description.textContent =
+                food.description ||
+                t("noDescription");
+
+
+            const category =
+                document.createElement("div");
+
+            category.className =
+                "food-category";
+
+            category.textContent =
+                t("category") + ": " +
+                (
+                    food.category ||
+                    "Other"
+                );
+
+
+            const price =
+                document.createElement("div");
+
+            price.className =
+                "food-price";
+
+            price.textContent =
+                "TSh " +
+                Number(
+                    food.price || 0
+                ).toLocaleString();
+
+
+            const availability =
+                document.createElement("span");
+
+            availability.className =
+                "availability available";
+
+            availability.textContent =
+                t("available");
+
+
+            /*
+             * ADD TO CART BUTTON
+             */
+
+            const button =
+                document.createElement("button");
+
+            button.type =
+                "button";
+
+            button.className =
+                "cart-button";
+
+            button.textContent =
+                t("addToCart");
+
+
+            button.onclick =
+                function() {
+
+                    addToCart(food);
+
+                };
+
+
+            info.appendChild(
+                name
+            );
+
+            info.appendChild(
+                description
+            );
+
+            info.appendChild(
+                category
+            );
+
+            info.appendChild(
+                price
+            );
+
+            info.appendChild(
+                availability
+            );
+
+            info.appendChild(
+                button
+            );
+
+
+            card.appendChild(
+                info
+            );
+
+
+            grid.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   ADD TO CART
+===================================================== */
+
+function addToCart(food) {
+
+    if (!food.is_available) {
+
+        alert(
+            t("unavailable")
+        );
+
+        return;
+
+    }
+
+
+    let cart = [];
+
+
+    try {
+
+        cart =
+            JSON.parse(
+                localStorage.getItem(
+                    "foodCart"
+                )
+            ) || [];
+
+    } catch {
+
+        cart = [];
+
+    }
+
+
+    /*
+     * Prevent mixing restaurants
+     */
+
+    if (
+        cart.length > 0 &&
+        cart.some(
+            item =>
+                String(
+                    item.restaurant_id
+                ) !==
+                String(
+                    food.restaurant_id
+                )
+        )
+    ) {
+
+        showToast(t("anotherRestaurant"));
+        return;
+
+    }
+
+
+    const existing =
+        cart.find(
+            item =>
+                String(item.menu_id) ===
+                String(food.id)
+        );
+
+
+    if (existing) {
+
+        existing.quantity =
+            Number(
+                existing.quantity || 0
+            ) + 1;
+
+    } else {
+
+        cart.push({
+
+            menu_id:
+                food.id,
+
+            restaurant_id:
+                food.restaurant_id,
+
+            food_name:
+                food.name,
+
+            price:
+                Number(
+                    food.price || 0
+                ),
+
+            quantity:
+                1,
+
+            image_url:
+                food.image_url || ""
+
+        });
+
+    }
+
+
+    localStorage.setItem(
+        "foodCart",
+        JSON.stringify(cart)
+    );
+
+
+    updateCartCount();
+
+
+    showToast(food.name + " " + t("added"));
+
+}
+
+
+/* =====================================================
+   CART COUNT
+===================================================== */
+
+function updateCartCount() {
+
+    let cart = [];
+
+
+    try {
+
+        cart =
+            JSON.parse(
+                localStorage.getItem(
+                    "foodCart"
+                )
+            ) || [];
+
+    } catch {
+
+        cart = [];
+
+    }
+
+
+    let count = 0;
+
+
+    cart.forEach(
+        function(item) {
+
+            count +=
+                Number(
+                    item.quantity || 0
+                );
+
+        }
+    );
+
+
+    cartCount.textContent =
+        count;
+
+}
+
+
+/* =====================================================
+   GO TO CART
+===================================================== */
+
+function goToCart() {
+
+    window.location.href =
+        "cart.html";
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+window.addEventListener("storage", (event) => {
+    if (event.key === "foodLanguage") {
+        currentLanguage = event.newValue === "sw" ? "sw" : "en";
+        if (languageSelect) languageSelect.value = currentLanguage;
+        applyLanguage();
+        if (restaurantData) renderRestaurant();
+        if (menuData.length) renderMenu();
+    }
+    if (event.key === "foodCart") updateCartCount();
+});
+
+loadRestaurant();
+
+updateCartCount();
+
+</script>
+
+</body>
+</html>
