@@ -1,1092 +1,654 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Order Confirmation | Food Platform</title>
-
-    <link rel="stylesheet"
-          href="style.css">
+    <link rel="stylesheet" href="style.css">
 
     <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #f8fafc;
+            color: #1f2937;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: #fff;
+            box-shadow: 0 2px 10px #0000000d;
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: auto;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 20px;
+            color: #f97316;
+        }
+
+        .language-select {
+            padding: 9px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            background: white;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 25px auto;
+            padding: 0 14px 30px;
+        }
+
+        .card {
+            margin-bottom: 18px;
+            padding: 22px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px #0000000a;
+        }
+
+        .success-card { text-align: center; }
+
+        .success-icon {
+            font-size: 62px;
+            line-height: 1.3;
+        }
+
+        h1 { font-size: 27px; margin: 10px 0; }
+        h2 { font-size: 19px; margin: 0 0 18px; }
+
+        .muted { color: #6b7280; }
+        .info-row, .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .info-row span:first-child,
+        .summary-row span:first-child { color: #6b7280; }
+
+        .info-row strong {
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .order-number-box {
+            margin-top: 20px;
+            padding: 16px;
+            background: #fff7ed;
+            border-radius: 12px;
+        }
+
+        #orderNumber {
+            display: block;
+            margin-top: 7px;
+            color: #ea580c;
+            font-size: 23px;
+            overflow-wrap: anywhere;
+        }
 
         .status-box {
-            margin-top: 15px;
             display: inline-block;
             padding: 10px 20px;
             border-radius: 20px;
             font-weight: bold;
             background: #fff7ed;
-            color: #ea580c;
-        }
-
-        .status-message {
-            margin-top: 12px;
-            color: #777;
-            font-size: 14px;
-        }
-
-        .status-updated {
-            margin-top: 10px;
-            font-size: 13px;
-            color: #16a34a;
-            font-weight: bold;
-            display: none;
-        }
-
-        .status-cancelled {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-confirmed {
-            background: #ecfdf5;
-            color: #166534;
-        }
-
-        .status-preparing {
-            background: #fff7ed;
             color: #c2410c;
         }
 
-        .status-ready {
-            background: #eff6ff;
-            color: #1d4ed8;
+        .status-confirmed { background: #dcfce7; color: #166534; }
+        .status-preparing { background: #ffedd5; color: #9a3412; }
+        .status-ready { background: #dbeafe; color: #1d4ed8; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+        .status-message { margin: 12px 0 0; color: #6b7280; }
+        .status-updated {
+            display: none;
+            margin-top: 12px;
+            color: #15803d;
+            font-size: 13px;
+            font-weight: bold;
         }
 
-    </style>
+        .food-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+        }
 
+        .food-row:last-child { border-bottom: none; }
+
+        .food-details { min-width: 0; }
+        .food-name { overflow-wrap: anywhere; }
+        .food-price { color: #6b7280; font-size: 14px; margin-top: 5px; }
+        .food-total { white-space: nowrap; }
+
+        .grand-total {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #ddd;
+            font-size: 21px;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 12px;
+            border: 2px solid #f97316;
+            border-radius: 12px;
+            background: white;
+            color: #f97316;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .primary-button {
+            background: #f97316;
+            color: white;
+            border-color: #f97316;
+        }
+
+        .action-button:active { transform: scale(.99); }
+
+        .notice {
+            padding: 14px;
+            background: #fff7ed;
+            color: #9a3412;
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .header-content { align-items: flex-start; }
+            .logo { font-size: 17px; }
+            .card { padding: 17px; }
+            h1 { font-size: 24px; }
+            .info-row { flex-direction: column; gap: 4px; }
+            .info-row strong { text-align: left; }
+        }
+    </style>
 </head>
 
 <body>
-
-
 <header>
-
     <div class="header-content">
+        <div class="logo">🍽️ Food Platform</div>
 
-        <div class="logo">
-            🍽️ Food Platform
-        </div>
-
-        <div class="location">
-            Order Received
-        </div>
-
+        <select id="languageSelect" class="language-select"
+                aria-label="Choose language">
+            <option value="en">English</option>
+            <option value="sw">Kiswahili</option>
+        </select>
     </div>
-
 </header>
-
 
 <main class="container">
 
-
-    <!-- SUCCESS -->
-
-    <div style="
-        background:white;
-        padding:30px 20px;
-        border-radius:20px;
-        text-align:center;
-        box-shadow:0 4px 15px rgba(0,0,0,0.08);
-    ">
-
-        <div style="
-            font-size:70px;
-        ">
-            ✅
-        </div>
-
-
-        <h1 style="
-            margin-top:10px;
-        ">
-            Order Received!
-        </h1>
-
-
-        <p style="
-            margin-top:10px;
-            color:#666;
-        ">
-            Thank you! Your order has been received
-            and is waiting for confirmation.
+    <section class="card success-card">
+        <div class="success-icon">✅</div>
+        <h1 data-i18n="received">Order Received!</h1>
+        <p class="muted" data-i18n="receivedMessage">
+            Thank you! Your order has been received.
         </p>
 
-
-        <div style="
-            margin-top:20px;
-            background:#fff7ed;
-            padding:15px;
-            border-radius:12px;
-        ">
-
-            <div style="
-                color:#777;
-                font-size:14px;
-            ">
-                Order Number
-            </div>
-
-
-            <strong
-                id="orderNumber"
-                style="
-                display:block;
-                margin-top:5px;
-                font-size:22px;
-                color:#ff6b35;
-                ">
-
-                Loading...
-
-            </strong>
-
+        <div class="order-number-box">
+            <div class="muted" data-i18n="orderNumber">Order Number</div>
+            <strong id="orderNumber">Loading...</strong>
         </div>
-
-    </div>
-
-
-
-    <!-- CUSTOMER INFORMATION -->
-
-    <section style="
-        margin-top:20px;
-        background:white;
-        padding:20px;
-        border-radius:18px;
-        box-shadow:0 4px 15px rgba(0,0,0,0.08);
-    ">
-
-        <h2>
-            👤 Customer Information
-        </h2>
-
-
-        <div style="margin-top:15px;">
-
-            <strong>Name</strong>
-
-            <p
-                id="customerName"
-                style="
-                margin-top:5px;
-                color:#666;
-                ">
-            </p>
-
-        </div>
-
-
-        <div style="margin-top:15px;">
-
-            <strong>Phone</strong>
-
-            <p
-                id="customerPhone"
-                style="
-                margin-top:5px;
-                color:#666;
-                ">
-            </p>
-
-        </div>
-
-
-        <div style="margin-top:15px;">
-
-            <strong>Location</strong>
-
-            <p
-                id="customerLocation"
-                style="
-                margin-top:5px;
-                color:#666;
-                ">
-            </p>
-
-        </div>
-
-
-        <div style="margin-top:15px;">
-
-            <strong>Delivery Type</strong>
-
-            <p
-                id="deliveryType"
-                style="
-                margin-top:5px;
-                color:#666;
-                ">
-            </p>
-
-        </div>
-
     </section>
 
+    <div id="pageNotice" class="notice" style="display:none;"></div>
 
+    <section class="card">
+        <h2 data-i18n="customerInfo">👤 Customer Information</h2>
 
-    <!-- ORDER ITEMS -->
-
-    <section style="
-        margin-top:20px;
-        background:white;
-        padding:20px;
-        border-radius:18px;
-        box-shadow:0 4px 15px rgba(0,0,0,0.08);
-    ">
-
-        <h2>
-            🍴 Ordered Food
-        </h2>
-
-
-        <div
-            id="orderItems"
-            style="
-            margin-top:15px;
-            ">
+        <div class="info-row">
+            <span data-i18n="name">Name</span>
+            <strong id="customerName">-</strong>
         </div>
 
+        <div class="info-row">
+            <span data-i18n="phone">Phone</span>
+            <strong id="customerPhone">-</strong>
+        </div>
+
+        <div class="info-row">
+            <span data-i18n="location">Location</span>
+            <strong id="customerLocation">-</strong>
+        </div>
+
+        <div class="info-row">
+            <span data-i18n="deliveryType">Delivery Type</span>
+            <strong id="deliveryType">-</strong>
+        </div>
     </section>
 
-
-
-    <!-- ORDER SUMMARY -->
-
-    <section style="
-        margin-top:20px;
-        background:white;
-        padding:20px;
-        border-radius:18px;
-        box-shadow:0 4px 15px rgba(0,0,0,0.08);
-    ">
-
-        <h2>
-            🛒 Order Summary
-        </h2>
-
-
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            margin-top:15px;
-        ">
-
-            <span>
-                Subtotal
-            </span>
-
-            <strong id="subtotal">
-                TSh 0
-            </strong>
-
+    <section class="card">
+        <h2 data-i18n="orderedFood">🍴 Ordered Food</h2>
+        <div id="orderItems">
+            <p class="muted" data-i18n="loadingItems">Loading ordered food...</p>
         </div>
-
-
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            margin-top:10px;
-        ">
-
-            <span>
-                Delivery Fee
-            </span>
-
-            <strong id="deliveryFee">
-                TSh 0
-            </strong>
-
-        </div>
-
-
-        <hr style="
-            margin:18px 0;
-            border:none;
-            border-top:1px solid #ddd;
-        ">
-
-
-        <div style="
-            display:flex;
-            justify-content:space-between;
-            margin-top:15px;
-            font-size:21px;
-        ">
-
-            <strong>
-                Total
-            </strong>
-
-            <strong id="total">
-                TSh 0
-            </strong>
-
-        </div>
-
     </section>
 
+    <section class="card">
+        <h2 data-i18n="summary">🛒 Order Summary</h2>
 
-
-    <!-- ORDER STATUS -->
-
-    <section style="
-        margin-top:20px;
-        background:white;
-        padding:20px;
-        border-radius:18px;
-        text-align:center;
-        box-shadow:0 4px 15px rgba(0,0,0,0.08);
-    ">
-
-        <h2>
-            📦 Order Status
-        </h2>
-
-
-        <div
-            id="orderStatus"
-            class="status-box">
-
-            Pending
-
+        <div class="summary-row">
+            <span data-i18n="subtotal">Subtotal</span>
+            <strong id="subtotal">TSh 0</strong>
         </div>
 
+        <div class="summary-row">
+            <span data-i18n="deliveryFee">Delivery Fee</span>
+            <strong id="deliveryFee">TSh 0</strong>
+        </div>
 
-        <p
-            id="statusMessage"
-            class="status-message">
+        <div class="summary-row grand-total">
+            <strong data-i18n="total">Total</strong>
+            <strong id="total">TSh 0</strong>
+        </div>
+    </section>
 
+    <section class="card" style="text-align:center;">
+        <h2 data-i18n="orderStatus">📦 Order Status</h2>
+
+        <div id="orderStatus" class="status-box">Pending</div>
+        <p id="statusMessage" class="status-message">
             Your order is waiting for restaurant confirmation.
-
         </p>
-
-
-        <div
-            id="statusUpdated"
-            class="status-updated">
-
-            Order status updated.
-
-        </div>
-
+        <div id="statusUpdated" class="status-updated"></div>
     </section>
 
-
-
-    <!-- BACK TO HOME -->
-
-    <button
-        onclick="window.location.href='index.html'"
-        style="
-        margin-top:25px;
-        width:100%;
-        padding:16px;
-        border:none;
-        border-radius:12px;
-        background:#ff6b35;
-        color:white;
-        font-size:17px;
-        font-weight:bold;
-        cursor:pointer;
-        ">
-
+    <button class="action-button primary-button" id="homeButton"
+            onclick="window.location.href='index.html'">
         🏠 Back to Home
-
     </button>
 
-
-
-    <!-- TRACK ORDER -->
-
-    <button
-        onclick="trackOrder()"
-        style="
-        margin-top:12px;
-        width:100%;
-        padding:16px;
-        border:2px solid #ff6b35;
-        border-radius:12px;
-        background:white;
-        color:#ff6b35;
-        font-size:17px;
-        font-weight:bold;
-        cursor:pointer;
-        ">
-
+    <button class="action-button" id="trackButton"
+            onclick="trackOrder()">
         📦 Track Order
-
     </button>
-
-
 </main>
-
-
-
-<!-- SUPABASE -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-
 <script>
+"use strict";
 
-/* ========================================
-   SUPABASE
-======================================== */
+const SUPABASE_URL = "https://ienquzigbawhvthnirtj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
 
-const SUPABASE_URL =
-    "https://ienquzigbawhvthnirtj.supabase.co";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_KEY =
-    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+const translations = {
+    en: {
+        received: "Order Received!",
+        receivedMessage: "Thank you! Your order has been received and is waiting for confirmation.",
+        orderNumber: "Order Number",
+        customerInfo: "👤 Customer Information",
+        name: "Name",
+        phone: "Phone",
+        location: "Location",
+        deliveryType: "Delivery Type",
+        delivery: "🛵 Delivery",
+        pickup: "🏪 Pickup",
+        orderedFood: "🍴 Ordered Food",
+        loadingItems: "Loading ordered food...",
+        summary: "🛒 Order Summary",
+        subtotal: "Subtotal",
+        deliveryFee: "Delivery Fee",
+        total: "Total",
+        orderStatus: "📦 Order Status",
+        home: "🏠 Back to Home",
+        track: "📦 Track Order",
+        pending: "Pending",
+        confirmed: "Confirmed",
+        preparing: "Preparing",
+        ready: "Ready",
+        cancelled: "Cancelled",
+        pendingMessage: "Your order is waiting for restaurant confirmation.",
+        confirmedMessage: "The restaurant has confirmed your order.",
+        preparingMessage: "Your food is being prepared.",
+        readyMessage: "Your food is ready for pickup or collection.",
+        cancelledMessage: "This order has been cancelled by the restaurant.",
+        updated: "Order status updated to",
+        noOrder: "No order information was found on this device.",
+        noItems: "No ordered food was found.",
+        loadItemsError: "Unable to load ordered food. Please refresh the page.",
+        orderNotFound: "Order not found. Please check your order history.",
+        loading: "Loading...",
+        food: "Food",
+        quantity: "Qty"
+    },
+    sw: {
+        received: "Oda Imepokelewa!",
+        receivedMessage: "Asante! Oda yako imepokelewa na inasubiri kuthibitishwa.",
+        orderNumber: "Namba ya Oda",
+        customerInfo: "👤 Taarifa za Mteja",
+        name: "Jina",
+        phone: "Simu",
+        location: "Mahali",
+        deliveryType: "Aina ya Huduma",
+        delivery: "🛵 Kuletwa",
+        pickup: "🏪 Kuchukua mwenyewe",
+        orderedFood: "🍴 Vyakula Vilivyoagizwa",
+        loadingItems: "Inapakia vyakula...",
+        summary: "🛒 Muhtasari wa Oda",
+        subtotal: "Jumla ya Vyakula",
+        deliveryFee: "Gharama ya Kuleta",
+        total: "Jumla Kuu",
+        orderStatus: "📦 Hali ya Oda",
+        home: "🏠 Rudi Mwanzo",
+        track: "📦 Fuatilia Oda",
+        pending: "Inasubiri",
+        confirmed: "Imethibitishwa",
+        preparing: "Inaandaliwa",
+        ready: "Iko Tayari",
+        cancelled: "Imefutwa",
+        pendingMessage: "Oda yako inasubiri kuthibitishwa na mgahawa.",
+        confirmedMessage: "Mgahawa umethibitisha oda yako.",
+        preparingMessage: "Chakula chako kinaandaliwa.",
+        readyMessage: "Chakula chako kiko tayari kuchukuliwa.",
+        cancelledMessage: "Oda hii imefutwa na mgahawa.",
+        updated: "Hali ya oda imebadilika kuwa",
+        noOrder: "Taarifa za oda hazikupatikana kwenye kifaa hiki.",
+        noItems: "Hakuna vyakula vilivyopatikana kwenye oda hii.",
+        loadItemsError: "Imeshindikana kupakia vyakula. Tafadhali onyesha ukurasa upya.",
+        orderNotFound: "Oda haikupatikana. Tafadhali angalia historia ya oda zako.",
+        loading: "Inapakia...",
+        food: "Chakula",
+        quantity: "Idadi"
+    }
+};
 
+let language = localStorage.getItem("foodLanguage") || "en";
+if (!translations[language]) language = "en";
 
-const db =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-
-
-/* ========================================
-   LAST ORDER
-======================================== */
-
-const lastOrder =
-    JSON.parse(
-        localStorage.getItem("lastOrder")
-    );
-
+let lastOrder = null;
+try {
+    lastOrder = JSON.parse(localStorage.getItem("lastOrder") || "null");
+} catch (error) {
+    lastOrder = null;
+}
 
 let currentStatus = null;
+let realtimeChannel = null;
 
+const $ = id => document.getElementById(id);
+const t = key => translations[language][key] || translations.en[key] || key;
 
-
-/* ========================================
-   FORMAT PRICE
-======================================== */
-
-function formatPrice(price) {
-
-    return Number(price || 0)
-        .toLocaleString("en-US");
-
+function formatPrice(value) {
+    return Number(value || 0).toLocaleString("en-US");
 }
 
-
-
-/* ========================================
-   STATUS INFORMATION
-======================================== */
-
-function getStatusInfo(status) {
-
-    const normalized =
-        String(status || "Pending")
-            .trim()
-            .toLowerCase();
-
-
-    if (normalized === "confirmed") {
-
-        return {
-            title: "Confirmed",
-            message:
-                "The restaurant has confirmed your order.",
-            className: "status-confirmed"
-        };
-
-    }
-
-
-    if (normalized === "preparing") {
-
-        return {
-            title: "Preparing",
-            message:
-                "Your food is being prepared.",
-            className: "status-preparing"
-        };
-
-    }
-
-
-    if (normalized === "ready") {
-
-        return {
-            title: "Ready",
-            message:
-                "Your food is ready for pickup or collection.",
-            className: "status-ready"
-        };
-
-    }
-
-
-    if (normalized === "cancelled") {
-
-        return {
-            title: "Cancelled",
-            message:
-                "This order has been cancelled by the restaurant.",
-            className: "status-cancelled"
-        };
-
-    }
-
-
-    return {
-        title: "Pending",
-        message:
-            "Your order is waiting for restaurant confirmation.",
-        className: ""
-    };
-
+function money(value) {
+    return "TSh " + formatPrice(value);
 }
 
-
-
-/* ========================================
-   UPDATE STATUS UI
-======================================== */
-
-function updateStatusUI(status) {
-
-    const statusBox =
-        document.getElementById(
-            "orderStatus"
-        );
-
-
-    const statusMessage =
-        document.getElementById(
-            "statusMessage"
-        );
-
-
-    const updated =
-        document.getElementById(
-            "statusUpdated"
-        );
-
-
-    const info =
-        getStatusInfo(status);
-
-
-    statusBox.textContent =
-        info.title;
-
-
-    statusBox.className =
-        "status-box " +
-        info.className;
-
-
-    statusMessage.textContent =
-        info.message;
-
-
-    /*
-     * Show update message only
-     * when status actually changes.
-     */
-
-    if (
-        currentStatus !== null &&
-        currentStatus.toLowerCase() !==
-        info.title.toLowerCase()
-    ) {
-
-        updated.textContent =
-            "Order status updated to " +
-            info.title;
-
-
-        updated.style.display =
-            "block";
-
-
-        setTimeout(function() {
-
-            updated.style.display =
-                "none";
-
-        }, 4000);
-
-    }
-
-
-    currentStatus =
-        info.title;
-
+function setText(id, value) {
+    $(id).textContent = value == null || value === "" ? "-" : String(value);
 }
 
-
-
-/* ========================================
-   LOAD ORDER FROM SUPABASE
-======================================== */
-
-async function loadOrderStatus() {
-
-    if (!lastOrder) {
-
-        return;
-
-    }
-
-
-    let order = null;
-
-
-    /*
-     * FIRST: use order ID
-     */
-
-    if (lastOrder.id) {
-
-        const result =
-            await db
-                .from("food_orders")
-                .select("*")
-                .eq(
-                    "id",
-                    lastOrder.id
-                )
-                .maybeSingle();
-
-
-        if (result.error) {
-
-            console.error(
-                "Order status error:",
-                result.error
-            );
-
-            return;
-
-        }
-
-
-        order =
-            result.data;
-
-    }
-
-
-    /*
-     * FALLBACK:
-     * use order number
-     */
-
-    if (!order && lastOrder.order_number) {
-
-        const result =
-            await db
-                .from("food_orders")
-                .select("*")
-                .eq(
-                    "order_number",
-                    lastOrder.order_number
-                )
-                .maybeSingle();
-
-
-        if (result.error) {
-
-            console.error(
-                "Order number error:",
-                result.error
-            );
-
-            return;
-
-        }
-
-
-        order =
-            result.data;
-
-    }
-
-
-    if (!order) {
-
-        console.error(
-            "Order not found."
-        );
-
-        return;
-
-    }
-
-
-    /*
-     * THIS IS THE IMPORTANT PART
-     *
-     * Status comes directly from
-     * food_orders.status
-     */
-
-    updateStatusUI(
-        order.status
-    );
-
+function showNotice(message) {
+    $("pageNotice").textContent = message;
+    $("pageNotice").style.display = "block";
 }
 
-
-
-/* ========================================
-   CUSTOMER + SUMMARY
-======================================== */
-
-function loadStoredOrderInfo() {
-
-    if (!lastOrder) {
-
-        document.getElementById(
-            "orderNumber"
-        ).textContent =
-            "No order found";
-
-        return;
-
-    }
-
-
-    document.getElementById(
-        "orderNumber"
-    ).textContent =
-        lastOrder.order_number || "-";
-
-
-    document.getElementById(
-        "customerName"
-    ).textContent =
-        lastOrder.customer_name || "-";
-
-
-    document.getElementById(
-        "customerPhone"
-    ).textContent =
-        lastOrder.customer_phone || "-";
-
-
-    document.getElementById(
-        "customerLocation"
-    ).textContent =
-        lastOrder.delivery_location || "-";
-
-
-    document.getElementById(
-        "deliveryType"
-    ).textContent =
-        lastOrder.delivery_type === "delivery"
-            ? "🛵 Delivery"
-            : "🏪 Pickup";
-
-
-    document.getElementById(
-        "subtotal"
-    ).textContent =
-        "TSh " +
-        formatPrice(
-            lastOrder.subtotal
-        );
-
-
-    document.getElementById(
-        "deliveryFee"
-    ).textContent =
-        "TSh " +
-        formatPrice(
-            lastOrder.delivery_fee
-        );
-
-
-    document.getElementById(
-        "total"
-    ).textContent =
-        "TSh " +
-        formatPrice(
-            lastOrder.total
-        );
-
+function hideNotice() {
+    $("pageNotice").style.display = "none";
 }
 
+function applyLanguage() {
+    document.documentElement.lang = language;
 
-
-/* ========================================
-   LOAD ORDER ITEMS
-======================================== */
-
-async function loadOrderItems(orderId) {
-
-    const container =
-        document.getElementById(
-            "orderItems"
-        );
-
-
-    if (!orderId) {
-
-        container.innerHTML = `
-            <p style="
-                color:#777;
-                padding:10px 0;
-            ">
-                Order items not found.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await db
-            .from("food_order_items")
-            .select("*")
-            .eq(
-                "order_id",
-                orderId
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: true
-                }
-            );
-
-
-    if (error) {
-
-        console.error(
-            "Order Items Error:",
-            error
-        );
-
-
-        container.innerHTML = `
-            <p style="
-                color:#c00;
-                padding:10px 0;
-            ">
-                Failed to load ordered food.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    if (!data ||
-        data.length === 0) {
-
-        container.innerHTML = `
-            <p style="
-                color:#777;
-                padding:10px 0;
-            ">
-                No ordered food found.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    container.innerHTML = "";
-
-
-    data.forEach(function(item) {
-
-        const itemTotal =
-            Number(item.price || 0) *
-            Number(item.quantity || 0);
-
-
-        const row =
-            document.createElement(
-                "div"
-            );
-
-
-        row.style.cssText = `
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:15px;
-            padding:14px 0;
-            border-bottom:1px solid #eee;
-        `;
-
-
-        row.innerHTML = `
-
-            <div style="flex:1;">
-
-                <strong>
-                    ${item.food_name || "Food"}
-                </strong>
-
-                <div style="
-                    margin-top:5px;
-                    color:#777;
-                    font-size:14px;
-                ">
-
-                    TSh ${formatPrice(item.price)}
-                    ×
-                    ${item.quantity}
-
-                </div>
-
-            </div>
-
-
-            <strong style="
-                white-space:nowrap;
-            ">
-
-                TSh ${formatPrice(itemTotal)}
-
-            </strong>
-
-        `;
-
-
-        container.appendChild(
-            row
-        );
-
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+        const key = element.getAttribute("data-i18n");
+        element.textContent = t(key);
     });
 
-}
+    $("languageSelect").value = language;
+    $("homeButton").textContent = t("home");
+    $("trackButton").textContent = t("track");
 
-
-
-/* ========================================
-   TRACK ORDER
-======================================== */
-
-function trackOrder() {
-
-    window.location.href =
-        "order-tracking.html";
-
-}
-
-
-
-/* ========================================
-   REALTIME STATUS
-======================================== */
-
-function subscribeToOrder() {
-
-    if (!lastOrder ||
-        !lastOrder.id) {
-
-        return;
-
+    if (lastOrder) {
+        $("deliveryType").textContent =
+            lastOrder.delivery_type === "delivery" ? t("delivery") : t("pickup");
     }
 
+    if (currentStatus) updateStatusUI(currentStatus, false);
+}
 
-    db
-        .channel(
-            "order-status-" +
-            lastOrder.id
-        )
+$("languageSelect").addEventListener("change", event => {
+    language = event.target.value;
+    localStorage.setItem("foodLanguage", language);
+    applyLanguage();
+});
+
+function getStatusKey(status) {
+    const normalized = String(status || "Pending").trim().toLowerCase();
+
+    if (normalized === "confirmed") return "confirmed";
+    if (normalized === "preparing") return "preparing";
+    if (normalized === "ready") return "ready";
+    if (normalized === "cancelled") return "cancelled";
+
+    return "pending";
+}
+
+function updateStatusUI(status, showUpdate = true) {
+    const key = getStatusKey(status);
+    const previous = currentStatus;
+
+    currentStatus = status || "Pending";
+
+    const classNames = {
+        pending: "",
+        confirmed: "status-confirmed",
+        preparing: "status-preparing",
+        ready: "status-ready",
+        cancelled: "status-cancelled"
+    };
+
+    $("orderStatus").textContent = t(key);
+    $("orderStatus").className = "status-box " + classNames[key];
+    $("statusMessage").textContent = t(key + "Message");
+
+    if (showUpdate && previous !== null &&
+        getStatusKey(previous) !== key) {
+        $("statusUpdated").textContent = t("updated") + " " + t(key) + ".";
+        $("statusUpdated").style.display = "block";
+    }
+}
+
+function loadStoredOrderInfo() {
+    if (!lastOrder) {
+        setText("orderNumber", t("noOrder"));
+        showNotice(t("noOrder"));
+        return;
+    }
+
+    setText("orderNumber", lastOrder.order_number || lastOrder.id);
+    setText("customerName", lastOrder.customer_name);
+    setText("customerPhone", lastOrder.customer_phone);
+    setText("customerLocation", lastOrder.delivery_location);
+
+    $("deliveryType").textContent =
+        lastOrder.delivery_type === "delivery" ? t("delivery") : t("pickup");
+
+    $("subtotal").textContent = money(lastOrder.subtotal);
+    $("deliveryFee").textContent = money(lastOrder.delivery_fee);
+    $("total").textContent = money(lastOrder.total);
+}
+
+function createFoodRow(item) {
+    const row = document.createElement("div");
+    row.className = "food-row";
+
+    const details = document.createElement("div");
+    details.className = "food-details";
+
+    const name = document.createElement("strong");
+    name.className = "food-name";
+    name.textContent = item.food_name || t("food");
+
+    const price = document.createElement("div");
+    price.className = "food-price";
+    price.textContent = money(item.price) + " × " +
+        Number(item.quantity || 0);
+
+    details.appendChild(name);
+    details.appendChild(price);
+
+    const total = document.createElement("strong");
+    total.className = "food-total";
+    total.textContent = money(
+        Number(item.price || 0) * Number(item.quantity || 0)
+    );
+
+    row.appendChild(details);
+    row.appendChild(total);
+
+    return row;
+}
+
+async function loadOrderItems(orderId) {
+    const container = $("orderItems");
+    container.replaceChildren();
+
+    if (!orderId) {
+        container.textContent = t("noItems");
+        return;
+    }
+
+    const { data, error } = await db
+        .from("food_order_items")
+        .select("*")
+        .eq("order_id", orderId);
+
+    if (error) {
+        console.error("Order items error:", error);
+        container.textContent = t("loadItemsError");
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.textContent = t("noItems");
+        return;
+    }
+
+    data.forEach(item => container.appendChild(createFoodRow(item)));
+}
+
+async function loadOrderStatus() {
+    if (!lastOrder) return;
+
+    let query = db.from("food_orders").select("*");
+
+    if (lastOrder.id) {
+        query = query.eq("id", lastOrder.id);
+    } else if (lastOrder.order_number) {
+        query = query.eq("order_number", lastOrder.order_number);
+    } else {
+        return;
+    }
+
+    const { data, error } = await query.maybeSingle();
+
+    if (error) {
+        console.error("Order status error:", error);
+        return;
+    }
+
+    if (!data) {
+        showNotice(t("orderNotFound"));
+        return;
+    }
+
+    if (data.order_number) setText("orderNumber", data.order_number);
+    if (data.customer_name) setText("customerName", data.customer_name);
+    if (data.customer_phone) setText("customerPhone", data.customer_phone);
+    if (data.delivery_location) setText("customerLocation", data.delivery_location);
+    if (data.delivery_type) {
+        $("deliveryType").textContent =
+            data.delivery_type === "delivery" ? t("delivery") : t("pickup");
+    }
+
+    if (data.subtotal != null) $("subtotal").textContent = money(data.subtotal);
+    if (data.delivery_fee != null) $("deliveryFee").textContent = money(data.delivery_fee);
+    if (data.total != null) $("total").textContent = money(data.total);
+
+    updateStatusUI(data.status || "Pending");
+
+    // Keep the latest status in the existing local order object.
+    lastOrder.status = data.status || "Pending";
+    localStorage.setItem("lastOrder", JSON.stringify(lastOrder));
+}
+
+function subscribeToOrder() {
+    if (!lastOrder || !lastOrder.id) return;
+
+    if (realtimeChannel) {
+        db.removeChannel(realtimeChannel);
+    }
+
+    realtimeChannel = db
+        .channel("order-status-" + lastOrder.id)
         .on(
             "postgres_changes",
             {
                 event: "UPDATE",
                 schema: "public",
                 table: "food_orders",
-                filter:
-                    "id=eq." +
-                    lastOrder.id
+                filter: "id=eq." + lastOrder.id
             },
-            function(payload) {
-
-                console.log(
-                    "Order updated:",
-                    payload.new
-                );
-
-
-                /*
-                 * Immediately update the
-                 * Order Status section.
-                 */
-
-                updateStatusUI(
-                    payload.new.status
-                );
-
+            payload => {
+                if (payload.new && payload.new.status) {
+                    updateStatusUI(payload.new.status);
+                    lastOrder.status = payload.new.status;
+                    localStorage.setItem("lastOrder", JSON.stringify(lastOrder));
+                }
             }
         )
         .subscribe();
-
 }
 
-
-
-/* ========================================
-   START
-======================================== */
+function trackOrder() {
+    window.location.href = "order-tracking.html";
+}
 
 async function startPage() {
-
+    applyLanguage();
     loadStoredOrderInfo();
 
+    if (!lastOrder) return;
 
-    if (lastOrder) {
-
-        await loadOrderItems(
-            lastOrder.id
-        );
-
-
-        /*
-         * Get current status directly
-         * from Supabase.
-         */
-
-        await loadOrderStatus();
-
-
-        /*
-         * Listen for vendor changes.
-         */
-
-        subscribeToOrder();
-
-    }
-
+    hideNotice();
+    await loadOrderItems(lastOrder.id);
+    await loadOrderStatus();
+    subscribeToOrder();
 }
 
-
 startPage();
-
 </script>
-
-
 </body>
-
 </html>
+```
