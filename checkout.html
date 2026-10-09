@@ -1,1350 +1,577 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f97316">
 
-    <title>Checkout | Food Platform</title>
+<title>Checkout | Food Platform</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <link rel="stylesheet" href="style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            color: #222;
-        }
-
-        .checkout-container {
-            max-width: 700px;
-            margin: auto;
-            padding: 15px;
-            padding-bottom: 40px;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 12px;
-            text-decoration: none;
-            color: #f97316;
-            font-weight: bold;
-        }
-
-        .page-title {
-            margin: 5px 0 15px;
-            font-size: 25px;
-        }
-
-        .checkout-card {
-            background: white;
-            padding: 16px;
-            border-radius: 14px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
-        }
-
-        .checkout-card h2 {
-            margin: 0 0 14px;
-            font-size: 19px;
-        }
-
-        label {
-            display: block;
-            margin-top: 13px;
-            margin-bottom: 6px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        input[type="text"],
-        input[type="tel"],
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d5d5d5;
-            border-radius: 9px;
-            font-size: 15px;
-            outline: none;
-            background: white;
-        }
-
-        input[type="text"]:focus,
-        input[type="tel"]:focus,
-        textarea:focus {
-            border-color: #f97316;
-        }
-
-        textarea {
-            min-height: 90px;
-            resize: vertical;
-        }
-
-        .delivery-option {
-            display: flex;
-            gap: 25px;
-            margin-top: 5px;
-        }
-
-        .delivery-option label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin: 0;
-            font-weight: normal;
-            cursor: pointer;
-        }
-
-        .delivery-option input {
-            width: auto;
-        }
-
-        .location-help {
-            background: #fff7ed;
-            border-left: 3px solid #f97316;
-            padding: 10px;
-            border-radius: 7px;
-            margin-top: 8px;
-            font-size: 13px;
-            line-height: 1.4;
-            color: #555;
-        }
-
-        .restaurant-name {
-            padding: 11px 12px;
-            background: #f8f8f8;
-            border-radius: 9px;
-            font-weight: bold;
-            margin-bottom: 14px;
-        }
-
-        .order-items {
-            margin-bottom: 15px;
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 9px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-
-        .order-item:last-child {
-            border-bottom: none;
-        }
-
-        .order-item-name {
-            flex: 1;
-        }
-
-        .order-item-qty {
-            color: #777;
-        }
-
-        .order-item-price {
-            font-weight: bold;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-
-        .total {
-            display: flex;
-            justify-content: space-between;
-            border-top: 1px solid #ddd;
-            padding-top: 14px;
-            margin-top: 14px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .total strong:last-child {
-            color: #f97316;
-        }
-
-        #placeOrderBtn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background: #f97316;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 17px;
-        }
-
-        #placeOrderBtn:hover {
-            background: #ea580c;
-        }
-
-        #placeOrderBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        #message {
-            margin-top: 12px;
-            padding: 11px;
-            border-radius: 8px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .loading {
-            color: #777;
-            font-size: 14px;
-        }
-    </style>
+<style>
+*{box-sizing:border-box}
+:root{--orange:#f97316;--dark:#222;--muted:#6b7280;--border:#e5e7eb}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f6f8;color:var(--dark)}
+button,input,textarea,select{font:inherit}
+.checkout-container{max-width:720px;margin:auto;padding:16px;padding-bottom:45px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.back-link{color:var(--orange);text-decoration:none;font-weight:bold}
+.language-select{padding:9px;border:1px solid var(--border);border-radius:9px;background:white}
+.page-title{font-size:27px;margin:8px 0 5px}
+.subtitle{color:var(--muted);font-size:14px;margin:0 0 20px}
+.checkout-card{background:white;padding:18px;border-radius:15px;margin-bottom:15px;box-shadow:0 3px 12px #00000008}
+.checkout-card h2{font-size:18px;margin:0 0 15px}
+label{display:block;margin:13px 0 6px;font-weight:600;font-size:14px}
+input[type=text],input[type=tel],textarea{width:100%;padding:13px;border:1px solid #d1d5db;border-radius:10px;background:white;outline:none}
+input:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 2px #f9731620}
+textarea{min-height:82px;resize:vertical}
+.delivery-option{display:flex;gap:12px}
+.delivery-choice{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:13px;cursor:pointer}
+.delivery-choice:has(input:checked){border-color:var(--orange);background:#fff7ed}
+.delivery-choice label{margin:0;font-weight:normal;cursor:pointer}
+.location-help{background:#fff7ed;border-left:3px solid var(--orange);padding:11px;border-radius:7px;margin-top:8px;font-size:13px;line-height:1.5;color:#555}
+.restaurant-name{padding:12px;background:#f8fafc;border-radius:9px;font-weight:bold;margin-bottom:12px}
+.order-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #eee;font-size:14px}
+.order-item:last-child{border-bottom:0}
+.item-name{flex:1;overflow-wrap:anywhere}
+.item-qty{color:var(--muted);white-space:nowrap}
+.item-price{font-weight:bold;white-space:nowrap}
+.summary-row{display:flex;justify-content:space-between;gap:12px;margin:12px 0;font-size:14px}
+.total{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--border);padding-top:15px;margin-top:15px;font-size:21px;font-weight:bold}
+.total strong{color:var(--orange)}
+#placeOrderBtn{width:100%;padding:15px;border:0;border-radius:11px;background:var(--orange);color:white;font-weight:bold;font-size:16px;cursor:pointer;margin-top:17px}
+#placeOrderBtn:hover{background:#ea580c}
+#placeOrderBtn:disabled{opacity:.6;cursor:not-allowed}
+#message{display:none;margin-top:13px;padding:12px;border-radius:9px;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.success{display:block!important;background:#dcfce7;color:#166534}
+.error{display:block!important;background:#fee2e2;color:#991b1b}
+.hidden{display:none!important}
+.loading{color:var(--muted);font-size:14px;padding:10px 0}
+.footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:17px}
+@media(max-width:420px){.checkout-container{padding:12px}.checkout-card{padding:14px}.page-title{font-size:24px}.delivery-option{gap:8px}.delivery-choice{padding:10px;font-size:14px}.total{font-size:19px}}
+</style>
 </head>
 
 <body>
+<main class="checkout-container">
 
-<div class="checkout-container">
-
-    <a href="cart.html" class="back-link">
-        ← Back to Cart
-    </a>
-
-    <h1 class="page-title">
-        Checkout
-    </h1>
-
-    <!-- CUSTOMER INFORMATION -->
-
-    <div class="checkout-card">
-
-        <h2>Customer Information</h2>
-
-        <label for="customerName">
-            Full Name
-        </label>
-
-        <input
-            type="text"
-            id="customerName"
-            placeholder="Enter your full name"
-        >
-
-        <label for="customerPhone">
-            Phone Number
-        </label>
-
-        <input
-            type="tel"
-            id="customerPhone"
-            placeholder="Enter your phone number"
-        >
-
-    </div>
-
-
-    <!-- DELIVERY METHOD -->
-
-    <div class="checkout-card">
-
-        <h2>Delivery Method</h2>
-
-        <div class="delivery-option">
-
-            <label>
-                <input
-                    type="radio"
-                    name="deliveryType"
-                    value="delivery"
-                    checked
-                >
-                Delivery
-            </label>
-
-            <label>
-                <input
-                    type="radio"
-                    name="deliveryType"
-                    value="pickup"
-                >
-                Pickup
-            </label>
-
-        </div>
-
-
-        <div id="locationSection">
-
-            <label for="deliveryLocation">
-                Delivery Location
-            </label>
-
-            <textarea
-                id="deliveryLocation"
-                placeholder="Mfano: Keko, karibu na..."
-            ></textarea>
-
-            <div class="location-help">
-                Taja eneo, mtaa, barabara au landmark
-                iliyo karibu ili eneo lako lijulikane kwa usahihi.
-            </div>
-
-        </div>
-
-
-        <label for="instructions">
-            Additional Instructions
-        </label>
-
-        <textarea
-            id="instructions"
-            placeholder="Mfano: Nipigie simu ukifika..."
-        ></textarea>
-
-    </div>
-
-
-    <!-- ORDER SUMMARY -->
-
-    <div class="checkout-card">
-
-        <h2>Order Summary</h2>
-
-        <div
-            id="restaurantName"
-            class="restaurant-name"
-        >
-            Loading restaurant...
-        </div>
-
-
-        <div
-            id="orderItems"
-            class="order-items"
-        >
-            <div class="loading">
-                Loading items...
-            </div>
-        </div>
-
-
-        <div class="summary-row">
-
-            <span>
-                Subtotal
-            </span>
-
-            <strong id="subtotal">
-                TSh 0
-            </strong>
-
-        </div>
-
-
-        <div class="summary-row">
-
-            <span>
-                Delivery Fee
-            </span>
-
-            <strong id="deliveryFee">
-                TSh 0
-            </strong>
-
-        </div>
-
-
-        <div class="total">
-
-            <span>
-                Total
-            </span>
-
-            <strong id="total">
-                TSh 0
-            </strong>
-
-        </div>
-
-
-        <button id="placeOrderBtn">
-            Place Order
-        </button>
-
-
-        <div id="message"></div>
-
-    </div>
-
+<div class="topbar">
+<a href="cart.html" class="back-link" data-i18n="back">← Back to Cart</a>
+<select id="languageSelect" class="language-select" aria-label="Language">
+<option value="en">🇬🇧 English</option>
+<option value="sw">🇹🇿 Kiswahili</option>
+</select>
 </div>
 
+<h1 class="page-title" data-i18n="title">Checkout</h1>
+<p class="subtitle" data-i18n="subtitle">Confirm your details and place your order.</p>
+
+<section class="checkout-card">
+<h2 data-i18n="customer">Customer Information</h2>
+
+<label for="customerName" data-i18n="fullName">Full Name</label>
+<input type="text" id="customerName" autocomplete="name" data-placeholder="namePlaceholder" placeholder="Enter your full name" required>
+
+<label for="customerPhone" data-i18n="phone">Phone Number</label>
+<input type="tel" id="customerPhone" autocomplete="tel" inputmode="tel" data-placeholder="phonePlaceholder" placeholder="Enter your phone number" required>
+</section>
+
+<section class="checkout-card">
+<h2 data-i18n="deliveryMethod">Delivery Method</h2>
+
+<div class="delivery-option">
+<div class="delivery-choice">
+<input type="radio" id="deliveryRadio" name="deliveryType" value="delivery" checked>
+<label for="deliveryRadio" data-i18n="delivery">Delivery</label>
+</div>
+<div class="delivery-choice">
+<input type="radio" id="pickupRadio" name="deliveryType" value="pickup">
+<label for="pickupRadio" data-i18n="pickup">Pickup</label>
+</div>
+</div>
+
+<div id="locationSection">
+<label for="deliveryLocation" data-i18n="location">Delivery Location</label>
+<textarea id="deliveryLocation" autocomplete="street-address" data-placeholder="locationPlaceholder" placeholder="Enter your area, street or nearby landmark"></textarea>
+<div class="location-help" data-i18n="locationHelp">Mention your area, street, road or a nearby landmark so the restaurant can find you.</div>
+</div>
+
+<label for="instructions" data-i18n="instructions">Additional Instructions (optional)</label>
+<textarea id="instructions" data-placeholder="instructionsPlaceholder" placeholder="For example: Call me when you arrive"></textarea>
+</section>
+
+<section class="checkout-card">
+<h2 data-i18n="summary">Order Summary</h2>
+<div id="restaurantName" class="restaurant-name">Loading restaurant...</div>
+<div id="orderItems" aria-live="polite">
+<div class="loading" data-i18n="loadingItems">Loading order items...</div>
+</div>
+
+<div class="summary-row">
+<span data-i18n="subtotal">Subtotal</span>
+<strong id="subtotal">TSh 0</strong>
+</div>
+<div class="summary-row">
+<span data-i18n="deliveryFee">Delivery Fee</span>
+<strong id="deliveryFee">TSh 0</strong>
+</div>
+<div class="total">
+<span data-i18n="total">Total</span>
+<strong id="total">TSh 0</strong>
+</div>
+
+<button id="placeOrderBtn" type="button" data-i18n="placeOrder">Place Order</button>
+<div id="message" role="status" aria-live="polite"></div>
+</section>
+
+<p class="footer-note" data-i18n="footer">Please confirm your phone number and delivery location before ordering.</p>
+</main>
 
 <script>
+"use strict";
 
-/* ==========================================
-   SUPABASE
-========================================== */
+/* SUPABASE CONFIGURATION */
+const SUPABASE_URL = "https://ienquzigbawhvthnirtj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_URL =
-    "https://ienquzigbawhvthnirtj.supabase.co";
+/* LANGUAGE */
+const translations = {
+en: {
+back:"← Back to Cart",title:"Checkout",
+subtitle:"Confirm your details and place your order.",
+customer:"Customer Information",fullName:"Full Name",
+namePlaceholder:"Enter your full name",phone:"Phone Number",
+phonePlaceholder:"Enter your phone number",
+deliveryMethod:"Delivery Method",delivery:"Delivery",pickup:"Pickup",
+location:"Delivery Location",
+locationPlaceholder:"Enter your area, street or nearby landmark",
+locationHelp:"Mention your area, street, road or a nearby landmark so the restaurant can find you.",
+instructions:"Additional Instructions (optional)",
+instructionsPlaceholder:"For example: Call me when you arrive",
+summary:"Order Summary",loadingRestaurant:"Loading restaurant...",
+loadingItems:"Loading order items...",subtotal:"Subtotal",
+deliveryFee:"Delivery Fee",total:"Total",placeOrder:"Place Order",
+processing:"Processing order...",footer:"Please confirm your phone number and delivery location before ordering.",
+emptyCart:"Your cart is empty.",cartError:"Your cart data is invalid. Please return to your cart.",
+oneRestaurant:"Please order from one restaurant at a time.",
+loginRequired:"Please log in as a customer first.",
+restaurantMissing:"Restaurant not found. Please return to your cart.",
+loadError:"Unable to load checkout. Please return to your cart and try again.",
+enterName:"Please enter your full name.",enterPhone:"Please enter your phone number.",
+invalidPhone:"Please enter a valid phone number.",
+enterLocation:"Please enter your delivery location.",
+incomplete:"Checkout information is incomplete. Please reload the page.",
+orderFailed:"Could not place your order: ",
+orderSuccess:"Order placed successfully. Opening your order page...",
+unknownError:"An unexpected error occurred.",
+pickupText:"Pickup",
+redirecting:"Opening your order...",
+failedItems:"Your order items could not be saved. Please contact support before placing another order."
+},
+sw: {
+back:"← Rudi kwenye Kikapu",title:"Kamilisha Oda",
+subtitle:"Hakiki taarifa zako kisha tuma oda yako.",
+customer:"Taarifa za Mteja",fullName:"Jina Kamili",
+namePlaceholder:"Andika jina lako kamili",phone:"Namba ya Simu",
+phonePlaceholder:"Andika namba yako ya simu",
+deliveryMethod:"Njia ya Kupokea Oda",delivery:"Kuletewa",pickup:"Kujichukulia",
+location:"Eneo la Kuletewa",
+locationPlaceholder:"Andika eneo, mtaa au alama ya karibu",
+locationHelp:"Taja eneo, mtaa, barabara au alama ya karibu ili mgahawa uweze kukupata.",
+instructions:"Maelekezo ya Ziada (si lazima)",
+instructionsPlaceholder:"Mfano: Nipigie simu ukifika",
+summary:"Muhtasari wa Oda",loadingRestaurant:"Inapakia taarifa za mgahawa...",
+loadingItems:"Inapakia vyakula...",subtotal:"Jumla ya Vyakula",
+deliveryFee:"Gharama ya Usafirishaji",total:"Jumla ya Kulipa",
+placeOrder:"Tuma Oda",processing:"Inatuma oda...",
+footer:"Hakiki namba yako ya simu na eneo kabla ya kutuma oda.",
+emptyCart:"Kikapu chako hakina bidhaa.",cartError:"Taarifa za kikapu si sahihi. Rudi kwenye kikapu.",
+oneRestaurant:"Tafadhali agiza kutoka mgahawa mmoja kwa wakati.",
+loginRequired:"Tafadhali ingia kwenye akaunti ya mteja kwanza.",
+restaurantMissing:"Mgahawa haujapatikana. Tafadhali rudi kwenye kikapu.",
+loadError:"Imeshindikana kufungua checkout. Rudi kwenye kikapu ujaribu tena.",
+enterName:"Tafadhali andika jina lako kamili.",enterPhone:"Tafadhali andika namba yako ya simu.",
+invalidPhone:"Tafadhali weka namba sahihi ya simu.",
+enterLocation:"Tafadhali andika eneo la kuletewa oda.",
+incomplete:"Taarifa za oda hazijakamilika. Tafadhali pakia ukurasa upya.",
+orderFailed:"Imeshindikana kutuma oda: ",
+orderSuccess:"Oda imetumwa kikamilifu. Inafungua ukurasa wa oda yako...",
+unknownError:"Hitilafu isiyotarajiwa imetokea.",
+pickupText:"Kujichukulia",
+redirecting:"Inafungua oda yako...",
+failedItems:"Vyakula vya oda havijahifadhiwa. Tafadhali wasiliana na msaada kabla ya kutuma oda nyingine."
+}
+};
 
-const SUPABASE_KEY =
-    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+let language = localStorage.getItem("foodLanguage") || "en";
+if (!translations[language]) language = "en";
 
-const db =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+function t(key) {
+return translations[language][key] || translations.en[key] || key;
+}
 
+function applyLanguage() {
+document.documentElement.lang = language;
+document.getElementById("languageSelect").value = language;
 
-/* ==========================================
-   VARIABLES
-========================================== */
+document.querySelectorAll("[data-i18n]").forEach(el => {
+const key = el.dataset.i18n;
+if (translations[language][key]) el.textContent = t(key);
+});
 
+document.querySelectorAll("[data-placeholder]").forEach(el => {
+el.placeholder = t(el.dataset.placeholder);
+});
+
+if (restaurant) {
+restaurantNameElement.textContent = restaurant.name || "Restaurant";
+}
+renderOrderItems();
+calculateTotal();
+}
+
+document.getElementById("languageSelect").addEventListener("change", event => {
+language = event.target.value;
+localStorage.setItem("foodLanguage", language);
+applyLanguage();
+});
+
+/* ELEMENTS AND STATE */
 let cart = [];
 let restaurant = null;
 let currentUser = null;
+let submitting = false;
 
-
-/* ==========================================
-   ELEMENTS
-========================================== */
-
-const customerName =
-    document.getElementById("customerName");
-
-const customerPhone =
-    document.getElementById("customerPhone");
-
-const deliveryLocation =
-    document.getElementById("deliveryLocation");
-
-const instructions =
-    document.getElementById("instructions");
-
-const locationSection =
-    document.getElementById("locationSection");
-
-const restaurantNameElement =
-    document.getElementById("restaurantName");
-
-const orderItemsElement =
-    document.getElementById("orderItems");
-
-const subtotalElement =
-    document.getElementById("subtotal");
-
-const deliveryFeeElement =
-    document.getElementById("deliveryFee");
-
-const totalElement =
-    document.getElementById("total");
-
-const placeOrderBtn =
-    document.getElementById("placeOrderBtn");
-
-const messageElement =
-    document.getElementById("message");
-
-
-/* ==========================================
-   MONEY
-========================================== */
+const customerName = document.getElementById("customerName");
+const customerPhone = document.getElementById("customerPhone");
+const deliveryLocation = document.getElementById("deliveryLocation");
+const instructions = document.getElementById("instructions");
+const locationSection = document.getElementById("locationSection");
+const restaurantNameElement = document.getElementById("restaurantName");
+const orderItemsElement = document.getElementById("orderItems");
+const subtotalElement = document.getElementById("subtotal");
+const deliveryFeeElement = document.getElementById("deliveryFee");
+const totalElement = document.getElementById("total");
+const placeOrderBtn = document.getElementById("placeOrderBtn");
+const messageElement = document.getElementById("message");
 
 function money(value) {
-
-    return "TSh " +
-        Number(value || 0).toLocaleString();
-
+return "TSh " + Number(value || 0).toLocaleString("en-US");
 }
 
-
-/* ==========================================
-   MESSAGE
-========================================== */
-
-function showMessage(
-    text,
-    type
-) {
-
-    messageElement.textContent = text;
-
-    messageElement.className = type;
-
-    messageElement.style.display =
-        "block";
-
+function showMessage(message, type) {
+messageElement.textContent = message;
+messageElement.className = type;
+messageElement.style.display = "block";
 }
-
-
-/* ==========================================
-   LOAD CHECKOUT
-========================================== */
-
-async function loadCheckout() {
-
-    try {
-
-        /* ----------------------------------
-           USER
-        ---------------------------------- */
-
-        const {
-            data: {
-                user
-            },
-            error: userError
-        } =
-            await db.auth.getUser();
-
-
-        if (userError) {
-
-            console.error(
-                "User error:",
-                userError
-            );
-
-        }
-
-
-        if (!user) {
-
-            alert(
-                "Please login as a customer first."
-            );
-
-            window.location.href =
-                "customer-login.html";
-
-            return;
-
-        }
-
-
-        currentUser = user;
-
-
-        /* ----------------------------------
-           LOAD CART
-        ---------------------------------- */
-
-        let savedCart =
-            localStorage.getItem(
-                "foodCart"
-            );
-
-
-        try {
-
-            cart =
-                savedCart
-                    ? JSON.parse(savedCart)
-                    : [];
-
-        } catch {
-
-            cart = [];
-
-        }
-
-
-        if (
-            !Array.isArray(cart) ||
-            cart.length === 0
-        ) {
-
-            alert(
-                "Your cart is empty."
-            );
-
-            window.location.href =
-                "cart.html";
-
-            return;
-
-        }
-
-
-        /* ----------------------------------
-           NORMALIZE CART
-        ---------------------------------- */
-
-        cart = cart.map(item => ({
-
-            menu_id:
-                item.menu_id ||
-                item.id ||
-                null,
-
-            restaurant_id:
-                item.restaurant_id ||
-                null,
-
-            food_name:
-                item.food_name ||
-                item.name ||
-                "Food Item",
-
-            price:
-                Number(item.price || 0),
-
-            quantity:
-                Number(item.quantity || 1),
-
-            image_url:
-                item.image_url ||
-                ""
-
-        }));
-
-
-        /* ----------------------------------
-           FIND RESTAURANT
-        ---------------------------------- */
-
-        const restaurantIds =
-            [
-                ...new Set(
-                    cart
-                        .map(
-                            item =>
-                                item.restaurant_id
-                        )
-                        .filter(Boolean)
-                )
-            ];
-
-
-        if (
-            restaurantIds.length !== 1
-        ) {
-
-            alert(
-                "Please order from one restaurant at a time."
-            );
-
-            window.location.href =
-                "cart.html";
-
-            return;
-
-        }
-
-
-        const restaurantId =
-            restaurantIds[0];
-
-
-        /* ----------------------------------
-           GET RESTAURANT
-        ---------------------------------- */
-
-        const {
-            data,
-            error
-        } =
-            await db
-                .from(
-                    "food_restaurants"
-                )
-                .select("*")
-                .eq(
-                    "id",
-                    restaurantId
-                )
-                .maybeSingle();
-
-
-        if (error) {
-
-            console.error(
-                "Restaurant error:",
-                error
-            );
-
-            throw error;
-
-        }
-
-
-        if (!data) {
-
-            alert(
-                "Restaurant not found."
-            );
-
-            window.location.href =
-                "cart.html";
-
-            return;
-
-        }
-
-
-        restaurant = data;
-
-
-        /* ----------------------------------
-           RESTAURANT NAME
-        ---------------------------------- */
-
-        restaurantNameElement.textContent =
-            restaurant.name ||
-            "Restaurant";
-
-
-        /* ----------------------------------
-           CUSTOMER DATA
-        ---------------------------------- */
-
-        const metadata =
-            currentUser.user_metadata ||
-            {};
-
-
-        customerName.value =
-            metadata.full_name ||
-            metadata.name ||
-            "";
-
-
-        customerPhone.value =
-            metadata.phone ||
-            "";
-
-
-        /* ----------------------------------
-           RENDER ITEMS
-        ---------------------------------- */
-
-        renderOrderItems();
-
-
-        /* ----------------------------------
-           CALCULATE
-        ---------------------------------- */
-
-        calculateTotal();
-
-
-    } catch (error) {
-
-        console.error(
-            "Checkout loading error:",
-            error
-        );
-
-
-        restaurantNameElement.textContent =
-            "Unable to load restaurant";
-
-        orderItemsElement.innerHTML = `
-            <div class="error">
-                Failed to load your order.
-                Please return to cart and try again.
-            </div>
-        `;
-
-    }
-
-}
-
-
-/* ==========================================
-   RENDER ORDER ITEMS
-========================================== */
-
-function renderOrderItems() {
-
-    orderItemsElement.innerHTML = "";
-
-
-    cart.forEach(item => {
-
-        const itemTotal =
-            Number(item.price) *
-            Number(item.quantity);
-
-
-        const row =
-            document.createElement("div");
-
-
-        row.className =
-            "order-item";
-
-
-        row.innerHTML = `
-
-            <div class="order-item-name">
-                ${escapeHTML(
-                    item.food_name
-                )}
-            </div>
-
-            <div class="order-item-qty">
-                x${item.quantity}
-            </div>
-
-            <div class="order-item-price">
-                ${money(itemTotal)}
-            </div>
-
-        `;
-
-
-        orderItemsElement.appendChild(
-            row
-        );
-
-    });
-
-}
-
-
-/* ==========================================
-   CALCULATE TOTAL
-========================================== */
-
-function calculateTotal() {
-
-    let subtotal = 0;
-
-
-    cart.forEach(item => {
-
-        subtotal +=
-            Number(item.price) *
-            Number(item.quantity);
-
-    });
-
-
-    const selected =
-        document.querySelector(
-            'input[name="deliveryType"]:checked'
-        );
-
-
-    const deliveryType =
-        selected
-            ? selected.value
-            : "delivery";
-
-
-    let deliveryFee = 0;
-
-
-    if (
-        deliveryType === "delivery" &&
-        restaurant
-    ) {
-
-        deliveryFee =
-            Number(
-                restaurant.delivery_fee ||
-                0
-            );
-
-    }
-
-
-    const total =
-        subtotal +
-        deliveryFee;
-
-
-    subtotalElement.textContent =
-        money(subtotal);
-
-
-    deliveryFeeElement.textContent =
-        money(deliveryFee);
-
-
-    totalElement.textContent =
-        money(total);
-
-}
-
-
-/* ==========================================
-   DELIVERY CHANGE
-========================================== */
-
-document
-    .querySelectorAll(
-        'input[name="deliveryType"]'
-    )
-    .forEach(radio => {
-
-        radio.addEventListener(
-            "change",
-            function() {
-
-                if (
-                    this.value === "delivery"
-                ) {
-
-                    locationSection
-                        .classList
-                        .remove("hidden");
-
-                } else {
-
-                    locationSection
-                        .classList
-                        .add("hidden");
-
-                }
-
-
-                calculateTotal();
-
-            }
-        );
-
-    });
-
-
-/* ==========================================
-   PLACE ORDER
-========================================== */
-
-placeOrderBtn.addEventListener(
-    "click",
-    async function() {
-
-        try {
-
-            placeOrderBtn.disabled =
-                true;
-
-            placeOrderBtn.textContent =
-                "Processing...";
-
-
-            /* ------------------------------
-               CUSTOMER
-            ------------------------------ */
-
-            const name =
-                customerName.value.trim();
-
-            const phone =
-                customerPhone.value.trim();
-
-            const location =
-                deliveryLocation.value.trim();
-
-            const notes =
-                instructions.value.trim();
-
-
-            const selected =
-                document.querySelector(
-                    'input[name="deliveryType"]:checked'
-                );
-
-
-            const deliveryType =
-                selected
-                    ? selected.value
-                    : "delivery";
-
-
-            /* ------------------------------
-               VALIDATION
-            ------------------------------ */
-
-            if (!name) {
-
-                showMessage(
-                    "Please enter your full name.",
-                    "error"
-                );
-
-                resetButton();
-
-                return;
-
-            }
-
-
-            if (!phone) {
-
-                showMessage(
-                    "Please enter your phone number.",
-                    "error"
-                );
-
-                resetButton();
-
-                return;
-
-            }
-
-
-            if (
-                deliveryType === "delivery" &&
-                !location
-            ) {
-
-                showMessage(
-                    "Please enter your delivery location.",
-                    "error"
-                );
-
-                resetButton();
-
-                return;
-
-            }
-
-
-            if (
-                !restaurant ||
-                !currentUser
-            ) {
-
-                showMessage(
-                    "Checkout information is incomplete. Please reload the cart.",
-                    "error"
-                );
-
-                resetButton();
-
-                return;
-
-            }
-
-
-            /* ------------------------------
-               CALCULATE
-            ------------------------------ */
-
-            let subtotal = 0;
-
-
-            cart.forEach(item => {
-
-                subtotal +=
-                    Number(item.price) *
-                    Number(item.quantity);
-
-            });
-
-
-            const deliveryFee =
-                deliveryType === "delivery"
-                    ? Number(
-                        restaurant.delivery_fee ||
-                        0
-                    )
-                    : 0;
-
-
-            const total =
-                subtotal +
-                deliveryFee;
-
-
-            /* ------------------------------
-               ORDER NUMBER
-            ------------------------------ */
-
-            const orderNumber =
-                "ORD-" +
-                Date.now();
-
-
-            /* ------------------------------
-               ORDER DATA
-            ------------------------------ */
-
-            const orderData = {
-
-                order_number:
-                    orderNumber,
-
-                customer_id:
-                    currentUser.id,
-
-                customer_name:
-                    name,
-
-                customer_phone:
-                    phone,
-
-                delivery_location:
-                    deliveryType === "pickup"
-                        ? "Pickup"
-                        : location,
-
-                latitude:
-                    null,
-
-                longitude:
-                    null,
-
-                instructions:
-                    notes,
-
-                delivery_type:
-                    deliveryType,
-
-                subtotal:
-                    subtotal,
-
-                delivery_fee:
-                    deliveryFee,
-
-                total:
-                    total,
-
-                restaurant_id:
-                    restaurant.id,
-
-                status:
-                    "Pending"
-
-            };
-
-
-            /* ------------------------------
-               INSERT ORDER
-            ------------------------------ */
-
-            const {
-                data: order,
-                error: orderError
-            } =
-                await db
-                    .from(
-                        "food_orders"
-                    )
-                    .insert(
-                        orderData
-                    )
-                    .select()
-                    .single();
-
-
-            if (orderError) {
-
-                throw orderError;
-
-            }
-
-
-            /* ------------------------------
-               ORDER ITEMS
-            ------------------------------ */
-
-            const orderItems =
-                cart.map(item => ({
-
-                    order_id:
-                        order.id,
-
-                    menu_id:
-                        item.menu_id,
-
-                    food_name:
-                        item.food_name,
-
-                    price:
-                        Number(item.price),
-
-                    quantity:
-                        Number(item.quantity)
-
-                }));
-
-
-            const {
-                error: itemsError
-            } =
-                await db
-                    .from(
-                        "food_order_items"
-                    )
-                    .insert(
-                        orderItems
-                    );
-
-
-            if (itemsError) {
-
-                throw itemsError;
-
-            }
-
-
-            /* ------------------------------
-               SAVE LAST ORDER
-            ------------------------------ */
-
-            const completeOrder = {
-
-                ...order,
-
-                items: cart.map(item => ({
-
-                    menu_id:
-                        item.menu_id,
-
-                    food_name:
-                        item.food_name,
-
-                    price:
-                        Number(item.price),
-
-                    quantity:
-                        Number(item.quantity),
-
-                    image_url:
-                        item.image_url ||
-                        ""
-
-                })),
-
-                restaurant_name:
-                    restaurant.name
-
-            };
-
-
-            localStorage.setItem(
-                "lastOrder",
-                JSON.stringify(
-                    completeOrder
-                )
-            );
-
-
-            localStorage.setItem(
-                "lastOrderNumber",
-                orderNumber
-            );
-
-
-            localStorage.setItem(
-                "lastOrderId",
-                order.id
-            );
-
-
-            /* ------------------------------
-               CLEAR CART
-            ------------------------------ */
-
-            localStorage.removeItem(
-                "foodCart"
-            );
-
-
-            /* ------------------------------
-               SUCCESS
-            ------------------------------ */
-
-            window.location.href =
-                "order-confirmation.html";
-
-
-        } catch (error) {
-
-            console.error(
-                "Place order error:",
-                error
-            );
-
-
-            showMessage(
-                "Failed to place order: " +
-                (
-                    error.message ||
-                    "Unknown error"
-                ),
-                "error"
-            );
-
-
-            resetButton();
-
-        }
-
-    }
-);
-
-
-/* ==========================================
-   RESET BUTTON
-========================================== */
-
-function resetButton() {
-
-    placeOrderBtn.disabled =
-        false;
-
-    placeOrderBtn.textContent =
-        "Place Order";
-
-}
-
-
-/* ==========================================
-   ESCAPE HTML
-========================================== */
 
 function escapeHTML(value) {
-
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-
+return String(value)
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#039;");
 }
 
+function selectedDeliveryType() {
+return document.querySelector('input[name="deliveryType"]:checked')?.value || "delivery";
+}
 
-/* ==========================================
-   START
-========================================== */
+function getSubtotal() {
+return cart.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
+}
 
+function getDeliveryFee() {
+return selectedDeliveryType() === "delivery" && restaurant
+? Math.max(0, Number(restaurant.delivery_fee) || 0)
+: 0;
+}
+
+function calculateTotal() {
+const subtotal = getSubtotal();
+const fee = getDeliveryFee();
+subtotalElement.textContent = money(subtotal);
+deliveryFeeElement.textContent = money(fee);
+totalElement.textContent = money(subtotal + fee);
+}
+
+function renderOrderItems() {
+if (!orderItemsElement) return;
+
+if (!cart.length) {
+orderItemsElement.innerHTML = `<div class="loading">${escapeHTML(t("emptyCart"))}</div>`;
+return;
+}
+
+orderItemsElement.innerHTML = cart.map(item => `
+<div class="order-item">
+<div class="item-name">${escapeHTML(item.food_name)}</div>
+<div class="item-qty">×${Number(item.quantity)}</div>
+<div class="item-price">${money(Number(item.price) * Number(item.quantity))}</div>
+</div>
+`).join("");
+}
+
+function resetButton() {
+submitting = false;
+placeOrderBtn.disabled = false;
+placeOrderBtn.textContent = t("placeOrder");
+}
+
+function syncDeliverySection() {
+locationSection.classList.toggle("hidden", selectedDeliveryType() === "pickup");
+calculateTotal();
+}
+
+document.querySelectorAll('input[name="deliveryType"]').forEach(radio => {
+radio.addEventListener("change", syncDeliverySection);
+});
+
+async function loadCheckout() {
+try {
+const { data: authData, error: authError } = await db.auth.getUser();
+
+if (authError) console.warn("Authentication check:", authError);
+
+currentUser = authData?.user || null;
+
+if (!currentUser) {
+showMessage(t("loginRequired"), "error");
+setTimeout(() => {
+window.location.href = "customer-login.html";
+}, 1200);
+return;
+}
+
+let savedCart;
+try {
+savedCart = JSON.parse(localStorage.getItem("foodCart") || "[]");
+} catch {
+savedCart = null;
+}
+
+if (!Array.isArray(savedCart) || savedCart.length === 0) {
+showMessage(t("emptyCart"), "error");
+setTimeout(() => window.location.href = "cart.html", 1200);
+return;
+}
+
+cart = savedCart.map(item => ({
+menu_id: item.menu_id || item.id || null,
+restaurant_id: item.restaurant_id || null,
+food_name: item.food_name || item.name || "Food Item",
+price: Number(item.price),
+quantity: Number(item.quantity || 1),
+image_url: item.image_url || ""
+}));
+
+const invalidItem = cart.some(item =>
+!item.restaurant_id ||
+!Number.isFinite(item.price) ||
+item.price < 0 ||
+!Number.isInteger(item.quantity) ||
+item.quantity < 1 ||
+!item.menu_id
+);
+
+if (invalidItem) {
+showMessage(t("cartError"), "error");
+placeOrderBtn.disabled = true;
+return;
+}
+
+const restaurantIds = [...new Set(cart.map(item => item.restaurant_id))];
+
+if (restaurantIds.length !== 1) {
+showMessage(t("oneRestaurant"), "error");
+setTimeout(() => window.location.href = "cart.html", 1200);
+return;
+}
+
+const { data, error } = await db
+.from("food_restaurants")
+.select("*")
+.eq("id", restaurantIds[0])
+.maybeSingle();
+
+if (error) throw error;
+if (!data) {
+showMessage(t("restaurantMissing"), "error");
+setTimeout(() => window.location.href = "cart.html", 1200);
+return;
+}
+
+restaurant = data;
+restaurantNameElement.textContent = restaurant.name || "Restaurant";
+
+const metadata = currentUser.user_metadata || {};
+customerName.value = metadata.full_name || metadata.name || "";
+customerPhone.value = metadata.phone || metadata.phone_number || "";
+
+renderOrderItems();
+calculateTotal();
+syncDeliverySection();
+applyLanguage();
+} catch (error) {
+console.error("Checkout loading error:", error);
+restaurantNameElement.textContent = t("loadError");
+orderItemsElement.innerHTML = `<div class="error">${escapeHTML(t("loadError"))}</div>`;
+showMessage(t("loadError"), "error");
+placeOrderBtn.disabled = true;
+}
+}
+
+/* PLACE ORDER */
+placeOrderBtn.addEventListener("click", async () => {
+if (submitting) return;
+
+const name = customerName.value.trim();
+const phone = customerPhone.value.trim();
+const location = deliveryLocation.value.trim();
+const notes = instructions.value.trim();
+const deliveryType = selectedDeliveryType();
+
+if (!name) {
+showMessage(t("enterName"), "error");
+customerName.focus();
+return;
+}
+
+if (!phone) {
+showMessage(t("enterPhone"), "error");
+customerPhone.focus();
+return;
+}
+
+if (!/^[+0-9()\s-]{7,20}$/.test(phone)) {
+showMessage(t("invalidPhone"), "error");
+customerPhone.focus();
+return;
+}
+
+if (deliveryType === "delivery" && !location) {
+showMessage(t("enterLocation"), "error");
+deliveryLocation.focus();
+return;
+}
+
+if (!restaurant || !currentUser || !cart.length) {
+showMessage(t("incomplete"), "error");
+return;
+}
+
+if (cart.some(item =>
+!item.restaurant_id ||
+!Number.isFinite(item.price) ||
+item.price < 0 ||
+!Number.isInteger(item.quantity) ||
+item.quantity < 1 ||
+!item.menu_id
+)) {
+showMessage(t("cartError"), "error");
+return;
+}
+
+submitting = true;
+placeOrderBtn.disabled = true;
+placeOrderBtn.textContent = t("processing");
+messageElement.style.display = "none";
+
+let createdOrder = null;
+
+try {
+const subtotal = getSubtotal();
+const deliveryFee = getDeliveryFee();
+const total = subtotal + deliveryFee;
+const orderNumber = "ORD-" + Date.now();
+
+const orderData = {
+order_number: orderNumber,
+customer_id: currentUser.id,
+customer_name: name,
+customer_phone: phone,
+delivery_location: deliveryType === "pickup" ? "Pickup" : location,
+latitude: null,
+longitude: null,
+instructions: notes,
+delivery_type: deliveryType,
+subtotal: subtotal,
+delivery_fee: deliveryFee,
+total: total,
+restaurant_id: restaurant.id,
+status: "Pending"
+};
+
+const { data: order, error: orderError } = await db
+.from("food_orders")
+.insert(orderData)
+.select()
+.single();
+
+if (orderError) throw orderError;
+createdOrder = order;
+
+const orderItems = cart.map(item => ({
+order_id: order.id,
+menu_id: item.menu_id,
+food_name: item.food_name,
+price: Number(item.price),
+quantity: Number(item.quantity)
+}));
+
+const { error: itemsError } = await db
+.from("food_order_items")
+.insert(orderItems);
+
+if (itemsError) {
+console.error("Order items insertion error:", itemsError);
+showMessage(t("failedItems"), "error");
+resetButton();
+return;
+}
+
+const completeOrder = {
+...order,
+items: cart.map(item => ({
+menu_id: item.menu_id,
+food_name: item.food_name,
+price: Number(item.price),
+quantity: Number(item.quantity),
+image_url: item.image_url || ""
+})),
+restaurant_name: restaurant.name || "Restaurant"
+};
+
+localStorage.setItem("lastOrder", JSON.stringify(completeOrder));
+localStorage.setItem("lastOrderNumber", orderNumber);
+localStorage.setItem("lastOrderId", order.id);
+localStorage.removeItem("foodCart");
+
+showMessage(t("orderSuccess"), "success");
+
+setTimeout(() => {
+window.location.href = "order-confirmation.html";
+}, 250);
+} catch (error) {
+console.error("Place order error:", error);
+
+if (createdOrder) {
+console.error("An order record may exist without its items. Order ID:", createdOrder.id);
+}
+
+showMessage(t("orderFailed") + (error?.message || t("unknownError")), "error");
+resetButton();
+}
+});
+
+applyLanguage();
+syncDeliverySection();
 loadCheckout();
-
 </script>
-
 </body>
 </html>
+```
