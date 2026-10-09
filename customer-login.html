@@ -1,11 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Customer Login | Food Platform</title>
-
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -15,21 +14,17 @@
             background: white;
             padding: 25px;
             border-radius: 18px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 20px rgba(0,0,0,.08);
         }
 
-        .auth-box h1 {
-            margin-bottom: 8px;
-        }
+        .auth-box h1 { margin-bottom: 8px; }
 
         .auth-box p {
             color: #777;
             margin-bottom: 25px;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         .form-group label {
             display: block;
@@ -38,17 +33,15 @@
         }
 
         .form-group input {
+            box-sizing: border-box;
             width: 100%;
             padding: 14px;
             border: 1px solid #ddd;
             border-radius: 10px;
             font-size: 16px;
-            outline: none;
         }
 
-        .form-group input:focus {
-            border-color: #ff6b35;
-        }
+        .form-group input:focus { border-color: #ff6b35; }
 
         .login-btn {
             width: 100%;
@@ -63,7 +56,8 @@
         }
 
         .login-btn:disabled {
-            opacity: 0.6;
+            opacity: .6;
+            cursor: wait;
         }
 
         .message {
@@ -71,6 +65,7 @@
             padding: 12px;
             border-radius: 10px;
             display: none;
+            overflow-wrap: anywhere;
         }
 
         .error {
@@ -97,211 +92,157 @@
 </head>
 
 <body>
-
     <div class="page-header">
-        <h1>🍽️ Food Platform</h1>
+        <h1>Food Platform</h1>
     </div>
 
     <main class="container">
-
         <div class="auth-box">
-
-            <h1>👤 Customer Login</h1>
-
-            <p>
-                Login to view your orders and track your deliveries.
-            </p>
+            <h1>Customer Login</h1>
+            <p>Login to view your orders and track your orders.</p>
 
             <form id="loginForm">
-
                 <div class="form-group">
-
-                    <label for="email">
-                        Email
-                    </label>
-
+                    <label for="email">Email</label>
                     <input
                         type="email"
                         id="email"
                         placeholder="Enter your email"
+                        autocomplete="email"
                         required
                     >
-
                 </div>
 
-
                 <div class="form-group">
-
-                    <label for="password">
-                        Password
-                    </label>
-
+                    <label for="password">Password</label>
                     <input
                         type="password"
                         id="password"
                         placeholder="Enter your password"
+                        autocomplete="current-password"
                         required
                     >
-
                 </div>
 
-
-                <button
-                    type="submit"
-                    class="login-btn"
-                    id="loginBtn"
-                >
-                    🔐 Login
+                <button type="submit" class="login-btn" id="loginBtn">
+                    Login
                 </button>
-
             </form>
 
-
-            <div
-                id="errorMessage"
-                class="message error"
-            ></div>
-
-
-            <div
-                id="successMessage"
-                class="message success"
-            ></div>
-
+            <div id="errorMessage" class="message error" role="alert"></div>
+            <div id="successMessage" class="message success" role="status"></div>
 
             <div class="register-link">
-
                 Don't have an account?
-
-                <a href="customer-register.html">
-                    Create Account
-                </a>
-
+                <a href="customer-register.html">Create Account</a>
             </div>
-
         </div>
-
     </main>
 
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script src="supabase.js"></script>
 
-
     <script>
+        const loginForm = document.getElementById("loginForm");
+        const loginBtn = document.getElementById("loginBtn");
+        const errorMessage = document.getElementById("errorMessage");
+        const successMessage = document.getElementById("successMessage");
 
-        const loginForm =
-            document.getElementById("loginForm");
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = "block";
+            successMessage.style.display = "none";
+        }
 
-        const loginBtn =
-            document.getElementById("loginBtn");
+        function getSupabaseClient() {
+            // Support the client name used by the existing project.
+            if (typeof db !== "undefined" && db && db.auth) {
+                return db;
+            }
 
-        const errorMessage =
-            document.getElementById("errorMessage");
+            if (typeof supabaseClient !== "undefined" &&
+                supabaseClient && supabaseClient.auth) {
+                return supabaseClient;
+            }
 
-        const successMessage =
-            document.getElementById("successMessage");
+            return null;
+        }
 
+        loginForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
 
-        loginForm.addEventListener(
-            "submit",
-            async function(event) {
+            errorMessage.style.display = "none";
+            successMessage.style.display = "none";
 
-                event.preventDefault();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
 
+            if (!email || !password) {
+                showError("Please enter your email and password.");
+                return;
+            }
 
-                errorMessage.style.display =
-                    "none";
+            const client = getSupabaseClient();
 
-                successMessage.style.display =
-                    "none";
+            if (!client) {
+                showError(
+                    "Supabase connection was not found. Check supabase.js " +
+                    "and confirm that it creates the client as db or supabaseClient."
+                );
+                console.error(
+                    "Supabase client missing. Check supabase.js and browser Console."
+                );
+                return;
+            }
 
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Logging in...";
 
-                const email =
-                    document
-                        .getElementById("email")
-                        .value
-                        .trim();
+            try {
+                const { data, error } = await client.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
 
-
-                const password =
-                    document
-                        .getElementById("password")
-                        .value;
-
-
-                loginBtn.disabled = true;
-
-                loginBtn.textContent =
-                    "⏳ Logging in...";
-
-
-                try {
-
-                    const {
-                        data,
-                        error
-                    } = await supabaseClient.auth.signInWithPassword({
-
-                        email: email,
-
-                        password: password
-
-                    });
-
-
-                    if (error) {
-
-                        throw error;
-
-                    }
-
-
-                    successMessage.textContent =
-                        "✅ Login successful!";
-
-                    successMessage.style.display =
-                        "block";
-
-
-                    setTimeout(function() {
-
-                        window.location.href =
-                            "my-orders.html";
-
-                    }, 700);
-
-
-                } catch (error) {
-
-                    console.error(error);
-
-
-                    errorMessage.textContent =
-                        "❌ " + (
-                            error.message ||
-                            "Login failed."
-                        );
-
-
-                    errorMessage.style.display =
-                        "block";
-
-
-                } finally {
-
-                    loginBtn.disabled = false;
-
-                    loginBtn.textContent =
-                        "🔐 Login";
-
+                if (error) {
+                    throw error;
                 }
 
+                if (!data || !data.user) {
+                    throw new Error("Login was not completed. Please try again.");
+                }
+
+                successMessage.textContent = "Login successful. Opening your orders...";
+                successMessage.style.display = "block";
+
+                // Allow Supabase to save the session before navigating.
+                window.location.assign("my-orders.html");
+
+            } catch (error) {
+                console.error("Customer login error:", error);
+
+                let message = error && error.message
+                    ? error.message
+                    : "Login failed. Please try again.";
+
+                if (message.toLowerCase().includes("invalid login credentials")) {
+                    message = "Email or password is incorrect. Please check and try again.";
+                } else if (
+                    message.toLowerCase().includes("email not confirmed")
+                ) {
+                    message = "Your email has not been confirmed. Please complete email confirmation first.";
+                } else if (
+                    message.toLowerCase().includes("failed to fetch")
+                ) {
+                    message = "Cannot connect to Supabase. Check your internet connection and Supabase settings.";
+                }
+
+                showError(message);
+
+                loginBtn.disabled = false;
+                loginBtn.textContent = "Login";
             }
-        );
-
+        });
     </script>
-
 </body>
 </html>
