@@ -1,14 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f97316">
 
     <title>My Orders | Food Platform</title>
 
@@ -16,22 +12,30 @@
     <script src="supabase.js"></script>
 
     <style>
+        * { box-sizing: border-box; }
 
-        * {
-            box-sizing: border-box;
+        :root {
+            --orange: #f97316;
+            --orange-dark: #ea580c;
+            --background: #f5f6f8;
+            --text: #222;
+            --muted: #6b7280;
+            --border: #e5e7eb;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f6f8;
-            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--text);
         }
 
+        button, select { font: inherit; }
+
         header {
-            background: #f97316;
+            background: var(--orange);
             color: white;
-            padding: 15px;
+            padding: 14px 16px;
         }
 
         .header-inner {
@@ -40,6 +44,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 12px;
         }
 
         header h1 {
@@ -47,12 +52,27 @@
             font-size: 20px;
         }
 
-        .home-btn {
-            background: white;
-            color: #f97316;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-select {
+            padding: 8px;
             border: 0;
             border-radius: 7px;
-            padding: 8px 12px;
+            background: white;
+            color: #222;
+            max-width: 115px;
+        }
+
+        .home-btn {
+            background: white;
+            color: var(--orange-dark);
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 12px;
             font-weight: bold;
             cursor: pointer;
         }
@@ -61,43 +81,66 @@
             max-width: 900px;
             margin: auto;
             padding: 16px;
-            padding-bottom: 80px;
+            padding-bottom: 85px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 5px 0 16px;
         }
 
         .page-title {
-            margin: 5px 0 15px;
-            font-size: 22px;
+            margin: 0;
+            font-size: 23px;
+        }
+
+        .order-count {
+            color: var(--muted);
+            font-size: 13px;
         }
 
         .order-card {
             background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 16px;
             margin-bottom: 14px;
+            box-shadow: 0 2px 7px rgba(0,0,0,.025);
         }
 
         .order-top {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .order-number {
             font-weight: bold;
             font-size: 15px;
+            overflow-wrap: anywhere;
         }
 
         .restaurant {
-            color: #666;
+            color: var(--muted);
             font-size: 13px;
-            margin-top: 4px;
+            margin-top: 5px;
+        }
+
+        .order-date {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 5px;
         }
 
         .status {
             display: inline-block;
-            padding: 5px 9px;
+            padding: 6px 10px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: bold;
@@ -136,47 +179,61 @@
             margin: 10px 0;
         }
 
-        .row {
+        .info-row {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
-            margin: 6px 0;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 8px 0;
             font-size: 13px;
         }
 
-        .label {
-            color: #777;
+        .info-label {
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            text-align: right;
+            overflow-wrap: anywhere;
         }
 
         .total {
-            font-weight: bold;
             font-size: 16px;
+            font-weight: bold;
+            color: var(--orange-dark);
         }
 
         .actions {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 9px;
+            margin-top: 13px;
         }
 
         .btn {
             border: 0;
-            border-radius: 7px;
-            padding: 9px 12px;
+            border-radius: 8px;
+            padding: 11px 12px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 13px;
             flex: 1;
+            min-width: 0;
         }
 
         .btn-primary {
-            background: #f97316;
+            background: var(--orange);
             color: white;
         }
 
+        .btn-primary:hover {
+            background: var(--orange-dark);
+        }
+
         .btn-secondary {
-            background: #e5e7eb;
+            background: #f3f4f6;
             color: #111827;
+            border: 1px solid var(--border);
         }
 
         .btn:disabled {
@@ -184,33 +241,42 @@
             cursor: not-allowed;
         }
 
-        .empty {
+        .empty, .loading, .error-box {
             background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 35px 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px 20px;
             text-align: center;
-            color: #777;
+            color: var(--muted);
         }
 
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: #777;
+        .empty h3 {
+            color: #222;
+            margin-top: 0;
+        }
+
+        .empty p {
+            line-height: 1.6;
         }
 
         .message {
             margin-top: 10px;
             font-size: 13px;
-            color: #c2410c;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
         }
+
+        .message.error { color: #b91c1c; }
+        .message.success { color: #15803d; }
+        .message.info { color: #9a3412; }
 
         .bottom-nav {
             position: fixed;
             left: 0;
             right: 0;
             bottom: 0;
-            height: 58px;
+            min-height: 58px;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
             background: white;
             border-top: 1px solid #ddd;
             display: flex;
@@ -219,6 +285,7 @@
 
         .bottom-nav a {
             flex: 1;
+            min-height: 58px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -229,890 +296,863 @@
         }
 
         .bottom-nav a.active {
-            color: #f97316;
+            color: var(--orange);
+        }
+
+        .refresh-btn {
+            border: 1px solid var(--border);
+            background: white;
+            padding: 9px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #444;
         }
 
         @media (max-width: 500px) {
-
             .container {
                 padding: 12px;
-                padding-bottom: 75px;
+                padding-bottom: 85px;
             }
 
-            .order-top {
-                align-items: flex-start;
+            header h1 { font-size: 17px; }
+
+            .header-inner { gap: 7px; }
+
+            .header-actions { gap: 6px; }
+
+            .home-btn { padding: 8px; }
+
+            .language-select {
+                max-width: 100px;
+                padding: 8px 5px;
             }
 
-            .actions {
-                flex-direction: column;
-            }
+            .order-card { padding: 13px; }
 
+            .order-top { gap: 8px; }
+
+            .actions { flex-direction: column; }
+
+            .btn { width: 100%; }
+
+            .page-title { font-size: 21px; }
         }
-
     </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
     <div class="header-inner">
+        <h1 id="headerTitle">My Orders</h1>
 
-        <h1>My Orders</h1>
+        <div class="header-actions">
+            <select
+                id="languageSelect"
+                class="language-select"
+                aria-label="Select language"
+            >
+                <option value="en">English</option>
+                <option value="sw">Kiswahili</option>
+            </select>
 
-        <button
-            class="home-btn"
-            onclick="window.location.href='index.html'"
-        >
-            Home
-        </button>
-
+            <button
+                class="home-btn"
+                type="button"
+                onclick="window.location.href='index.html'"
+                id="homeButton"
+            >
+                Home
+            </button>
+        </div>
     </div>
-
 </header>
 
-
-<div class="container">
-
-    <h2 class="page-title">
-        Order History
-    </h2>
-
-    <div id="ordersContainer">
-
-        <div class="loading">
-            Loading orders...
+<main class="container">
+    <div class="page-heading">
+        <div>
+            <h2 class="page-title" id="pageTitle">Order History</h2>
+            <div class="order-count" id="orderCount"></div>
         </div>
 
+        <button
+            type="button"
+            class="refresh-btn"
+            id="refreshButton"
+        >
+            ↻ Refresh
+        </button>
     </div>
 
-</div>
-
+    <div id="ordersContainer" aria-live="polite">
+        <div class="loading" id="loadingMessage">
+            Loading orders...
+        </div>
+    </div>
+</main>
 
 <nav class="bottom-nav">
-
-    <a href="index.html">
-        Home
-    </a>
-
-    <a href="cart.html">
-        Cart
-    </a>
-
-    <a
-        href="my-orders.html"
-        class="active"
-    >
-        Orders
-    </a>
-
-    <a href="customer-account.html">
-        Account
-    </a>
-
+    <a href="index.html" id="navHome">Home</a>
+    <a href="cart.html" id="navCart">Cart</a>
+    <a href="my-orders.html" class="active" id="navOrders">Orders</a>
+    <a href="customer-account.html" id="navAccount">Account</a>
 </nav>
 
-
 <script>
+"use strict";
+
+/* ======================================
+   SUPABASE AND APP STATE
+====================================== */
 
 let currentUser = null;
 let orders = [];
+let orderChannel = null;
+let isLoadingOrders = false;
 
+const translations = {
+    en: {
+        header: "My Orders",
+        home: "Home",
+        title: "Order History",
+        refresh: "↻ Refresh",
+        loading: "Loading your orders...",
+        noOrders: "No orders yet",
+        noOrdersText: "Your orders will appear here after you place an order.",
+        browse: "Browse Food",
+        restaurant: "Restaurant",
+        customer: "Customer",
+        delivery: "Order type",
+        location: "Location",
+        total: "Total",
+        track: "Track Order",
+        again: "Order Again",
+        checking: "Checking menu...",
+        orderNotFound: "Order not found.",
+        noRestaurant: "This order is not linked to a restaurant.",
+        loadItemsError: "Could not load the items from this order.",
+        noItems: "This order has no food items.",
+        restaurantUnavailable: "This restaurant is no longer available.",
+        noMenuItems: "No valid menu items found in this order.",
+        noAvailableItems: "None of the foods from this order are currently available.",
+        unavailablePrefix: "Some items are unavailable and were skipped: ",
+        orderAgainSuccess: "Available items added to your cart. Opening cart...",
+        loadError: "Could not load orders. Please refresh and try again.",
+        authError: "Please log in to view your orders.",
+        deliveryValue: "Delivery",
+        pickupValue: "Pickup",
+        pending: "Pending",
+        confirmed: "Confirmed",
+        preparing: "Preparing",
+        ready: "Ready",
+        cancelled: "Cancelled",
+        orderCount: "order(s)",
+        date: "Date",
+        notAvailable: "Not available",
+        status: "Status",
+        unexpectedError: "Something went wrong. Please try again.",
+        emptyLocation: "Not provided",
+        refreshDone: "Orders refreshed.",
+        account: "Account",
+        cart: "Cart",
+        orders: "Orders"
+    },
 
-/* =========================
-   AUTH
-========================= */
-
-async function checkAuth() {
-
-    const {
-        data: {
-            user
-        }
-    } = await db.auth.getUser();
-
-    if (!user) {
-
-        window.location.href =
-            "customer-login.html";
-
-        return false;
-
+    sw: {
+        header: "Oda Zangu",
+        home: "Nyumbani",
+        title: "Historia ya Oda",
+        refresh: "↻ Onyesha Upya",
+        loading: "Inapakia oda zako...",
+        noOrders: "Bado huna oda",
+        noOrdersText: "Oda zako zitaonekana hapa baada ya kuagiza chakula.",
+        browse: "Angalia Vyakula",
+        restaurant: "Mgahawa",
+        customer: "Mteja",
+        delivery: "Aina ya oda",
+        location: "Mahali",
+        total: "Jumla",
+        track: "Fuatilia Oda",
+        again: "Agiza Tena",
+        checking: "Inakagua menyu...",
+        orderNotFound: "Oda haijapatikana.",
+        noRestaurant: "Oda hii haijaunganishwa na mgahawa.",
+        loadItemsError: "Imeshindikana kupakia vyakula vya oda hii.",
+        noItems: "Oda hii haina vyakula.",
+        restaurantUnavailable: "Mgahawa huu haupatikani tena.",
+        noMenuItems: "Hakuna vyakula halali vilivyopatikana kwenye oda hii.",
+        noAvailableItems: "Hakuna chakula cha oda hii kinachopatikana kwa sasa.",
+        unavailablePrefix: "Baadhi ya vyakula havipatikani na vimeachwa: ",
+        orderAgainSuccess: "Vyakula vinavyopatikana vimeongezwa kwenye kikapu. Kikapu kinafunguliwa...",
+        loadError: "Imeshindikana kupakia oda. Onyesha upya na ujaribu tena.",
+        authError: "Tafadhali ingia kwenye akaunti yako kuona oda zako.",
+        deliveryValue: "Kuletewa",
+        pickupValue: "Kujichukulia",
+        pending: "Inasubiri",
+        confirmed: "Imethibitishwa",
+        preparing: "Inaandaliwa",
+        ready: "Tayari",
+        cancelled: "Imeghairiwa",
+        orderCount: "oda",
+        date: "Tarehe",
+        notAvailable: "Haipatikani",
+        status: "Hali",
+        unexpectedError: "Hitilafu imetokea. Tafadhali jaribu tena.",
+        emptyLocation: "Haijawekwa",
+        refreshDone: "Oda zimeonyeshwa upya.",
+        account: "Akaunti",
+        cart: "Kikapu",
+        orders: "Oda"
     }
+};
 
-    currentUser = user;
+let language = localStorage.getItem("foodLanguage") || "en";
 
-    return true;
-
+if (!translations[language]) {
+    language = "en";
 }
 
+const t = key => translations[language][key] || key;
 
-/* =========================
-   LOAD ORDERS
-========================= */
+const container = document.getElementById("ordersContainer");
 
-async function loadOrders() {
+/* ======================================
+   LANGUAGE
+====================================== */
 
-    const container =
-        document.getElementById(
-            "ordersContainer"
-        );
+function applyLanguage() {
+    document.documentElement.lang = language;
+    document.getElementById("languageSelect").value = language;
 
+    document.getElementById("headerTitle").textContent = t("header");
+    document.getElementById("homeButton").textContent = t("home");
+    document.getElementById("pageTitle").textContent = t("title");
+    document.getElementById("refreshButton").textContent = t("refresh");
 
-    const {
-        data,
-        error
-    } = await db
-        .from("food_orders")
-        .select("*")
-        .eq(
-            "customer_id",
-            currentUser.id
-        )
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
-
-
-    if (error) {
-
-        console.error(error);
-
-        container.innerHTML = `
-            <div class="empty">
-                ${escapeHtml(error.message)}
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    orders = data || [];
+    document.getElementById("navHome").textContent = t("home");
+    document.getElementById("navCart").textContent = t("cart");
+    document.getElementById("navOrders").textContent = t("orders");
+    document.getElementById("navAccount").textContent = t("account");
 
     renderOrders();
-
 }
 
+document.getElementById("languageSelect").addEventListener("change", event => {
+    language = event.target.value === "sw" ? "sw" : "en";
 
-/* =========================
-   RENDER ORDERS
-========================= */
+    localStorage.setItem("foodLanguage", language);
 
-function renderOrders() {
+    applyLanguage();
+});
 
-    const container =
-        document.getElementById(
-            "ordersContainer"
-        );
+/* ======================================
+   AUTHENTICATION
+====================================== */
 
+async function checkAuth() {
+    if (typeof db === "undefined" || !db.auth) {
+        container.innerHTML = `
+            <div class="error-box">
+                ${escapeHtml(t("loadError"))}
+            </div>
+        `;
+        return false;
+    }
 
-    if (!orders.length) {
+    try {
+        const { data, error } = await db.auth.getUser();
+
+        if (error) {
+            console.error("Authentication error:", error);
+        }
+
+        if (!data || !data.user) {
+            window.location.href = "customer-login.html";
+            return false;
+        }
+
+        currentUser = data.user;
+        return true;
+
+    } catch (error) {
+        console.error("Authentication error:", error);
 
         container.innerHTML = `
-            <div class="empty">
-
-                <h3>
-                    No orders yet
-                </h3>
-
-                <p>
-                    Your orders will appear here.
-                </p>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="window.location.href='index.html'"
-                    style="max-width:180px;"
-                >
-                    Browse Food
+            <div class="error-box">
+                ${escapeHtml(t("authError"))}
+                <br><br>
+                <button class="btn btn-primary"
+                    onclick="window.location.href='customer-login.html'">
+                    ${escapeHtml(t("home"))}
                 </button>
-
             </div>
         `;
 
-        return;
+        return false;
+    }
+}
 
+/* ======================================
+   LOAD ORDERS
+====================================== */
+
+async function loadOrders(showLoading = true) {
+    if (!currentUser || isLoadingOrders) return;
+
+    isLoadingOrders = true;
+
+    if (showLoading) {
+        container.innerHTML = `
+            <div class="loading">${escapeHtml(t("loading"))}</div>
+        `;
     }
 
+    try {
+        const { data, error } = await db
+            .from("food_orders")
+            .select("*")
+            .eq("customer_id", currentUser.id)
+            .order("created_at", { ascending: false });
 
-    container.innerHTML =
-        orders.map(order => {
+        if (error) throw error;
 
-            const status =
-                order.status || "Pending";
+        orders = data || [];
+        renderOrders();
 
-            return `
+    } catch (error) {
+        console.error("Load orders error:", error);
 
-                <div
-                    class="order-card"
-                    id="order-${escapeHtml(order.id)}"
-                >
+        container.innerHTML = `
+            <div class="error-box">
+                ${escapeHtml(t("loadError"))}
+                <br><br>
+                <button class="btn btn-primary" onclick="loadOrders(true)">
+                    ${escapeHtml(t("refresh"))}
+                </button>
+            </div>
+        `;
 
-                    <div class="order-top">
+    } finally {
+        isLoadingOrders = false;
+    }
+}
 
-                        <div>
+/* ======================================
+   RENDER ORDER CARDS
+====================================== */
 
-                            <div class="order-number">
-                                ${escapeHtml(
-                                    order.order_number ||
-                                    "Order"
-                                )}
-                            </div>
+function renderOrders() {
+    if (!container) return;
 
-                            <div class="restaurant">
-                                Restaurant:
-                                ${escapeHtml(
-                                    order.restaurant_name ||
-                                    "Food Platform"
-                                )}
-                            </div>
+    const countElement = document.getElementById("orderCount");
 
+    if (countElement) {
+        countElement.textContent =
+            orders.length + " " + t("orderCount");
+    }
+
+    if (!orders.length) {
+        container.innerHTML = `
+            <div class="empty">
+                <h3>${escapeHtml(t("noOrders"))}</h3>
+                <p>${escapeHtml(t("noOrdersText"))}</p>
+                <button
+                    class="btn btn-primary"
+                    style="max-width:220px"
+                    onclick="window.location.href='index.html'">
+                    ${escapeHtml(t("browse"))}
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = orders.map(order => {
+        const status = normalizeStatus(order.status);
+        const orderId = String(order.id || "");
+        const orderNumber = String(order.order_number || "Order");
+        const restaurantName = order.restaurant_name || "Food Platform";
+
+        const deliveryType = formatDelivery(order.delivery_type);
+        const location = order.delivery_location || t("emptyLocation");
+        const customerName = order.customer_name || "-";
+        const date = formatDate(order.created_at);
+
+        return `
+            <article class="order-card" id="order-${escapeHtml(orderId)}">
+                <div class="order-top">
+                    <div>
+                        <div class="order-number">
+                            #${escapeHtml(orderNumber)}
                         </div>
 
+                        <div class="restaurant">
+                            ${escapeHtml(t("restaurant"))}:
+                            ${escapeHtml(restaurantName)}
+                        </div>
 
-                        <span
-                            class="status ${statusClass(status)}"
-                        >
-                            ${escapeHtml(status)}
-                        </span>
-
+                        <div class="order-date">
+                            ${escapeHtml(t("date"))}: ${escapeHtml(date)}
+                        </div>
                     </div>
 
-
-                    <div class="order-info">
-
-                        <div class="row">
-
-                            <span class="label">
-                                Customer
-                            </span>
-
-                            <span>
-                                ${escapeHtml(
-                                    order.customer_name ||
-                                    "-"
-                                )}
-                            </span>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <span class="label">
-                                Delivery
-                            </span>
-
-                            <span>
-                                ${escapeHtml(
-                                    order.delivery_type ||
-                                    "-"
-                                )}
-                            </span>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <span class="label">
-                                Location
-                            </span>
-
-                            <span>
-                                ${escapeHtml(
-                                    order.delivery_location ||
-                                    "-"
-                                )}
-                            </span>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <span class="label">
-                                Total
-                            </span>
-
-                            <span class="total">
-                                ${money(order.total)}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="actions">
-
-                        <button
-                            class="btn btn-secondary"
-                            onclick="trackOrder(
-                                '${escapeHtml(order.order_number || "")}',
-                                '${escapeHtml(order.id)}'
-                            )"
-                        >
-                            Track Order
-                        </button>
-
-
-                        <button
-                            class="btn btn-primary"
-                            onclick="orderAgain(
-                                '${escapeHtml(order.id)}'
-                            )"
-                        >
-                            Order Again
-                        </button>
-
-                    </div>
-
-
-                    <div
-                        class="message"
-                        id="message-${escapeHtml(order.id)}"
-                    ></div>
-
+                    <span class="status ${statusClass(status)}"
+                        id="status-${escapeHtml(orderId)}">
+                        ${escapeHtml(statusLabel(status))}
+                    </span>
                 </div>
 
-            `;
+                <div class="order-info">
+                    <div class="info-row">
+                        <span class="info-label">${escapeHtml(t("customer"))}</span>
+                        <span class="info-value">${escapeHtml(customerName)}</span>
+                    </div>
 
-        }).join("");
+                    <div class="info-row">
+                        <span class="info-label">${escapeHtml(t("delivery"))}</span>
+                        <span class="info-value">${escapeHtml(deliveryType)}</span>
+                    </div>
 
+                    <div class="info-row">
+                        <span class="info-label">${escapeHtml(t("location"))}</span>
+                        <span class="info-value">${escapeHtml(location)}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">${escapeHtml(t("total"))}</span>
+                        <span class="info-value total">${money(order.total)}</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-action="track"
+                        data-id="${escapeHtml(orderId)}">
+                        ${escapeHtml(t("track"))}
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        data-action="again"
+                        data-id="${escapeHtml(orderId)}">
+                        ${escapeHtml(t("again"))}
+                    </button>
+                </div>
+
+                <div class="message" id="message-${escapeHtml(orderId)}"></div>
+            </article>
+        `;
+    }).join("");
 }
 
+/* ======================================
+   SAFE BUTTON HANDLING
+====================================== */
 
-/* =========================
+container.addEventListener("click", event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+
+    const orderId = button.dataset.id;
+    if (!orderId) return;
+
+    if (button.dataset.action === "track") {
+        trackOrder(orderId);
+    }
+
+    if (button.dataset.action === "again") {
+        orderAgain(orderId, button);
+    }
+});
+
+/* ======================================
    TRACK ORDER
-========================= */
+====================================== */
 
-function trackOrder(
-    orderNumber,
-    orderId
-) {
+function trackOrder(orderId) {
+    const order = orders.find(item => String(item.id) === String(orderId));
 
-    if (orderNumber) {
+    if (!order) return;
 
-        window.location.href =
-            "order-tracking.html?order=" +
-            encodeURIComponent(orderNumber) +
-            "&id=" +
-            encodeURIComponent(orderId);
+    /*
+      Keep these values for order-tracking.html and
+      order-confirmation.html.
+    */
+    localStorage.setItem("lastOrderId", String(order.id));
 
-        return;
-
+    if (order.order_number) {
+        localStorage.setItem("lastOrderNumber", String(order.order_number));
     }
 
+    localStorage.setItem("lastOrder", JSON.stringify(order));
 
-    window.location.href =
-        "order-tracking.html?id=" +
-        encodeURIComponent(orderId);
+    const params = new URLSearchParams();
+    params.set("id", String(order.id));
 
+    if (order.order_number) {
+        params.set("order", String(order.order_number));
+    }
+
+    window.location.href = "order-tracking.html?" + params.toString();
 }
 
-
-/* =========================
+/* ======================================
    ORDER AGAIN
-========================= */
-
-async function orderAgain(orderId) {
-
-    const message =
-        document.getElementById(
-            "message-" + orderId
-        );
-
-
-    message.textContent =
-        "Checking menu...";
-
-
-    const {
-        data: order,
-        error: orderError
-    } = await db
-        .from("food_orders")
-        .select("*")
-        .eq("id", orderId)
-        .eq(
-            "customer_id",
-            currentUser.id
-        )
-        .maybeSingle();
-
-
-    if (orderError) {
-
-        message.textContent =
-            orderError.message;
-
-        return;
-
-    }
-
-
-    if (!order) {
-
-        message.textContent =
-            "Order not found.";
-
-        return;
-
-    }
-
-
-    if (!order.restaurant_id) {
-
-        message.textContent =
-            "This order cannot be repeated because its restaurant is not linked.";
-
-        return;
-
-    }
-
-
-    /* =========================
-       LOAD OLD ORDER ITEMS
-    ========================= */
-
-    const {
-        data: oldItems,
-        error: itemError
-    } = await db
-        .from("food_order_items")
-        .select("*")
-        .eq(
-            "order_id",
-            order.id
-        );
-
-
-    if (itemError) {
-
-        message.textContent =
-            itemError.message;
-
-        return;
-
-    }
-
-
-    if (!oldItems || !oldItems.length) {
-
-        message.textContent =
-            "This order has no food items.";
-
-        return;
-
-    }
-
-
-    /* =========================
-       LOAD CURRENT RESTAURANT
-    ========================= */
-
-    const {
-        data: restaurant,
-        error: restaurantError
-    } = await db
-        .from("food_restaurants")
-        .select("*")
-        .eq(
-            "id",
-            order.restaurant_id
-        )
-        .maybeSingle();
-
-
-    if (restaurantError) {
-
-        message.textContent =
-            restaurantError.message;
-
-        return;
-
-    }
-
-
-    if (!restaurant) {
-
-        message.textContent =
-            "This restaurant is no longer available.";
-
-        return;
-
-    }
-
-
-    /* =========================
-       LOAD CURRENT MENU ITEMS
-    ========================= */
-
-    const menuIds =
-        oldItems
-            .map(item => item.menu_id)
-            .filter(Boolean);
-
-
-    if (!menuIds.length) {
-
-        message.textContent =
-            "No valid menu items found.";
-
-        return;
-
-    }
-
-
-    const {
-        data: currentMenu,
-        error: menuError
-    } = await db
-        .from("food_menu")
-        .select(
-            "id, restaurant_id, name, price, image_url, is_available"
-        )
-        .eq(
-            "restaurant_id",
-            order.restaurant_id
-        )
-        .in(
-            "id",
-            menuIds
-        );
-
-
-    if (menuError) {
-
-        message.textContent =
-            menuError.message;
-
-        return;
-
-    }
-
-
-    const menuMap =
-        new Map(
-            (currentMenu || []).map(
-                item => [
-                    item.id,
-                    item
-                ]
+====================================== */
+
+async function orderAgain(orderId, button) {
+    const message = document.getElementById("message-" + orderId);
+
+    if (!message || !currentUser) return;
+
+    const originalText = button.textContent;
+
+    button.disabled = true;
+    message.className = "message info";
+    message.textContent = t("checking");
+
+    try {
+        /* Load the selected order owned by this customer. */
+        const { data: order, error: orderError } = await db
+            .from("food_orders")
+            .select("*")
+            .eq("id", orderId)
+            .eq("customer_id", currentUser.id)
+            .maybeSingle();
+
+        if (orderError) throw orderError;
+
+        if (!order) {
+            message.textContent = t("orderNotFound");
+            return;
+        }
+
+        if (!order.restaurant_id) {
+            message.textContent = t("noRestaurant");
+            return;
+        }
+
+        /* Load the previous order items. */
+        const { data: oldItems, error: itemError } = await db
+            .from("food_order_items")
+            .select("*")
+            .eq("order_id", order.id);
+
+        if (itemError) {
+            console.error(itemError);
+            message.textContent = t("loadItemsError");
+            return;
+        }
+
+        if (!oldItems || !oldItems.length) {
+            message.textContent = t("noItems");
+            return;
+        }
+
+        /* Check that the restaurant still exists. */
+        const { data: restaurant, error: restaurantError } = await db
+            .from("food_restaurants")
+            .select("*")
+            .eq("id", order.restaurant_id)
+            .maybeSingle();
+
+        if (restaurantError) throw restaurantError;
+
+        if (!restaurant) {
+            message.textContent = t("restaurantUnavailable");
+            return;
+        }
+
+        const menuIds = [
+            ...new Set(
+                oldItems
+                    .map(item => item.menu_id)
+                    .filter(Boolean)
             )
+        ];
+
+        if (!menuIds.length) {
+            message.textContent = t("noMenuItems");
+            return;
+        }
+
+        /* Read current menu prices and availability. */
+        const { data: currentMenu, error: menuError } = await db
+            .from("food_menu")
+            .select("id, restaurant_id, name, price, image_url, is_available")
+            .eq("restaurant_id", order.restaurant_id)
+            .in("id", menuIds);
+
+        if (menuError) throw menuError;
+
+        const menuMap = new Map(
+            (currentMenu || []).map(item => [String(item.id), item])
         );
 
+        const cart = [];
+        const unavailableItems = [];
 
-    /* =========================
-       BUILD NEW CART
-    ========================= */
+        oldItems.forEach(oldItem => {
+            const currentItem = menuMap.get(String(oldItem.menu_id));
 
-    const cart = [];
+            if (!currentItem) {
+                unavailableItems.push(oldItem.food_name || "Food item");
+                return;
+            }
 
-    const unavailableItems = [];
+            if (currentItem.is_available === false) {
+                unavailableItems.push(currentItem.name || oldItem.food_name || "Food item");
+                return;
+            }
 
+            const price = Number(currentItem.price);
 
-    oldItems.forEach(oldItem => {
+            if (!Number.isFinite(price) || price < 0) {
+                unavailableItems.push(currentItem.name || oldItem.food_name || "Food item");
+                return;
+            }
 
-        const currentItem =
-            menuMap.get(
-                oldItem.menu_id
-            );
-
-
-        if (!currentItem) {
-
-            unavailableItems.push(
-                oldItem.food_name
-            );
-
-            return;
-
-        }
-
-
-        if (
-            currentItem.is_available === false
-        ) {
-
-            unavailableItems.push(
-                currentItem.name
-            );
-
-            return;
-
-        }
-
-
-        cart.push({
-
-            menu_id:
-                currentItem.id,
-
-            restaurant_id:
-                currentItem.restaurant_id,
-
-            food_name:
-                currentItem.name,
-
-            price:
-                Number(
-                    currentItem.price || 0
-                ),
-
-            quantity:
-                Number(
-                    oldItem.quantity || 1
-                ),
-
-            image_url:
-                currentItem.image_url ||
-                ""
-
+            cart.push({
+                menu_id: currentItem.id,
+                restaurant_id: currentItem.restaurant_id,
+                food_name: currentItem.name,
+                price: price,
+                quantity: Math.max(1, Number(oldItem.quantity) || 1),
+                image_url: currentItem.image_url || ""
+            });
         });
 
-    });
+        if (!cart.length) {
+            message.textContent = t("noAvailableItems");
+            return;
+        }
 
-
-    /* =========================
-       NOTHING AVAILABLE
-    ========================= */
-
-    if (!cart.length) {
-
-        message.textContent =
-            "None of the food items from this order are currently available.";
-
-        return;
-
-    }
-
-
-    /* =========================
-       SAVE CART
-    ========================= */
-
-    localStorage.setItem(
-        "foodCart",
-        JSON.stringify(cart)
-    );
-
-
-    localStorage.setItem(
-        "cartRestaurantId",
-        restaurant.id
-    );
-
-
-    /* =========================
-       SAVE ORDER AGAIN INFO
-    ========================= */
-
-    localStorage.setItem(
-        "orderAgainRestaurant",
-        JSON.stringify({
-            id: restaurant.id,
-            name: restaurant.name
-        })
-    );
-
-
-    /* =========================
-       MESSAGE
-    ========================= */
-
-    if (unavailableItems.length) {
+        /* Save the rebuilt cart using the existing cart format. */
+        localStorage.setItem("foodCart", JSON.stringify(cart));
+        localStorage.setItem("cartRestaurantId", String(restaurant.id));
 
         localStorage.setItem(
-            "orderAgainMessage",
-            unavailableItems.join(", ")
+            "orderAgainRestaurant",
+            JSON.stringify({
+                id: restaurant.id,
+                name: restaurant.name
+            })
         );
 
-    } else {
+        if (unavailableItems.length) {
+            localStorage.setItem(
+                "orderAgainMessage",
+                unavailableItems.join(", ")
+            );
+        } else {
+            localStorage.removeItem("orderAgainMessage");
+        }
 
-        localStorage.removeItem(
-            "orderAgainMessage"
-        );
+        message.className = "message success";
+        message.textContent = unavailableItems.length
+            ? t("unavailablePrefix") + unavailableItems.join(", ")
+            : t("orderAgainSuccess");
 
+        /* Continue to the existing cart and checkout flow. */
+        window.location.href = "cart.html";
+
+    } catch (error) {
+        console.error("Order again error:", error);
+
+        message.className = "message error";
+        message.textContent =
+            error && error.message
+                ? error.message
+                : t("unexpectedError");
+
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
     }
-
-
-    /* =========================
-       GO TO CART
-    ========================= */
-
-    window.location.href =
-        "cart.html";
-
 }
 
-
-/* =========================
-   REALTIME STATUS
-========================= */
+/* ======================================
+   REALTIME ORDER STATUS
+====================================== */
 
 function subscribeToOrders() {
+    if (!currentUser || typeof db.channel !== "function") return;
 
-    if (!currentUser) {
-        return;
-    }
-
-
-    db.channel(
-        "customer-orders-" +
-        currentUser.id
-    )
-
-    .on(
-        "postgres_changes",
-        {
-            event: "UPDATE",
-            schema: "public",
-            table: "food_orders",
-            filter:
-                "customer_id=eq." +
-                currentUser.id
-        },
-        payload => {
-
-            const index =
-                orders.findIndex(
-                    order =>
-                        order.id ===
-                        payload.new.id
-                );
-
-
-            if (index === -1) {
-                return;
-            }
-
-
-            orders[index] = {
-                ...orders[index],
-                ...payload.new
-            };
-
-
-            const status =
-                payload.new.status ||
-                "Pending";
-
-
-            const card =
-                document.getElementById(
-                    "order-" +
-                    payload.new.id
-                );
-
-
-            if (!card) {
-
-                renderOrders();
-
-                return;
-
-            }
-
-
-            const statusElement =
-                card.querySelector(
-                    ".status"
-                );
-
-
-            if (statusElement) {
-
-                statusElement.className =
-                    "status " +
-                    statusClass(status);
-
-                statusElement.textContent =
-                    status;
-
-            }
-
+    try {
+        if (orderChannel) {
+            db.removeChannel(orderChannel);
         }
-    )
 
-    .subscribe();
-
-}
-
-
-/* =========================
-   HELPERS
-========================= */
-
-function money(value) {
-
-    return "TSh " +
-        Number(value || 0)
-            .toLocaleString(
-                "en-TZ",
+        orderChannel = db
+            .channel("customer-orders-" + currentUser.id)
+            .on(
+                "postgres_changes",
                 {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
-                }
-            );
+                    event: "*",
+                    schema: "public",
+                    table: "food_orders",
+                    filter: "customer_id=eq." + currentUser.id
+                },
+                payload => {
+                    const updatedOrder = payload.new;
 
+                    if (!updatedOrder || !updatedOrder.id) {
+                        loadOrders(false);
+                        return;
+                    }
+
+                    const index = orders.findIndex(
+                        order => String(order.id) === String(updatedOrder.id)
+                    );
+
+                    if (payload.eventType === "DELETE") {
+                        orders = orders.filter(
+                            order => String(order.id) !== String(payload.old.id)
+                        );
+                        renderOrders();
+                        return;
+                    }
+
+                    if (index === -1) {
+                        loadOrders(false);
+                        return;
+                    }
+
+                    orders[index] = {
+                        ...orders[index],
+                        ...updatedOrder
+                    };
+
+                    const statusElement = document.getElementById(
+                        "status-" + updatedOrder.id
+                    );
+
+                    if (statusElement) {
+                        const status = normalizeStatus(updatedOrder.status);
+                        statusElement.className =
+                            "status " + statusClass(status);
+                        statusElement.textContent = statusLabel(status);
+                    }
+                }
+            )
+            .subscribe();
+
+    } catch (error) {
+        console.error("Realtime subscription error:", error);
+    }
 }
 
+/* ======================================
+   HELPERS
+====================================== */
+
+function normalizeStatus(status) {
+    const value = String(status || "Pending").trim().toLowerCase();
+
+    const knownStatuses = {
+        pending: "Pending",
+        confirmed: "Confirmed",
+        preparing: "Preparing",
+        ready: "Ready",
+        cancelled: "Cancelled"
+    };
+
+    return knownStatuses[value] || String(status || "Pending");
+}
 
 function statusClass(status) {
-
-    return String(status || "")
+    return String(status || "Pending")
         .toLowerCase()
-        .replace(/\s+/g, "");
-
+        .replace(/[^a-z]/g, "");
 }
 
+function statusLabel(status) {
+    const normalized = normalizeStatus(status);
+
+    const keys = {
+        Pending: "pending",
+        Confirmed: "confirmed",
+        Preparing: "preparing",
+        Ready: "ready",
+        Cancelled: "cancelled"
+    };
+
+    return t(keys[normalized] || normalized);
+}
+
+function formatDelivery(value) {
+    const normalized = String(value || "").trim().toLowerCase();
+
+    if (normalized === "delivery") return t("deliveryValue");
+    if (normalized === "pickup" || normalized === "pick-up") {
+        return t("pickupValue");
+    }
+
+    return value || "-";
+}
+
+function money(value) {
+    const amount = Number(value || 0);
+
+    return "TSh " + (Number.isFinite(amount) ? amount : 0)
+        .toLocaleString("en-TZ", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+}
+
+function formatDate(value) {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return "-";
+
+    return date.toLocaleString(
+        language === "sw" ? "sw-TZ" : "en-TZ",
+        {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
 
 function escapeHtml(value) {
-
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
 
+/* ======================================
+   PAGE INITIALIZATION
+====================================== */
 
-/* =========================
-   INIT
-========================= */
+document.getElementById("refreshButton").addEventListener("click", async () => {
+    await loadOrders(true);
+});
 
 async function init() {
+    applyLanguage();
 
-    const authenticated =
-        await checkAuth();
+    const authenticated = await checkAuth();
 
-    if (!authenticated) {
-        return;
-    }
+    if (!authenticated) return;
 
-
-    await loadOrders();
-
-
+    await loadOrders(true);
     subscribeToOrders();
-
 }
 
-
 init();
-
 </script>
 
 </body>
