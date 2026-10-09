@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Track Order | Food Platform</title>
+    <meta name="theme-color" content="#ff6b35">
 
     <link rel="stylesheet" href="style.css">
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -22,10 +23,21 @@
             color: #222;
         }
 
+        button {
+            font-family: inherit;
+        }
+
         .tracking-header {
             background: #ff6b35;
             color: white;
             padding: 15px 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
         }
 
         .back-link {
@@ -35,8 +47,18 @@
             font-size: 14px;
         }
 
+        .language-btn {
+            border: 1px solid rgba(255,255,255,.7);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            background: rgba(255,255,255,.15);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         .tracking-header h1 {
-            margin: 12px 0 0;
+            margin: 13px 0 0;
             font-size: 22px;
         }
 
@@ -57,6 +79,7 @@
         .order-number-box {
             background: #fff3ed;
             border: 1px solid #ffd8c7;
+            overflow-wrap: anywhere;
         }
 
         .order-number-box strong {
@@ -68,7 +91,7 @@
         }
 
         .status-icon {
-            font-size: 40px;
+            font-size: 42px;
         }
 
         .status-title {
@@ -80,8 +103,9 @@
 
         .status-description {
             color: #666;
-            margin-top: 6px;
+            margin-top: 8px;
             font-size: 14px;
+            line-height: 1.5;
         }
 
         .timeline-title {
@@ -128,7 +152,6 @@
         .timeline-item.cancelled .timeline-icon {
             background: #dc2626;
             color: white;
-            box-shadow: 0 0 0 4px #fee2e2;
         }
 
         .timeline-content h3 {
@@ -137,9 +160,10 @@
         }
 
         .timeline-content p {
-            margin: 4px 0 0;
+            margin: 5px 0 0;
             color: #777;
             font-size: 13px;
+            line-height: 1.5;
         }
 
         .timeline-line {
@@ -165,7 +189,7 @@
             display: flex;
             justify-content: space-between;
             gap: 15px;
-            padding: 9px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #eee;
             font-size: 14px;
         }
@@ -181,11 +205,12 @@
         .info-value {
             text-align: right;
             color: #555;
+            overflow-wrap: anywhere;
         }
 
         .total-box {
             background: #fff3ed;
-            padding: 13px;
+            padding: 14px;
             border-radius: 10px;
             text-align: center;
             font-size: 20px;
@@ -194,7 +219,9 @@
             margin-top: 12px;
         }
 
-        .refresh-btn {
+        .refresh-btn,
+        .home-btn {
+            display: block;
             width: 100%;
             padding: 13px;
             border: none;
@@ -204,50 +231,62 @@
             font-size: 15px;
             font-weight: bold;
             cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .home-btn {
+            background: #222;
+            margin-top: 10px;
         }
 
         .refresh-btn:disabled {
-            opacity: .7;
+            opacity: .65;
             cursor: not-allowed;
         }
 
-        .cancelled-box {
+        .cancelled-box,
+        .error-box {
             background: #fee2e2;
             color: #991b1b;
-            padding: 12px;
+            padding: 13px;
             border-radius: 10px;
             margin-top: 12px;
-            font-weight: bold;
             font-size: 14px;
+            line-height: 1.5;
         }
 
         .loading {
             text-align: center;
-            padding: 30px;
+            padding: 30px 15px;
             color: #777;
         }
 
         .error-box {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 14px;
-            border-radius: 10px;
             text-align: center;
+            overflow-wrap: anywhere;
         }
 
         .success-message {
             background: #ecfdf5;
             color: #166534;
-            padding: 10px;
+            padding: 11px;
             border-radius: 9px;
             margin-bottom: 12px;
             text-align: center;
             font-size: 13px;
+            line-height: 1.5;
             display: none;
         }
 
-        @media (max-width: 600px) {
+        .update-note {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin: 10px 0 0;
+        }
 
+        @media (max-width: 600px) {
             .tracking-container {
                 padding: 8px;
                 margin-top: 10px;
@@ -267,30 +306,35 @@
 
             .info-row {
                 flex-direction: column;
-                gap: 3px;
+                gap: 4px;
             }
 
             .info-value {
                 text-align: left;
             }
-
         }
-
     </style>
 </head>
 
 <body>
 
 <header class="tracking-header">
+    <div class="header-top">
+        <a href="order-confirmation.html"
+           class="back-link"
+           id="backLink">
+            ← Back
+        </a>
 
-    <a href="order-confirmation.html" class="back-link">
-        ← Back
-    </a>
+        <button type="button"
+                class="language-btn"
+                id="languageButton">
+            Kiswahili
+        </button>
+    </div>
 
-    <h1>Track Your Order</h1>
-
+    <h1 id="pageTitle">Track Your Order</h1>
 </header>
-
 
 <main class="tracking-container">
 
@@ -298,45 +342,27 @@
         Loading order...
     </div>
 
-
     <div id="errorBox"
          class="error-box"
          style="display:none;">
     </div>
 
-
     <div id="successMessage"
-         class="success-message">
+         class="success-message"
+         role="status">
     </div>
 
-
-    <div id="orderContent"
-         style="display:none;">
-
-        <!-- ORDER NUMBER -->
+    <div id="orderContent" style="display:none;">
 
         <div class="card order-number-box">
-
-            Order Number:
-
-            <strong id="orderNumber">
-                -
-            </strong>
-
+            <span id="orderNumberLabel">Order Number:</span>
+            <strong id="orderNumber">-</strong>
         </div>
 
-
-        <!-- CURRENT STATUS -->
-
         <div class="card current-status">
+            <div class="status-icon" id="statusIcon">⏳</div>
 
-            <div class="status-icon"
-                 id="statusIcon">
-                ⏳
-            </div>
-
-            <div class="status-title"
-                 id="statusTitle">
+            <div class="status-title" id="statusTitle">
                 Pending
             </div>
 
@@ -346,842 +372,622 @@
             </div>
 
             <div id="cancelledMessage"></div>
-
         </div>
 
-
-        <!-- TIMELINE -->
-
         <div class="card">
-
-            <div class="timeline-title">
+            <div class="timeline-title" id="timelineTitle">
                 Order Progress
             </div>
 
             <div id="timelineContainer"></div>
-
         </div>
 
-
-        <!-- CUSTOMER -->
-
         <div class="card">
-
-            <h2 class="info-title">
+            <h2 class="info-title" id="customerInfoTitle">
                 Customer Information
             </h2>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Name
-                </span>
-
-                <span class="info-value"
-                      id="customerName">
-                    -
-                </span>
-
+                <span class="info-label" id="nameLabel">Name</span>
+                <span class="info-value" id="customerName">-</span>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Phone
-                </span>
-
-                <span class="info-value"
-                      id="customerPhone">
-                    -
-                </span>
-
+                <span class="info-label" id="phoneLabel">Phone</span>
+                <span class="info-value" id="customerPhone">-</span>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Delivery
-                </span>
-
-                <span class="info-value"
-                      id="deliveryType">
-                    -
-                </span>
-
+                <span class="info-label" id="deliveryLabel">Service</span>
+                <span class="info-value" id="deliveryType">-</span>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Location
-                </span>
-
-                <span class="info-value"
-                      id="deliveryLocation">
-                    -
-                </span>
-
+                <span class="info-label" id="locationLabel">Location</span>
+                <span class="info-value" id="deliveryLocation">-</span>
             </div>
-
 
             <div class="total-box">
-
-                Total:
-
-                TSh
-
-                <span id="orderTotal">
-                    0
-                </span>
-
+                <span id="totalLabel">Total:</span>
+                TSh <span id="orderTotal">0</span>
             </div>
-
         </div>
 
-
-        <!-- REFRESH -->
-
-        <button id="refreshButton"
+        <button type="button"
+                id="refreshButton"
                 class="refresh-btn">
-
             Refresh Order
-
         </button>
 
+        <p class="update-note" id="updateNote">
+            Order status refreshes automatically.
+        </p>
+
+        <a href="index.html"
+           class="home-btn"
+           id="homeButton">
+            Back to Home
+        </a>
     </div>
-
 </main>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-
 <script>
+"use strict";
 
-    /* =========================
-       SUPABASE
-    ========================= */
+/* =========================
+   SUPABASE CONFIGURATION
+========================= */
 
-    const SUPABASE_URL =
-        "https://ienquzigbawhvthnirtj.supabase.co";
+const SUPABASE_URL =
+    "https://ienquzigbawhvthnirtj.supabase.co";
 
-    const SUPABASE_KEY =
-        "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+const SUPABASE_KEY =
+    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
 
-    const db =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
+const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
+/* =========================
+   LANGUAGE
+========================= */
 
-    /* =========================
-       ORDER PROGRESS
-    ========================= */
+let language =
+    localStorage.getItem("foodLanguage") === "sw"
+        ? "sw"
+        : "en";
 
-    const progressStatuses = [
+const translations = {
+    en: {
+        back: "← Back",
+        title: "Track Your Order",
+        loading: "Loading order...",
+        orderNumber: "Order Number:",
+        timeline: "Order Progress",
+        customerInfo: "Customer Information",
+        name: "Name",
+        phone: "Phone",
+        service: "Service",
+        location: "Location",
+        delivery: "Delivery",
+        pickup: "Pickup",
+        total: "Total:",
+        refresh: "Refresh Order",
+        refreshing: "Refreshing...",
+        home: "Back to Home",
+        updateNote: "Order status refreshes automatically.",
+        pending: "Pending",
+        confirmed: "Confirmed",
+        preparing: "Preparing",
+        ready: "Ready",
+        cancelled: "Cancelled",
+        pendingDesc: "Your order is waiting for restaurant confirmation.",
+        confirmedDesc: "The restaurant has confirmed your order.",
+        preparingDesc: "Your food is being prepared.",
+        readyDesc: "Your food is ready for pickup or collection.",
+        cancelledDesc: "This order has been cancelled by the restaurant.",
+        noOrder: "No order was found. Please place an order first.",
+        notFound: "Order not found. Please check your order and try again.",
+        loadError: "Unable to load the order. Please try again.",
+        updated: "Order status updated to",
+        refreshed: "Order information updated.",
+        timelinePending: "Your order is waiting for confirmation.",
+        timelineConfirmed: "The restaurant accepted your order.",
+        timelinePreparing: "The restaurant is preparing your food.",
+        timelineReady: "Your food is ready.",
+        languageButton: "Kiswahili",
+        cancelledNotice: "This order has been cancelled.",
+        serviceUnavailable: "Not specified"
+    },
+    sw: {
+        back: "← Rudi",
+        title: "Fuatilia Oda Yako",
+        loading: "Inapakia oda...",
+        orderNumber: "Namba ya Oda:",
+        timeline: "Hatua za Oda",
+        customerInfo: "Taarifa za Mteja",
+        name: "Jina",
+        phone: "Simu",
+        service: "Huduma",
+        location: "Eneo",
+        delivery: "Kufikishiwa",
+        pickup: "Kujichukulia",
+        total: "Jumla:",
+        refresh: "Angalia Hali ya Oda",
+        refreshing: "Inasasisha...",
+        home: "Rudi Mwanzo",
+        updateNote: "Hali ya oda inasasishwa kiotomatiki.",
+        pending: "Inasubiri",
+        confirmed: "Imethibitishwa",
+        preparing: "Inaandaliwa",
+        ready: "Tayari",
+        cancelled: "Imeghairiwa",
+        pendingDesc: "Oda yako inasubiri uthibitisho wa mgahawa.",
+        confirmedDesc: "Mgahawa umethibitisha oda yako.",
+        preparingDesc: "Chakula chako kinaandaliwa.",
+        readyDesc: "Chakula chako kiko tayari kuchukuliwa.",
+        cancelledDesc: "Oda hii imeghairiwa na mgahawa.",
+        noOrder: "Hakuna oda iliyopatikana. Tafadhali weka oda kwanza.",
+        notFound: "Oda haijapatikana. Tafadhali hakikisha taarifa za oda.",
+        loadError: "Imeshindikana kupakia oda. Tafadhali jaribu tena.",
+        updated: "Hali ya oda imebadilika kuwa",
+        refreshed: "Taarifa za oda zimesasishwa.",
+        timelinePending: "Oda yako inasubiri uthibitisho.",
+        timelineConfirmed: "Mgahawa umepokea oda yako.",
+        timelinePreparing: "Mgahawa unaandaa chakula chako.",
+        timelineReady: "Chakula chako kiko tayari.",
+        languageButton: "English",
+        cancelledNotice: "Oda hii imeghairiwa.",
+        serviceUnavailable: "Haijawekwa"
+    }
+};
 
-        {
-            name: "Pending",
-            icon: "⏳",
-            description:
-                "Your order is waiting for restaurant confirmation."
-        },
+function t(key) {
+    return translations[language][key] ||
+           translations.en[key] ||
+           key;
+}
 
-        {
-            name: "Confirmed",
-            icon: "✓",
-            description:
-                "The restaurant has confirmed your order."
-        },
+/* =========================
+   ORDER STATUS
+========================= */
 
-        {
-            name: "Preparing",
-            icon: "P",
-            description:
-                "Your food is being prepared."
-        },
+const progressStatuses = [
+    {
+        name: "Pending",
+        icon: "⏳",
+        descriptionKey: "pendingDesc",
+        timelineKey: "timelinePending"
+    },
+    {
+        name: "Confirmed",
+        icon: "✓",
+        descriptionKey: "confirmedDesc",
+        timelineKey: "timelineConfirmed"
+    },
+    {
+        name: "Preparing",
+        icon: "🍳",
+        descriptionKey: "preparingDesc",
+        timelineKey: "timelinePreparing"
+    },
+    {
+        name: "Ready",
+        icon: "✓",
+        descriptionKey: "readyDesc",
+        timelineKey: "timelineReady"
+    }
+];
 
-        {
-            name: "Ready",
-            icon: "R",
-            description:
-                "Your food is ready for pickup or collection."
-        }
+let currentOrderStatus = null;
+let loadedOrder = null;
+let isLoading = false;
+let messageTimer = null;
 
-    ];
+/* =========================
+   GENERAL HELPERS
+========================= */
 
+function formatMoney(value) {
+    return Number(value || 0).toLocaleString(
+        language === "sw" ? "en-US" : "en-US"
+    );
+}
 
-    /* =========================
-       VARIABLES
-    ========================= */
+function getOrderIdentifier() {
+    return {
+        orderId: localStorage.getItem("lastOrderId"),
+        orderNumber: localStorage.getItem("lastOrderNumber")
+    };
+}
 
-    let currentOrderStatus = null;
+function getStatusName(status) {
+    const normalized = String(status || "Pending")
+        .trim()
+        .toLowerCase();
 
-    let isLoading = false;
+    const found = progressStatuses.find(item =>
+        item.name.toLowerCase() === normalized
+    );
 
-
-    /* =========================
-       MONEY
-    ========================= */
-
-    function formatMoney(value) {
-
-        return Number(value || 0)
-            .toLocaleString("en-US");
-
+    if (found) {
+        return t(found.name.toLowerCase());
     }
 
-
-    /* =========================
-       GET ORDER IDENTIFIER
-    ========================= */
-
-    function getOrderIdentifier() {
-
-        const orderId =
-            localStorage.getItem("lastOrderId");
-
-        const orderNumber =
-            localStorage.getItem("lastOrderNumber");
-
-
-        return {
-            orderId,
-            orderNumber
-        };
-
+    if (normalized === "cancelled") {
+        return t("cancelled");
     }
 
+    return String(status || t("pending"));
+}
 
-    /* =========================
-       DISPLAY STATUS
-    ========================= */
+/* =========================
+   APPLY LANGUAGE
+========================= */
 
-    function displayStatus(status) {
+function applyLanguage() {
+    document.documentElement.lang = language;
 
-        const normalizedStatus =
-            String(status || "Pending")
-                .trim()
-                .toLowerCase();
+    document.getElementById("backLink").textContent = t("back");
+    document.getElementById("pageTitle").textContent = t("title");
+    document.getElementById("languageButton").textContent =
+        t("languageButton");
+    document.getElementById("orderNumberLabel").textContent =
+        t("orderNumber");
+    document.getElementById("timelineTitle").textContent =
+        t("timeline");
+    document.getElementById("customerInfoTitle").textContent =
+        t("customerInfo");
+    document.getElementById("nameLabel").textContent = t("name");
+    document.getElementById("phoneLabel").textContent = t("phone");
+    document.getElementById("deliveryLabel").textContent = t("service");
+    document.getElementById("locationLabel").textContent = t("location");
+    document.getElementById("totalLabel").textContent = t("total");
+    document.getElementById("homeButton").textContent = t("home");
+    document.getElementById("updateNote").textContent = t("updateNote");
 
-
-        let statusInfo =
-            progressStatuses.find(function(item) {
-
-                return item.name.toLowerCase() ===
-                       normalizedStatus;
-
-            });
-
-
-        /* =========================
-           CANCELLED
-        ========================= */
-
-        if (normalizedStatus === "cancelled") {
-
-            document.getElementById(
-                "statusIcon"
-            ).textContent = "X";
-
-
-            document.getElementById(
-                "statusTitle"
-            ).textContent = "Cancelled";
-
-
-            document.getElementById(
-                "statusDescription"
-            ).textContent =
-                "This order has been cancelled by the restaurant.";
-
-
-            const cancelledMessage =
-                document.getElementById(
-                    "cancelledMessage"
-                );
-
-
-            cancelledMessage.innerHTML = "";
-
-
-            const box =
-                document.createElement("div");
-
-
-            box.className =
-                "cancelled-box";
-
-
-            box.textContent =
-                "This order has been cancelled by the restaurant.";
-
-
-            cancelledMessage.appendChild(box);
-
-
-            renderTimeline(-1);
-
-            return;
-
-        }
-
-
-        /* =========================
-           UNKNOWN STATUS
-        ========================= */
-
-        if (!statusInfo) {
-
-            statusInfo =
-                progressStatuses[0];
-
-        }
-
-
-        document.getElementById(
-            "statusIcon"
-        ).textContent =
-            statusInfo.icon;
-
-
-        document.getElementById(
-            "statusTitle"
-        ).textContent =
-            statusInfo.name;
-
-
-        document.getElementById(
-            "statusDescription"
-        ).textContent =
-            statusInfo.description;
-
-
-        document.getElementById(
-            "cancelledMessage"
-        ).innerHTML = "";
-
-
-        const currentIndex =
-            progressStatuses.findIndex(
-                function(item) {
-
-                    return item.name.toLowerCase() ===
-                           statusInfo.name.toLowerCase();
-
-                }
-            );
-
-
-        renderTimeline(currentIndex);
-
+    if (!isLoading) {
+        document.getElementById("refreshButton").textContent = t("refresh");
     }
 
+    if (loadedOrder) {
+        displayOrder(loadedOrder, false);
+    }
+}
 
-    /* =========================
-       TIMELINE
-    ========================= */
+document.getElementById("languageButton").addEventListener(
+    "click",
+    function () {
+        language = language === "en" ? "sw" : "en";
 
-    function renderTimeline(currentIndex) {
+        localStorage.setItem("foodLanguage", language);
 
-        const container =
-            document.getElementById(
-                "timelineContainer"
-            );
+        applyLanguage();
+    }
+);
 
+/* =========================
+   STATUS TIMELINE
+========================= */
 
-        container.innerHTML = "";
+function renderTimeline(currentIndex) {
+    const container =
+        document.getElementById("timelineContainer");
 
+    container.innerHTML = "";
 
-        progressStatuses.forEach(
-            function(status, index) {
-
-                const item =
-                    document.createElement("div");
-
-
-                item.className =
-                    "timeline-item";
-
-
-                if (currentIndex === -1) {
-
-                    item.classList.add(
-                        "cancelled"
-                    );
-
-                } else {
-
-                    if (index < currentIndex) {
-
-                        item.classList.add(
-                            "completed"
-                        );
-
-                    }
-
-
-                    if (index === currentIndex) {
-
-                        item.classList.add(
-                            "active"
-                        );
-
-                    }
-
-                }
-
-
-                const icon =
-                    document.createElement("div");
-
-
-                icon.className =
-                    "timeline-icon";
-
-
-                icon.textContent =
-                    status.icon;
-
-
-                const content =
-                    document.createElement("div");
-
-
-                content.className =
-                    "timeline-content";
-
-
-                const title =
-                    document.createElement("h3");
-
-
-                title.textContent =
-                    status.name;
-
-
-                const description =
-                    document.createElement("p");
-
-
-                description.textContent =
-                    status.description;
-
-
-                content.appendChild(title);
-
-                content.appendChild(description);
-
-
-                item.appendChild(icon);
-
-                item.appendChild(content);
-
-
-                if (
-                    index <
-                    progressStatuses.length - 1
-                ) {
-
-                    const line =
-                        document.createElement("div");
-
-
-                    line.className =
-                        "timeline-line";
-
-
-                    item.appendChild(line);
-
-                }
-
-
-                container.appendChild(item);
-
-            }
-        );
-
-
-        /* =========================
-           CANCELLED ITEM
-        ========================= */
+    progressStatuses.forEach(function (status, index) {
+        const item = document.createElement("div");
+        item.className = "timeline-item";
 
         if (currentIndex === -1) {
-
-            const item =
-                document.createElement("div");
-
-
-            item.className =
-                "timeline-item cancelled";
-
-
-            const icon =
-                document.createElement("div");
-
-
-            icon.className =
-                "timeline-icon";
-
-
-            icon.textContent =
-                "X";
-
-
-            const content =
-                document.createElement("div");
-
-
-            content.className =
-                "timeline-content";
-
-
-            const title =
-                document.createElement("h3");
-
-
-            title.textContent =
-                "Cancelled";
-
-
-            const description =
-                document.createElement("p");
-
-
-            description.textContent =
-                "This order was cancelled by the restaurant.";
-
-
-            content.appendChild(title);
-
-            content.appendChild(description);
-
-
-            item.appendChild(icon);
-
-            item.appendChild(content);
-
-
-            container.appendChild(item);
-
+            item.classList.add("cancelled");
+        } else if (index < currentIndex) {
+            item.classList.add("completed");
+        } else if (index === currentIndex) {
+            item.classList.add("active");
         }
 
-    }
+        const icon = document.createElement("div");
+        icon.className = "timeline-icon";
+        icon.textContent =
+            index < currentIndex && currentIndex !== -1
+                ? "✓"
+                : status.icon;
 
+        const content = document.createElement("div");
+        content.className = "timeline-content";
 
-    /* =========================
-       DISPLAY ORDER
-    ========================= */
+        const title = document.createElement("h3");
+        title.textContent = t(status.name.toLowerCase());
 
-    function displayOrder(order) {
+        const description = document.createElement("p");
+        description.textContent = t(status.timelineKey);
 
-        document.getElementById(
-            "orderNumber"
-        ).textContent =
-            order.order_number || "-";
+        content.appendChild(title);
+        content.appendChild(description);
 
+        item.appendChild(icon);
+        item.appendChild(content);
 
-        document.getElementById(
-            "customerName"
-        ).textContent =
-            order.customer_name || "-";
-
-
-        document.getElementById(
-            "customerPhone"
-        ).textContent =
-            order.customer_phone || "-";
-
-
-        document.getElementById(
-            "deliveryLocation"
-        ).textContent =
-            order.delivery_location || "-";
-
-
-        document.getElementById(
-            "deliveryType"
-        ).textContent =
-            order.delivery_type === "pickup"
-                ? "Pickup"
-                : "Delivery";
-
-
-        document.getElementById(
-            "orderTotal"
-        ).textContent =
-            formatMoney(order.total);
-
-
-        const newStatus =
-            String(
-                order.status || "Pending"
-            ).trim();
-
-
-        /* =========================
-           DETECT STATUS CHANGE
-        ========================= */
-
-        if (
-            currentOrderStatus !== null &&
-            currentOrderStatus.toLowerCase() !==
-            newStatus.toLowerCase()
-        ) {
-
-            showMessage(
-                "Order status updated to " +
-                newStatus
-            );
-
+        if (index < progressStatuses.length - 1) {
+            const line = document.createElement("div");
+            line.className = "timeline-line";
+            item.appendChild(line);
         }
 
+        container.appendChild(item);
+    });
 
-        currentOrderStatus =
-            newStatus;
+    if (currentIndex === -1) {
+        const item = document.createElement("div");
+        item.className = "timeline-item cancelled";
 
+        const icon = document.createElement("div");
+        icon.className = "timeline-icon";
+        icon.textContent = "X";
 
-        displayStatus(newStatus);
+        const content = document.createElement("div");
+        content.className = "timeline-content";
 
+        const title = document.createElement("h3");
+        title.textContent = t("cancelled");
+
+        const description = document.createElement("p");
+        description.textContent = t("cancelledDesc");
+
+        content.appendChild(title);
+        content.appendChild(description);
+        item.appendChild(icon);
+        item.appendChild(content);
+        container.appendChild(item);
+    }
+}
+
+/* =========================
+   DISPLAY CURRENT STATUS
+========================= */
+
+function displayStatus(status) {
+    const normalized = String(status || "Pending")
+        .trim()
+        .toLowerCase();
+
+    const cancelledMessage =
+        document.getElementById("cancelledMessage");
+
+    cancelledMessage.innerHTML = "";
+
+    if (normalized === "cancelled") {
+        document.getElementById("statusIcon").textContent = "✕";
+        document.getElementById("statusTitle").textContent =
+            t("cancelled");
+        document.getElementById("statusDescription").textContent =
+            t("cancelledDesc");
+
+        const box = document.createElement("div");
+        box.className = "cancelled-box";
+        box.textContent = t("cancelledNotice");
+
+        cancelledMessage.appendChild(box);
+
+        renderTimeline(-1);
+        return;
     }
 
+    const statusInfo = progressStatuses.find(function (item) {
+        return item.name.toLowerCase() === normalized;
+    }) || progressStatuses[0];
 
-    /* =========================
-       SUCCESS MESSAGE
-    ========================= */
+    document.getElementById("statusIcon").textContent =
+        statusInfo.icon;
 
-    function showMessage(message) {
+    document.getElementById("statusTitle").textContent =
+        t(statusInfo.name.toLowerCase());
 
-        const box =
-            document.getElementById(
-                "successMessage"
-            );
+    document.getElementById("statusDescription").textContent =
+        t(statusInfo.descriptionKey);
 
+    const currentIndex = progressStatuses.findIndex(function (item) {
+        return item.name.toLowerCase() ===
+               statusInfo.name.toLowerCase();
+    });
 
-        box.textContent =
-            message;
+    renderTimeline(currentIndex);
+}
 
+/* =========================
+   DISPLAY ORDER DETAILS
+========================= */
 
-        box.style.display =
-            "block";
+function displayOrder(order, detectChange = true) {
+    document.getElementById("orderNumber").textContent =
+        order.order_number || "-";
 
+    document.getElementById("customerName").textContent =
+        order.customer_name || "-";
 
-        setTimeout(function() {
+    document.getElementById("customerPhone").textContent =
+        order.customer_phone || "-";
 
-            box.style.display =
-                "none";
+    document.getElementById("deliveryLocation").textContent =
+        order.delivery_location || "-";
 
-        }, 3000);
+    const deliveryType =
+        String(order.delivery_type || "").toLowerCase();
 
+    document.getElementById("deliveryType").textContent =
+        deliveryType === "pickup"
+            ? t("pickup")
+            : deliveryType === "delivery"
+                ? t("delivery")
+                : t("serviceUnavailable");
+
+    document.getElementById("orderTotal").textContent =
+        formatMoney(order.total);
+
+    const newStatus = String(order.status || "Pending").trim();
+
+    if (
+        detectChange &&
+        currentOrderStatus !== null &&
+        currentOrderStatus.toLowerCase() !== newStatus.toLowerCase()
+    ) {
+        showMessage(t("updated") + " " + getStatusName(newStatus));
     }
 
+    currentOrderStatus = newStatus;
 
-    /* =========================
-       LOAD ORDER
-    ========================= */
+    displayStatus(newStatus);
+}
 
-    async function loadOrder() {
+/* =========================
+   MESSAGE
+========================= */
 
-        if (isLoading) {
+function showMessage(message) {
+    const box = document.getElementById("successMessage");
 
-            return;
+    box.textContent = message;
+    box.style.display = "block";
 
+    if (messageTimer) {
+        clearTimeout(messageTimer);
+    }
+
+    messageTimer = setTimeout(function () {
+        box.style.display = "none";
+    }, 3500);
+}
+
+/* =========================
+   LOAD ORDER
+========================= */
+
+async function loadOrder() {
+    if (isLoading) return;
+
+    isLoading = true;
+
+    const refreshButton =
+        document.getElementById("refreshButton");
+
+    const loadingBox =
+        document.getElementById("loadingBox");
+
+    const orderContent =
+        document.getElementById("orderContent");
+
+    const errorBox =
+        document.getElementById("errorBox");
+
+    refreshButton.disabled = true;
+    refreshButton.textContent = t("refreshing");
+
+    errorBox.style.display = "none";
+
+    try {
+        const { orderId, orderNumber } = getOrderIdentifier();
+
+        if (!orderId && !orderNumber) {
+            throw new Error(t("noOrder"));
         }
 
+        let order = null;
+        let lastError = null;
 
-        isLoading = true;
+        // First try the saved order ID.
+        if (orderId) {
+            const result = await db
+                .from("food_orders")
+                .select("*")
+                .eq("id", orderId)
+                .maybeSingle();
 
-
-        const refreshButton =
-            document.getElementById(
-                "refreshButton"
-            );
-
-
-        const loadingBox =
-            document.getElementById(
-                "loadingBox"
-            );
-
-
-        const orderContent =
-            document.getElementById(
-                "orderContent"
-            );
-
-
-        const errorBox =
-            document.getElementById(
-                "errorBox"
-            );
-
-
-        try {
-
-            refreshButton.disabled =
-                true;
-
-
-            refreshButton.textContent =
-                "Loading...";
-
-
-            errorBox.style.display =
-                "none";
-
-
-            const {
-                orderId,
-                orderNumber
-            } =
-                getOrderIdentifier();
-
-
-            if (!orderId && !orderNumber) {
-
-                throw new Error(
-                    "No order found. Please place an order first."
-                );
-
-            }
-
-
-            let query =
-                db
-                    .from("food_orders")
-                    .select("*");
-
-
-            /*
-             * FIRST TRY ORDER ID
-             */
-
-            if (orderId) {
-
-                query =
-                    query.eq(
-                        "id",
-                        orderId
-                    );
-
+            if (result.error) {
+                lastError = result.error;
             } else {
-
-                query =
-                    query.eq(
-                        "order_number",
-                        orderNumber
-                    );
-
+                order = result.data;
             }
-
-
-            const {
-                data,
-                error
-            } =
-                await query.maybeSingle();
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-
-            if (!data) {
-
-                throw new Error(
-                    "Order not found."
-                );
-
-            }
-
-
-            /*
-             * IMPORTANT:
-             * data.status comes directly
-             * from food_orders.
-             */
-
-            displayOrder(data);
-
-
-            loadingBox.style.display =
-                "none";
-
-
-            orderContent.style.display =
-                "block";
-
-
-        } catch (error) {
-
-            console.error(
-                "Order tracking error:",
-                error
-            );
-
-
-            loadingBox.style.display =
-                "none";
-
-
-            orderContent.style.display =
-                "none";
-
-
-            errorBox.style.display =
-                "block";
-
-
-            errorBox.textContent =
-                error.message ||
-                "Unable to load order.";
-
-        } finally {
-
-            isLoading =
-                false;
-
-
-            refreshButton.disabled =
-                false;
-
-
-            refreshButton.textContent =
-                "Refresh Order";
-
         }
 
+        // If the ID was unavailable or did not match,
+        // try the saved order number.
+        if (!order && orderNumber) {
+            const result = await db
+                .from("food_orders")
+                .select("*")
+                .eq("order_number", orderNumber)
+                .maybeSingle();
+
+            if (result.error) {
+                lastError = result.error;
+            } else {
+                order = result.data;
+            }
+        }
+
+        if (!order) {
+            if (lastError) {
+                console.error("Supabase error:", lastError);
+                throw new Error(t("loadError"));
+            }
+
+            throw new Error(t("notFound"));
+        }
+
+        loadedOrder = order;
+        displayOrder(order);
+
+        loadingBox.style.display = "none";
+        orderContent.style.display = "block";
+
+    } catch (error) {
+        console.error("Order tracking error:", error);
+
+        loadingBox.style.display = "none";
+        orderContent.style.display = "none";
+        errorBox.style.display = "block";
+
+        errorBox.textContent =
+            error.message || t("loadError");
+
+    } finally {
+        isLoading = false;
+        refreshButton.disabled = false;
+        refreshButton.textContent = t("refresh");
     }
+}
 
+/* =========================
+   REFRESH BUTTON
+========================= */
 
-    /* =========================
-       REFRESH BUTTON
-    ========================= */
+document.getElementById("refreshButton").addEventListener(
+    "click",
+    loadOrder
+);
 
-    document
-        .getElementById(
-            "refreshButton"
-        )
-        .addEventListener(
-            "click",
-            loadOrder
-        );
+/* =========================
+   AUTO REFRESH
+   Check order status every 15 seconds.
+========================= */
 
+setInterval(function () {
+    if (loadedOrder && !isLoading) {
+        loadOrder();
+    }
+}, 15000);
 
-    /* =========================
-       START
-    ========================= */
+/* =========================
+   START
+========================= */
 
-    loadOrder();
-
+applyLanguage();
+loadOrder();
 </script>
 
 </body>
