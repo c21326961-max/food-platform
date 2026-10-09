@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -108,13 +108,9 @@
             box-shadow: 0 0 0 3px rgba(255,107,53,.12);
         }
 
-        .password-wrap {
-            position: relative;
-        }
+        .password-wrap { position: relative; }
 
-        .password-wrap input {
-            padding-right: 85px;
-        }
+        .password-wrap input { padding-right: 85px; }
 
         .show-password {
             position: absolute;
@@ -204,6 +200,8 @@
             padding: 5px 0;
         }
 
+        .forgot-btn:disabled { opacity: .6; }
+
         @media (max-width: 480px) {
             .auth-box {
                 padding: 24px 18px;
@@ -232,6 +230,7 @@
             <div class="login-icon">👤</div>
 
             <h2 id="pageTitle">Customer Login</h2>
+
             <p class="intro" id="introText">
                 Login to view your orders and track deliveries.
             </p>
@@ -295,7 +294,10 @@
         </section>
     </main>
 
+    <!-- Supabase library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase client configuration -->
     <script src="supabase.js"></script>
 
     <script>
@@ -326,8 +328,9 @@
                 resetSending: "Sending reset link...",
                 resetSent: "If the account exists, a password reset email has been requested. Check your inbox.",
                 resetFailed: "Could not request a password reset. Please try again.",
-                resetMissing: "Password reset is not configured in this project yet."
+                resetMissing: "Password reset is not available. Please try again later."
             },
+
             sw: {
                 title: "Ingia kwa Mteja",
                 intro: "Ingia kuona oda zako na kufuatilia usafirishaji.",
@@ -352,9 +355,9 @@
                 loginFailed: "Kuingia kumeshindikana. Tafadhali jaribu tena.",
                 resetEmail: "Weka barua pepe yako kwanza ili kuomba kubadilisha nenosiri.",
                 resetSending: "Inatuma ombi...",
-                resetSent: "Ikiwa akaunti ipo, ombi la kubadilisha nenosiri limetumwa. Kagua kikasha cha barua pepe.",
+                resetSent: "Ikiwa akaunti ipo, ombi limetumwa. Kagua kikasha cha barua pepe.",
                 resetFailed: "Imeshindikana kuomba kubadilisha nenosiri. Jaribu tena.",
-                resetMissing: "Huduma ya kubadilisha nenosiri bado haijaandaliwa kwenye mfumo huu."
+                resetMissing: "Huduma ya kubadilisha nenosiri haipatikani kwa sasa."
             }
         };
 
@@ -369,8 +372,17 @@
         const forgotBtn = document.getElementById("forgotBtn");
         const languageSelect = document.getElementById("languageSelect");
 
+        // Use the shared Supabase client created in supabase.js.
         function getSupabaseClient() {
-            if (typeof db !== "undefined" && db && db.auth) {
+            if (window.db && window.db.auth) {
+                return window.db;
+            }
+
+            if (
+                typeof db !== "undefined" &&
+                db &&
+                db.auth
+            ) {
                 return db;
             }
 
@@ -381,6 +393,10 @@
             ) {
                 return supabaseClient;
             }
+
+            console.error(
+                "Supabase client missing. Check supabase.js and script loading."
+            );
 
             return null;
         }
@@ -412,8 +428,10 @@
             document.getElementById("email").placeholder = t.emailPlaceholder;
             document.getElementById("passwordLabel").textContent = t.password;
             passwordInput.placeholder = t.passwordPlaceholder;
+
             showPasswordBtn.textContent =
                 passwordInput.type === "password" ? t.show : t.hide;
+
             forgotBtn.textContent = t.forgot;
             document.getElementById("registerText").textContent = t.registerText;
             document.getElementById("registerLink").textContent = t.registerLink;
@@ -426,20 +444,21 @@
             languageSelect.value = language;
         }
 
-        languageSelect.addEventListener("change", function() {
+        languageSelect.addEventListener("change", function () {
             language = this.value;
             localStorage.setItem("foodLanguage", language);
             updateLanguage();
             clearMessages();
         });
 
-        showPasswordBtn.addEventListener("click", function() {
+        showPasswordBtn.addEventListener("click", function () {
             passwordInput.type =
                 passwordInput.type === "password" ? "text" : "password";
+
             updateLanguage();
         });
 
-        loginForm.addEventListener("submit", async function(event) {
+        loginForm.addEventListener("submit", async function (event) {
             event.preventDefault();
             clearMessages();
 
@@ -456,7 +475,6 @@
 
             if (!client) {
                 showError(t.noClient);
-                console.error("Supabase client missing. Check supabase.js.");
                 return;
             }
 
@@ -477,7 +495,7 @@
 
                 showSuccess(t.loginSuccess);
 
-                // Keep the existing workflow: login -> customer orders.
+                // Continue to the customer's orders page.
                 window.location.assign("my-orders.html");
 
             } catch (error) {
@@ -509,7 +527,7 @@
             }
         });
 
-        forgotBtn.addEventListener("click", async function() {
+        forgotBtn.addEventListener("click", async function () {
             clearMessages();
 
             const t = translations[language] || translations.en;
@@ -533,18 +551,19 @@
                 return;
             }
 
-            const originalText = forgotBtn.textContent;
             forgotBtn.disabled = true;
             forgotBtn.textContent = t.resetSending;
 
             try {
-                const { error } = await client.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin +
-                        window.location.pathname.replace(
-                            /customer-login\.html$/,
-                            "customer-account.html"
-                        )
-                });
+                const redirectUrl = new URL(
+                    "customer-account.html",
+                    window.location.href
+                ).href;
+
+                const { error } = await client.auth.resetPasswordForEmail(
+                    email,
+                    { redirectTo: redirectUrl }
+                );
 
                 if (error) throw error;
 
@@ -553,9 +572,10 @@
             } catch (error) {
                 console.error("Password reset error:", error);
                 showError(t.resetFailed);
+
             } finally {
                 forgotBtn.disabled = false;
-                forgotBtn.textContent = originalText;
+                forgotBtn.textContent = t.forgot;
             }
         });
 
@@ -563,4 +583,3 @@
     </script>
 </body>
 </html>
-```
