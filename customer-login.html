@@ -45,9 +45,7 @@
             font-size: 14px;
         }
 
-        .container {
-            padding: 0 15px 35px;
-        }
+        .container { padding: 0 15px 35px; }
 
         .auth-box {
             max-width: 450px;
@@ -135,12 +133,12 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: .2s;
         }
 
         .login-btn:hover { background: #ed5725; }
 
-        .login-btn:disabled {
+        .login-btn:disabled,
+        .forgot-btn:disabled {
             opacity: .65;
             cursor: wait;
         }
@@ -155,15 +153,8 @@
             font-size: 14px;
         }
 
-        .error {
-            background: #ffebee;
-            color: #b71c1c;
-        }
-
-        .success {
-            background: #e8f5e9;
-            color: #1b5e20;
-        }
+        .error { background: #ffebee; color: #b71c1c; }
+        .success { background: #e8f5e9; color: #1b5e20; }
 
         .register-link {
             text-align: center;
@@ -200,14 +191,11 @@
             padding: 5px 0;
         }
 
-        .forgot-btn:disabled { opacity: .6; }
-
         @media (max-width: 480px) {
             .auth-box {
                 padding: 24px 18px;
                 margin-top: 12px;
             }
-
             .page-header h1 { font-size: 22px; }
         }
     </style>
@@ -230,7 +218,6 @@
             <div class="login-icon">👤</div>
 
             <h2 id="pageTitle">Customer Login</h2>
-
             <p class="intro" id="introText">
                 Login to view your orders and track deliveries.
             </p>
@@ -249,7 +236,6 @@
 
                 <div class="form-group">
                     <label for="password" id="passwordLabel">Password</label>
-
                     <div class="password-wrap">
                         <input
                             type="password"
@@ -258,7 +244,6 @@
                             autocomplete="current-password"
                             required
                         >
-
                         <button
                             type="button"
                             class="show-password"
@@ -294,10 +279,10 @@
         </section>
     </main>
 
-    <!-- Supabase library -->
+    <!-- Load Supabase library FIRST -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Supabase client configuration -->
+    <!-- Then load your configuration -->
     <script src="supabase.js"></script>
 
     <script>
@@ -318,19 +303,16 @@
                 registerLink: "Create Account",
                 home: "← Back to Home",
                 required: "Please enter your email and password.",
-                noClient: "Supabase connection was not found. Check supabase.js.",
-                loginSuccess: "Login successful. Opening your orders...",
+                noClient: "Supabase could not load. Check your internet connection and supabase.js.",
                 invalid: "Email or password is incorrect. Please try again.",
-                unconfirmed: "Your email has not been confirmed. Please confirm it first.",
+                unconfirmed: "Please confirm your email before logging in.",
                 network: "Cannot connect to the server. Check your internet connection.",
-                loginFailed: "Login failed. Please try again.",
-                resetEmail: "Enter your email address first to reset your password.",
+                failed: "Login failed. Please try again.",
+                resetEmail: "Enter your email address first.",
                 resetSending: "Sending reset link...",
-                resetSent: "If the account exists, a password reset email has been requested. Check your inbox.",
-                resetFailed: "Could not request a password reset. Please try again.",
-                resetMissing: "Password reset is not available. Please try again later."
+                resetSent: "If the account exists, a reset email has been requested. Check your inbox.",
+                resetFailed: "Could not request a password reset. Please try again."
             },
-
             sw: {
                 title: "Ingia kwa Mteja",
                 intro: "Ingia kuona oda zako na kufuatilia usafirishaji.",
@@ -347,17 +329,15 @@
                 registerLink: "Fungua Akaunti",
                 home: "← Rudi Mwanzo",
                 required: "Tafadhali weka barua pepe na nenosiri.",
-                noClient: "Muunganisho wa Supabase haujapatikana. Kagua supabase.js.",
-                loginSuccess: "Umeingia kikamilifu. Inafungua oda zako...",
+                noClient: "Supabase haijapakia. Kagua intaneti na faili supabase.js.",
                 invalid: "Barua pepe au nenosiri si sahihi. Jaribu tena.",
-                unconfirmed: "Barua pepe yako haijathibitishwa. Tafadhali ithibitishe kwanza.",
-                network: "Imeshindikana kuunganisha na seva. Kagua intaneti yako.",
-                loginFailed: "Kuingia kumeshindikana. Tafadhali jaribu tena.",
-                resetEmail: "Weka barua pepe yako kwanza ili kuomba kubadilisha nenosiri.",
+                unconfirmed: "Thibitisha barua pepe yako kabla ya kuingia.",
+                network: "Imeshindikana kuunganisha na seva. Kagua intaneti.",
+                failed: "Kuingia kumeshindikana. Jaribu tena.",
+                resetEmail: "Weka barua pepe yako kwanza.",
                 resetSending: "Inatuma ombi...",
-                resetSent: "Ikiwa akaunti ipo, ombi limetumwa. Kagua kikasha cha barua pepe.",
-                resetFailed: "Imeshindikana kuomba kubadilisha nenosiri. Jaribu tena.",
-                resetMissing: "Huduma ya kubadilisha nenosiri haipatikani kwa sasa."
+                resetSent: "Ikiwa akaunti ipo, ombi limetumwa. Kagua barua pepe yako.",
+                resetFailed: "Imeshindikana kuomba kubadilisha nenosiri. Jaribu tena."
             }
         };
 
@@ -372,30 +352,18 @@
         const forgotBtn = document.getElementById("forgotBtn");
         const languageSelect = document.getElementById("languageSelect");
 
-        // Use the shared Supabase client created in supabase.js.
+        // Always get the shared client from supabase.js.
         function getSupabaseClient() {
-            if (window.db && window.db.auth) {
+            if (
+                window.db &&
+                window.db.auth &&
+                typeof window.db.auth.signInWithPassword === "function"
+            ) {
                 return window.db;
             }
 
-            if (
-                typeof db !== "undefined" &&
-                db &&
-                db.auth
-            ) {
-                return db;
-            }
-
-            if (
-                typeof supabaseClient !== "undefined" &&
-                supabaseClient &&
-                supabaseClient.auth
-            ) {
-                return supabaseClient;
-            }
-
             console.error(
-                "Supabase client missing. Check supabase.js and script loading."
+                "Supabase client missing. Check the Supabase library and supabase.js."
             );
 
             return null;
@@ -436,12 +404,11 @@
             document.getElementById("registerText").textContent = t.registerText;
             document.getElementById("registerLink").textContent = t.registerLink;
             document.getElementById("homeLink").textContent = t.home;
+            languageSelect.value = language;
 
             if (!loginBtn.disabled) {
                 loginBtn.textContent = t.login;
             }
-
-            languageSelect.value = language;
         }
 
         languageSelect.addEventListener("change", function () {
@@ -454,7 +421,6 @@
         showPasswordBtn.addEventListener("click", function () {
             passwordInput.type =
                 passwordInput.type === "password" ? "text" : "password";
-
             updateLanguage();
         });
 
@@ -482,46 +448,52 @@
             loginBtn.textContent = t.loggingIn;
 
             try {
-                const { data, error } = await client.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
+                const { data, error } =
+                    await client.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
 
-                if (error) throw error;
+                if (error) {
+                    const msg = String(error.message || "").toLowerCase();
 
-                if (!data || !data.user) {
-                    throw new Error("Login was not completed.");
+                    if (msg.includes("email not confirmed")) {
+                        throw new Error(t.unconfirmed);
+                    }
+
+                    if (
+                        msg.includes("invalid login credentials") ||
+                        msg.includes("invalid email or password")
+                    ) {
+                        throw new Error(t.invalid);
+                    }
+
+                    if (
+                        msg.includes("failed to fetch") ||
+                        msg.includes("network") ||
+                        msg.includes("fetch")
+                    ) {
+                        throw new Error(t.network);
+                    }
+
+                    throw error;
                 }
 
-                showSuccess(t.loginSuccess);
+                if (!data || !data.user) {
+                    throw new Error(t.failed);
+                }
 
-                // Continue to the customer's orders page.
+                showSuccess(
+                    language === "sw"
+                        ? "Umeingia. Inafungua oda zako..."
+                        : "Login successful. Opening your orders..."
+                );
+
                 window.location.assign("my-orders.html");
 
             } catch (error) {
                 console.error("Customer login error:", error);
-
-                const message = String(error?.message || "").toLowerCase();
-                let friendlyMessage = t.loginFailed;
-
-                if (
-                    message.includes("invalid login credentials") ||
-                    message.includes("invalid email or password")
-                ) {
-                    friendlyMessage = t.invalid;
-                } else if (message.includes("email not confirmed")) {
-                    friendlyMessage = t.unconfirmed;
-                } else if (
-                    message.includes("failed to fetch") ||
-                    message.includes("network") ||
-                    message.includes("fetch")
-                ) {
-                    friendlyMessage = t.network;
-                } else if (error?.message) {
-                    friendlyMessage = error.message;
-                }
-
-                showError(friendlyMessage);
+                showError(error.message || t.failed);
                 loginBtn.disabled = false;
                 loginBtn.textContent = t.login;
             }
@@ -543,11 +515,6 @@
 
             if (!client) {
                 showError(t.noClient);
-                return;
-            }
-
-            if (typeof client.auth.resetPasswordForEmail !== "function") {
-                showError(t.resetMissing);
                 return;
             }
 
