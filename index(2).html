@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4511e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Food Platform</title>
+<link rel="manifest" href="./manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#222}a{text-decoration:none;color:inherit}button,input,select{font:inherit}
+.top-nav{position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid #ddd}.nav-inner{max-width:1100px;margin:auto;min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px}.logo{font-size:19px;font-weight:700;color:#f4511e;white-space:nowrap}.nav-links{display:flex;gap:4px;overflow-x:auto;align-items:center}.nav-links a{padding:8px 9px;font-size:13px;border-radius:7px;white-space:nowrap;color:#444}.nav-links a:hover{background:#f4f4f4;color:#f4511e}.language-select{border:1px solid #ddd;border-radius:7px;padding:8px;background:#fff;max-width:120px}
+.account-area,.location-area{max-width:1100px;margin:10px auto 0;padding:0 14px}.account-panel{background:white;border:1px solid #ddd;border-radius:10px;padding:12px}.account-title{font-size:14px;font-weight:bold;margin-bottom:9px}.account-links{display:flex;gap:7px;flex-wrap:wrap}.account-link{display:inline-block;padding:8px 11px;border-radius:7px;background:#f5f5f5;border:1px solid #ddd;font-size:12px;color:#333}.account-link.primary{background:#f4511e;border-color:#f4511e;color:white}.account-link.dark{background:#222;border-color:#222;color:white}
+.hero{background:#f4511e;color:white;padding:16px 14px 18px}.hero-inner{max-width:1100px;margin:auto}.hero h1{margin:0 0 5px;font-size:22px}.hero p{margin:0 0 12px;font-size:13px}.search-box{max-width:700px;display:flex;background:white;padding:5px;border-radius:8px}.search-box input{flex:1;min-width:0;border:0;outline:0;padding:10px;font-size:14px}.search-box button{border:0;background:#222;color:white;padding:0 15px;border-radius:6px;cursor:pointer}
+.location-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.location-btn,.distance-btn,.category{border:1px solid #ddd;background:white;padding:8px 11px;border-radius:7px;cursor:pointer;font-size:12px;white-space:nowrap}.location-status{color:#777;font-size:12px}.distance-filter{display:flex;gap:5px;overflow-x:auto;padding:8px 0 2px}.distance-btn{border-radius:18px}.distance-btn.active{background:#f4511e;color:white;border-color:#f4511e}
+.container{max-width:1100px;margin:auto;padding:14px}.section{margin-bottom:18px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.section-title h2{margin:0;font-size:17px}.section-title span{font-size:12px;color:#777}.categories{display:flex;gap:7px;overflow-x:auto;padding:2px 0 7px}.category{min-width:78px;padding:8px 10px;border-radius:8px}.category.active{background:#f4511e;border-color:#f4511e;color:white}
+.restaurants{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:11px}.restaurant-card,.food-card{background:white;border:1px solid #e1e1e1;border-radius:10px;overflow:hidden}.restaurant-image{width:100%;height:125px;object-fit:cover;display:block;background:#eee}.restaurant-content,.food-content{padding:10px}.restaurant-name{margin:0 0 5px;font-size:15px}.restaurant-description{margin:0 0 7px;font-size:12px;color:#777;line-height:1.4}.restaurant-meta{display:flex;justify-content:space-between;gap:5px;color:#666;font-size:11px;margin-bottom:8px}.restaurant-link,.add-cart-btn{display:block;background:#f4511e;color:white;text-align:center;padding:9px;border:0;border-radius:6px;font-size:12px;cursor:pointer;width:100%}
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}.food-image{width:100%;height:110px;object-fit:cover;display:block;background:#eee}.food-name{margin:0 0 4px;font-size:14px}.food-restaurant{color:#777;font-size:11px;margin-bottom:6px}.food-price{color:#f4511e;font-weight:bold;font-size:13px;margin-bottom:8px}.loading,.empty,.error{background:white;border-radius:8px;padding:20px;text-align:center;font-size:13px}.loading,.empty{color:#777}.error{color:#d32f2f}.install-app-btn{display:none;position:fixed;right:15px;bottom:20px;z-index:9999;border:0;border-radius:10px;padding:12px 17px;background:#f4511e;color:white;font-weight:700;font-size:13px;box-shadow:0 5px 18px #0004;cursor:pointer}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#222;color:white;padding:11px 16px;border-radius:9px;z-index:10001;font-size:13px;box-shadow:0 4px 15px #0003;max-width:90%;text-align:center}.cart-count{display:inline-block;background:#f4511e;color:white;border-radius:20px;padding:2px 6px;font-size:11px;margin-left:2px}
+@media(max-width:700px){.nav-inner{min-height:52px;flex-wrap:wrap}.logo{font-size:17px}.nav-links{max-width:100%;width:100%;order:3}.nav-links a{font-size:11px;padding:7px}.account-area{padding:0 12px}.account-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.account-link{text-align:center}.hero{padding:13px 12px 15px}.hero h1{font-size:20px}.container{padding:12px}.restaurants,.food-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.restaurant-image{height:105px}.restaurant-content,.food-content{padding:8px}.restaurant-name{font-size:13px}.food-image{height:100px}.install-app-btn{bottom:18px;right:12px}}
+</style>
+</head>
+<body>
+<button id="installAppBtn" class="install-app-btn" data-i18n="install">Install App</button>
+<header class="top-nav"><div class="nav-inner">
+<div class="logo">Food Platform</div>
+<select id="languageSelect" class="language-select" aria-label="Language">
+<option value="en">English</option><option value="sw">Kiswahili</option>
+</select>
+<nav class="nav-links">
+<a href="index.html" data-i18n="home">Home</a>
+<a href="cart.html"><span data-i18n="cart">Cart</span> <span class="cart-count" id="cartCount">0</span></a>
+<a href="my-orders.html" data-i18n="orders">Orders</a>
+<a href="customer-account.html" data-i18n="account">Account</a>
+</nav></div></header>
+<div class="account-area"><div class="account-panel">
+<div class="account-title" data-i18n="accountLogin">Account &amp; Login</div>
+<div class="account-links">
+<a class="account-link primary" href="customer-login.html" data-i18n="customerLogin">Customer Login</a>
+<a class="account-link" href="customer-register.html" data-i18n="createAccount">Create Account</a>
+<a class="account-link" href="vendor-login.html" data-i18n="vendorLogin">Vendor Login</a>
+<a class="account-link" href="vendor-register.html" data-i18n="becomeVendor">Become a Vendor</a>
+<a class="account-link dark" href="admin-login.html" data-i18n="adminLogin">Admin Login</a>
+</div></div></div>
+<section class="hero"><div class="hero-inner">
+<h1 data-i18n="heroTitle">Find food near you</h1><p data-i18n="heroText">Discover restaurants and order your favorite food.</p>
+<div class="search-box"><input type="search" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Search food or restaurant..." autocomplete="off"><button id="searchBtn" data-i18n="search">Search</button></div>
+</div></section>
+<div class="location-area"><div class="location-row">
+<button class="location-btn" id="locationBtn" data-i18n="useLocation">Use my location</button><span class="location-status" id="locationStatus" data-i18n="locationNotSelected">Location not selected</span>
+</div><div class="distance-filter">
+<button class="distance-btn active" data-distance="500">500 m</button><button class="distance-btn" data-distance="1000">1 km</button><button class="distance-btn" data-distance="3000">3 km</button><button class="distance-btn" data-distance="5000">5 km</button><button class="distance-btn" data-distance="all" data-i18n="all">All</button>
+</div></div>
+<main class="container">
+<section class="section"><div class="section-title"><h2 data-i18n="categories">Food Categories</h2><span id="categoryResultText">All food</span></div>
+<div class="categories" id="categories">
+<button class="category active" data-category="All" data-i18n="all">All</button>
+<button class="category" data-category="Rice" data-i18n="rice">Rice</button><button class="category" data-category="Ugali">Ugali</button><button class="category" data-category="Chips" data-i18n="chips">Chips</button><button class="category" data-category="Chicken" data-i18n="chicken">Chicken</button><button class="category" data-category="Beef" data-i18n="beef">Beef</button><button class="category" data-category="Fish" data-i18n="fish">Fish</button><button class="category" data-category="Banana" data-i18n="banana">Banana</button><button class="category" data-category="Beans" data-i18n="beans">Beans</button><button class="category" data-category="Chapati">Chapati</button><button class="category" data-category="Eggs" data-i18n="eggs">Eggs</button><button class="category" data-category="Burger">Burger</button><button class="category" data-category="Pizza">Pizza</button><button class="category" data-category="Pasta">Pasta</button><button class="category" data-category="Sandwich">Sandwich</button><button class="category" data-category="Breakfast" data-i18n="breakfast">Breakfast</button><button class="category" data-category="Drinks" data-i18n="drinks">Drinks</button>
+</div></section>
+<section class="section"><div class="section-title"><h2 data-i18n="restaurants">Restaurants</h2><span id="restaurantCount">0 restaurants</span></div><div id="restaurants" class="restaurants"><div class="loading" data-i18n="loadingRestaurants">Loading restaurants...</div></div></section>
+<section class="section"><div class="section-title"><h2 data-i18n="popularFood">Popular Food</h2><span id="foodCount">0 items</span></div><div id="foodGrid" class="food-grid"><div class="loading" data-i18n="loadingFood">Loading food...</div></div></section>
+</main>
+<script>
+(() => {
+"use strict";
+const SUPABASE_URL = "https://ienquzigbawhvthnirtj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const translations = {
+en:{install:"Install App",home:"Home",cart:"Cart",orders:"Orders",account:"Account",accountLogin:"Account & Login",customerLogin:"Customer Login",createAccount:"Create Account",vendorLogin:"Vendor Login",becomeVendor:"Become a Vendor",adminLogin:"Admin Login",heroTitle:"Find food near you",heroText:"Discover restaurants and order your favorite food.",searchPlaceholder:"Search food or restaurant...",search:"Search",useLocation:"Use my location",locationNotSelected:"Location not selected",locationGetting:"Getting your location...",locationSelected:"Location selected",locationUnsupported:"Location is not supported.",locationDenied:"Location permission denied.",categories:"Food Categories",all:"All",rice:"Rice",chips:"Chips",chicken:"Chicken",beef:"Beef",fish:"Fish",banana:"Banana",beans:"Beans",eggs:"Eggs",breakfast:"Breakfast",drinks:"Drinks",restaurants:"Restaurants",popularFood:"Popular Food",loadingRestaurants:"Loading restaurants...",loadingFood:"Loading food...",noRestaurants:"No restaurants found.",noFood:"No food items found.",loadRestaurantsError:"Unable to load restaurants.",loadFoodError:"Unable to load food.",viewRestaurant:"View Restaurant",distance:"Distance",allFood:"All food",restaurant:"restaurant",restaurantsPlural:"restaurants",item:"item",items:"items",addToCart:"Add to Cart",added:"Added to cart",chooseRestaurant:"Your cart already contains food from another restaurant. Clear the cart first to order from this restaurant.",installNotReady:"The app is not ready for installation yet. Please refresh the page.",food:"Food"},
+sw:{install:"Sakinisha App",home:"Nyumbani",cart:"Kikapu",orders:"Oda Zangu",account:"Akaunti",accountLogin:"Akaunti na Kuingia",customerLogin:"Ingia kama Mteja",createAccount:"Fungua Akaunti",vendorLogin:"Ingia kama Muuzaji",becomeVendor:"Jiunge kama Muuzaji",adminLogin:"Ingia Admin",heroTitle:"Pata chakula karibu nawe",heroText:"Gundua migahawa na oda chakula unachokipenda.",searchPlaceholder:"Tafuta chakula au mgahawa...",search:"Tafuta",useLocation:"Tumia eneo langu",locationNotSelected:"Eneo halijachaguliwa",locationGetting:"Tunatafuta eneo lako...",locationSelected:"Eneo limechaguliwa",locationUnsupported:"Kifaa hiki hakitumii huduma ya eneo.",locationDenied:"Ruhusa ya eneo imekataliwa.",categories:"Aina za Chakula",all:"Vyote",rice:"Wali",chips:"Chipsi",chicken:"Kuku",beef:"Nyama",fish:"Samaki",banana:"Ndizi",beans:"Maharage",eggs:"Mayai",breakfast:"Kifungua kinywa",drinks:"Vinywaji",restaurants:"Migahawa",popularFood:"Chakula Maarufu",loadingRestaurants:"Inapakia migahawa...",loadingFood:"Inapakia chakula...",noRestaurants:"Hakuna mgahawa uliopatikana.",noFood:"Hakuna chakula kilichopatikana.",loadRestaurantsError:"Imeshindikana kupakia migahawa.",loadFoodError:"Imeshindikana kupakia chakula.",viewRestaurant:"Angalia Mgahawa",distance:"Umbali",allFood:"Chakula chote",restaurant:"mgahawa",restaurantsPlural:"migahawa",item:"bidhaa",items:"bidhaa",addToCart:"Ongeza Kikapuni",added:"Imeongezwa kikapuni",chooseRestaurant:"Kikapu chako kina chakula kutoka mgahawa mwingine. Futa kikapu kwanza ili kuagiza kutoka mgahawa huu.",installNotReady:"App bado haiko tayari kusakinishwa. Tafadhali onyesha upya ukurasa.",food:"Chakula"}
+};
+let language = localStorage.getItem("foodLanguage") === "sw" ? "sw" : "en";
+let restaurants=[], menuItems=[], currentCategory="All", currentDistance="500", userLatitude=null, userLongitude=null;
+const restaurantById=new Map();
+const $=id=>document.getElementById(id);
+const restaurantsEl=$("restaurants"), foodGridEl=$("foodGrid"), restaurantCountEl=$("restaurantCount"), foodCountEl=$("foodCount"), searchInput=$("searchInput"), locationStatus=$("locationStatus"), categoryResultText=$("categoryResultText");
+function t(key){return translations[language][key] || translations.en[key] || key}
+function normalize(value){return String(value||"").trim().toLowerCase().replace(/\s+/g," ")}
+function escapeHTML(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function formatPrice(price){return Number(price||0).toLocaleString(language==="sw"?"sw-TZ":"en-US")}
+function applyLanguage(){
+ document.documentElement.lang=language;
+ $("languageSelect").value=language;
+ document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n; if(translations[language][key]) el.textContent=t(key)});
+ document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));
+ if(!userLatitude) locationStatus.textContent=t("locationNotSelected");
+ $("categoryResultText").textContent=currentCategory==="All"?t("allFood"):currentCategory;
+ renderAll(); updateCartCount();
+}
+$("languageSelect").addEventListener("change",e=>{language=e.target.value==="sw"?"sw":"en";localStorage.setItem("foodLanguage",language);applyLanguage()});
+function updateCartCount(){try{const cart=JSON.parse(localStorage.getItem("foodCart")||"[]");$("cartCount").textContent=cart.reduce((sum,item)=>sum+Math.max(0,Number(item.quantity)||0),0)}catch{$("cartCount").textContent="0"}}
+function showToast(message){const old=document.querySelector(".toast");if(old)old.remove();const el=document.createElement("div");el.className="toast";el.setAttribute("role","status");el.textContent=message;document.body.appendChild(el);setTimeout(()=>el.remove(),2200)}
+function distanceKm(lat1,lon1,lat2,lon2){const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180,a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
+function getRestaurantDistance(r){if(userLatitude===null||userLongitude===null||r.latitude==null||r.longitude==null)return null;const lat=Number(r.latitude),lng=Number(r.longitude);return Number.isFinite(lat)&&Number.isFinite(lng)?distanceKm(userLatitude,userLongitude,lat,lng):null}
+function categoryMatches(itemCategory,selectedCategory){
+ if(selectedCategory==="All")return true;const item=normalize(itemCategory),selected=normalize(selectedCategory);if(item===selected)return true;
+ const groups={rice:["rice","wali","pilau","biryani","wali wa nazi"],ugali:["ugali"],chips:["chips","chipsi","chips mayai","chipsi mayai"],chicken:["chicken","kuku"],beef:["beef","nyama","nyama beef","nyama choma","mishikaki"],fish:["fish","samaki","dagaa"],banana:["banana","ndizi"],beans:["beans","maharage"],chapati:["chapati"],eggs:["eggs","egg","mayai"],burger:["burger","burgers"],pizza:["pizza"],pasta:["pasta","spaghetti","macaroni"],sandwich:["sandwich","sandwiches"],breakfast:["breakfast","chai","tea","mandazi","vitumbua"],drinks:["drinks","drink","juice","soda","water","maji","coffee","kahawa","chai"]};
+ return (groups[selected]||[]).some(word=>item===word||item.includes(word)||word.includes(item));
+}
+function matchesSearch(restaurant,item,query){if(!query)return true;const q=normalize(query);return [restaurant?.name,restaurant?.description,restaurant?.address,item?.name,item?.description,item?.category].map(normalize).join(" ").includes(q)}
+function passesDistance(r){if(currentDistance==="all"||userLatitude===null)return true;const d=getRestaurantDistance(r);return d===null||d*1000<=Number(currentDistance)}
+function getRestaurantImage(r){return r?.logo_url||r?.image_url||"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"}
+function getFoodImage(item){return item?.image_url||"https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80"}
+async function loadRestaurants(){
+ const {data,error}=await db.from("food_restaurants").select("*").order("created_at",{ascending:false});
+ if(error){console.error("Restaurants error:",error);restaurantsEl.innerHTML=`<div class="error">${t("loadRestaurantsError")}<br><small>${escapeHTML(error.message)}</small></div>`;restaurants=[];return false}
+ restaurants=Array.isArray(data)?data:[];restaurantById.clear();restaurants.forEach(r=>restaurantById.set(String(r.id),r));return true;
+}
+async function loadMenu(){
+ const {data,error}=await db.from("food_menu").select("*").order("created_at",{ascending:false});
+ if(error){console.error("Menu error:",error);foodGridEl.innerHTML=`<div class="error">${t("loadFoodError")}<br><small>${escapeHTML(error.message)}</small></div>`;menuItems=[];return false}
+ menuItems=Array.isArray(data)?data:[];return true;
+}
+async function loadData(){
+ restaurantsEl.innerHTML=`<div class="loading">${t("loadingRestaurants")}</div>`;foodGridEl.innerHTML=`<div class="loading">${t("loadingFood")}</div>`;
+ await Promise.all([loadRestaurants(),loadMenu()]);renderAll();
+}
+function renderRestaurants(){
+ const search=searchInput.value.trim();
+ let filtered=restaurants.filter(r=>{
+  if(!passesDistance(r))return false;
+  if(currentCategory!=="All"&&!menuItems.some(item=>String(item.restaurant_id)===String(r.id)&&categoryMatches(item.category,currentCategory)))return false;
+  if(!search)return true;
+  const text=[r.name,r.description,r.address].map(normalize).join(" ");
+  return text.includes(normalize(search))||menuItems.some(item=>String(item.restaurant_id)===String(r.id)&&matchesSearch(r,item,search));
+ });
+ if(userLatitude!==null)filtered.sort((a,b)=>{const da=getRestaurantDistance(a),dbd=getRestaurantDistance(b);if(da===null)return dbd===null?0:1;if(dbd===null)return -1;return da-dbd});
+ restaurantCountEl.textContent=`${filtered.length} ${filtered.length===1?t("restaurant"):t("restaurantsPlural")}`;
+ if(!filtered.length){restaurantsEl.innerHTML=`<div class="empty">${t("noRestaurants")}</div>`;return}
+ restaurantsEl.innerHTML=filtered.map(r=>{
+  const distance=getRestaurantDistance(r),address=r.address||"Dar es Salaam",description=r.description||"Food and meals available.",rating=Number(r.rating??0);
+  return `<article class="restaurant-card"><img class="restaurant-image" src="${escapeHTML(getRestaurantImage(r))}" alt="${escapeHTML(r.name||t("restaurants"))}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80'"><div class="restaurant-content"><h3 class="restaurant-name">${escapeHTML(r.name||t("restaurants"))}</h3><p class="restaurant-description">${escapeHTML(description)}</p><div class="restaurant-meta"><span>${escapeHTML(address)}</span><span>★ ${rating.toFixed(1)}</span></div>${distance!==null?`<div class="restaurant-meta"><span>${t("distance")}</span><span>${distance.toFixed(1)} km</span></div>`:""}<a class="restaurant-link" href="restaurant.html?id=${encodeURIComponent(r.id)}">${t("viewRestaurant")}</a></div></article>`;
+ }).join("");
+}
+function addToCart(item){
+ const restaurant=restaurantById.get(String(item.restaurant_id));if(!restaurant){showToast(t("noRestaurants"));return}
+ let cart=[];try{cart=JSON.parse(localStorage.getItem("foodCart")||"[]");if(!Array.isArray(cart))cart=[]}catch{cart=[]}
+ if(cart.length&&String(cart[0].restaurant_id)!==String(item.restaurant_id)){showToast(t("chooseRestaurant"));return}
+ const id=String(item.id),existing=cart.find(row=>String(row.menu_id)===id);
+ if(existing)existing.quantity=Math.max(1,Number(existing.quantity)||1)+1;
+ else cart.push({menu_id:item.id,restaurant_id:item.restaurant_id,food_name:item.name||t("food"),price:Number(item.price)||0,quantity:1,image_url:item.image_url||""});
+ localStorage.setItem("foodCart",JSON.stringify(cart));updateCartCount();showToast(`${t("added")}: ${item.name||t("food")}`);
+}
+function renderFood(){
+ const search=searchInput.value.trim();
+ const filtered=menuItems.filter(item=>{const restaurant=restaurantById.get(String(item.restaurant_id));return restaurant&&item.is_available!==false&&passesDistance(restaurant)&&categoryMatches(item.category,currentCategory)&&(!search||matchesSearch(restaurant,item,search))});
+ foodCountEl.textContent=`${filtered.length} ${filtered.length===1?t("item"):t("items")}`;
+ if(!filtered.length){foodGridEl.innerHTML=`<div class="empty">${t("noFood")}</div>`;return}
+ foodGridEl.innerHTML=filtered.map(item=>{const restaurant=restaurantById.get(String(item.restaurant_id));return `<article class="food-card"><img class="food-image" src="${escapeHTML(getFoodImage(item))}" alt="${escapeHTML(item.name||t("food"))}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80'"><div class="food-content"><h3 class="food-name">${escapeHTML(item.name||t("food"))}</h3><div class="food-restaurant">${escapeHTML(restaurant?.name||t("restaurants"))}</div><div class="food-price">TSh ${formatPrice(item.price)}</div><button type="button" class="add-cart-btn" data-add-item="${escapeHTML(item.id)}">${t("addToCart")}</button></div></article>`}).join("");
+}
+function renderAll(){categoryResultText.textContent=currentCategory==="All"?t("allFood"):currentCategory;renderRestaurants();renderFood()}
+$("categories").addEventListener("click",event=>{const button=event.target.closest(".category");if(!button)return;document.querySelectorAll(".category").forEach(b=>b.classList.toggle("active",b===button));currentCategory=button.dataset.category;renderAll()});
+document.querySelectorAll(".distance-btn").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".distance-btn").forEach(b=>b.classList.toggle("active",b===button));currentDistance=button.dataset.distance;renderAll()}));
+$("searchBtn").addEventListener("click",renderAll);searchInput.addEventListener("input",renderAll);searchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();renderAll()}});
+foodGridEl.addEventListener("click",event=>{const button=event.target.closest("[data-add-item]");if(!button)return;const item=menuItems.find(row=>String(row.id)===String(button.dataset.addItem));if(item)addToCart(item)});
+$("locationBtn").addEventListener("click",()=>{
+ if(!navigator.geolocation){locationStatus.textContent=t("locationUnsupported");return}
+ locationStatus.textContent=t("locationGetting");
+ navigator.geolocation.getCurrentPosition(position=>{userLatitude=position.coords.latitude;userLongitude=position.coords.longitude;locationStatus.textContent=t("locationSelected");renderAll()},error=>{console.warn("Location error:",error);userLatitude=null;userLongitude=null;locationStatus.textContent=t("locationDenied");renderAll()},{enableHighAccuracy:false,timeout:10000,maximumAge:300000});
+});
+let deferredInstallPrompt=null;const installBtn=$("installAppBtn");
+window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();deferredInstallPrompt=event;installBtn.style.display="block"});
+installBtn.addEventListener("click",async()=>{if(!deferredInstallPrompt){showToast(t("installNotReady"));return}deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;installBtn.style.display="none"});
+window.addEventListener("appinstalled",()=>{installBtn.style.display="none"});
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(error=>console.error("Service Worker error:",error)));
+window.addEventListener("storage",event=>{if(event.key==="foodCart")updateCartCount();if(event.key==="foodLanguage"){language=event.newValue==="sw"?"sw":"en";applyLanguage()}});
+applyLanguage();
+loadData();
+})();
+</script>
+</body>
+</html>
