@@ -1,26 +1,86 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b35">
     <title>Customer Login | Food Platform</title>
     <link rel="stylesheet" href="style.css">
 
     <style>
-        .auth-box {
-            max-width: 450px;
-            margin: 50px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 5px 20px rgba(0,0,0,.08);
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #f7f8fa;
+            font-family: Arial, sans-serif;
         }
 
-        .auth-box h1 { margin-bottom: 8px; }
+        .page-header {
+            background: #ff6b35;
+            color: white;
+            padding: 18px 20px;
+            text-align: center;
+        }
 
-        .auth-box p {
+        .page-header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .language-bar {
+            display: flex;
+            justify-content: flex-end;
+            max-width: 500px;
+            margin: 18px auto 0;
+            padding: 0 15px;
+        }
+
+        .language-bar select {
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .container {
+            padding: 0 15px 35px;
+        }
+
+        .auth-box {
+            max-width: 450px;
+            margin: 18px auto;
+            background: white;
+            padding: 28px 24px;
+            border-radius: 18px;
+            box-shadow: 0 5px 25px rgba(0,0,0,.07);
+        }
+
+        .login-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: #fff0e9;
+            color: #ff6b35;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            margin: 0 0 10px;
+            color: #222;
+        }
+
+        .intro {
+            text-align: center;
             color: #777;
+            line-height: 1.6;
             margin-bottom: 25px;
         }
 
@@ -28,24 +88,50 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 7px;
+            margin-bottom: 8px;
             font-weight: bold;
+            color: #333;
         }
 
         .form-group input {
-            box-sizing: border-box;
             width: 100%;
             padding: 14px;
             border: 1px solid #ddd;
             border-radius: 10px;
             font-size: 16px;
+            outline: none;
+            background: white;
         }
 
-        .form-group input:focus { border-color: #ff6b35; }
+        .form-group input:focus {
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255,107,53,.12);
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
+            padding-right: 85px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #ff6b35;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 8px 4px;
+        }
 
         .login-btn {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: none;
             border-radius: 10px;
             background: #ff6b35;
@@ -53,10 +139,13 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: .2s;
         }
 
+        .login-btn:hover { background: #ed5725; }
+
         .login-btn:disabled {
-            opacity: .6;
+            opacity: .65;
             cursor: wait;
         }
 
@@ -66,44 +155,90 @@
             border-radius: 10px;
             display: none;
             overflow-wrap: anywhere;
+            line-height: 1.5;
+            font-size: 14px;
         }
 
         .error {
             background: #ffebee;
-            color: #c62828;
+            color: #b71c1c;
         }
 
         .success {
             background: #e8f5e9;
-            color: #2e7d32;
+            color: #1b5e20;
         }
 
         .register-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 22px;
+            line-height: 1.8;
+            color: #666;
         }
 
-        .register-link a {
+        .register-link a,
+        .back-home {
             color: #ff6b35;
             font-weight: bold;
             text-decoration: none;
+        }
+
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .forgot-wrap {
+            text-align: right;
+            margin-top: -7px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-btn {
+            background: none;
+            border: none;
+            color: #ff6b35;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 0;
+        }
+
+        @media (max-width: 480px) {
+            .auth-box {
+                padding: 24px 18px;
+                margin-top: 12px;
+            }
+
+            .page-header h1 { font-size: 22px; }
         }
     </style>
 </head>
 
 <body>
-    <div class="page-header">
-        <h1>Food Platform</h1>
+    <header class="page-header">
+        <h1>🍽️ Food Platform</h1>
+    </header>
+
+    <div class="language-bar">
+        <select id="languageSelect" aria-label="Select language">
+            <option value="en">🇬🇧 English</option>
+            <option value="sw">🇹🇿 Kiswahili</option>
+        </select>
     </div>
 
     <main class="container">
-        <div class="auth-box">
-            <h1>Customer Login</h1>
-            <p>Login to view your orders and track your orders.</p>
+        <section class="auth-box">
+            <div class="login-icon">👤</div>
+
+            <h2 id="pageTitle">Customer Login</h2>
+            <p class="intro" id="introText">
+                Login to view your orders and track deliveries.
+            </p>
 
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="email">Email</label>
+                    <label for="email" id="emailLabel">Email address</label>
                     <input
                         type="email"
                         id="email"
@@ -114,14 +249,29 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="Enter your password"
-                        autocomplete="current-password"
-                        required
-                    >
+                    <label for="password" id="passwordLabel">Password</label>
+
+                    <div class="password-wrap">
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            id="showPassword"
+                        >Show</button>
+                    </div>
+                </div>
+
+                <div class="forgot-wrap">
+                    <button type="button" class="forgot-btn" id="forgotBtn">
+                        Forgot password?
+                    </button>
                 </div>
 
                 <button type="submit" class="login-btn" id="loginBtn">
@@ -133,20 +283,107 @@
             <div id="successMessage" class="message success" role="status"></div>
 
             <div class="register-link">
-                Don't have an account?
-                <a href="customer-register.html">Create Account</a>
+                <span id="registerText">Don't have an account?</span>
+                <a href="customer-register.html" id="registerLink">
+                    Create Account
+                </a>
             </div>
-        </div>
+
+            <a href="index.html" class="back-home" id="homeLink">
+                ← Back to Home
+            </a>
+        </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
 
     <script>
+        const translations = {
+            en: {
+                title: "Customer Login",
+                intro: "Login to view your orders and track deliveries.",
+                email: "Email address",
+                emailPlaceholder: "Enter your email",
+                password: "Password",
+                passwordPlaceholder: "Enter your password",
+                show: "Show",
+                hide: "Hide",
+                forgot: "Forgot password?",
+                login: "Login",
+                loggingIn: "Logging in...",
+                registerText: "Don't have an account?",
+                registerLink: "Create Account",
+                home: "← Back to Home",
+                required: "Please enter your email and password.",
+                noClient: "Supabase connection was not found. Check supabase.js.",
+                loginSuccess: "Login successful. Opening your orders...",
+                invalid: "Email or password is incorrect. Please try again.",
+                unconfirmed: "Your email has not been confirmed. Please confirm it first.",
+                network: "Cannot connect to the server. Check your internet connection.",
+                loginFailed: "Login failed. Please try again.",
+                resetEmail: "Enter your email address first to reset your password.",
+                resetSending: "Sending reset link...",
+                resetSent: "If the account exists, a password reset email has been requested. Check your inbox.",
+                resetFailed: "Could not request a password reset. Please try again.",
+                resetMissing: "Password reset is not configured in this project yet."
+            },
+            sw: {
+                title: "Ingia kwa Mteja",
+                intro: "Ingia kuona oda zako na kufuatilia usafirishaji.",
+                email: "Barua pepe",
+                emailPlaceholder: "Weka barua pepe yako",
+                password: "Nenosiri",
+                passwordPlaceholder: "Weka nenosiri lako",
+                show: "Onyesha",
+                hide: "Ficha",
+                forgot: "Umesahau nenosiri?",
+                login: "Ingia",
+                loggingIn: "Inaingia...",
+                registerText: "Huna akaunti?",
+                registerLink: "Fungua Akaunti",
+                home: "← Rudi Mwanzo",
+                required: "Tafadhali weka barua pepe na nenosiri.",
+                noClient: "Muunganisho wa Supabase haujapatikana. Kagua supabase.js.",
+                loginSuccess: "Umeingia kikamilifu. Inafungua oda zako...",
+                invalid: "Barua pepe au nenosiri si sahihi. Jaribu tena.",
+                unconfirmed: "Barua pepe yako haijathibitishwa. Tafadhali ithibitishe kwanza.",
+                network: "Imeshindikana kuunganisha na seva. Kagua intaneti yako.",
+                loginFailed: "Kuingia kumeshindikana. Tafadhali jaribu tena.",
+                resetEmail: "Weka barua pepe yako kwanza ili kuomba kubadilisha nenosiri.",
+                resetSending: "Inatuma ombi...",
+                resetSent: "Ikiwa akaunti ipo, ombi la kubadilisha nenosiri limetumwa. Kagua kikasha cha barua pepe.",
+                resetFailed: "Imeshindikana kuomba kubadilisha nenosiri. Jaribu tena.",
+                resetMissing: "Huduma ya kubadilisha nenosiri bado haijaandaliwa kwenye mfumo huu."
+            }
+        };
+
+        let language = localStorage.getItem("foodLanguage") || "en";
+
         const loginForm = document.getElementById("loginForm");
         const loginBtn = document.getElementById("loginBtn");
         const errorMessage = document.getElementById("errorMessage");
         const successMessage = document.getElementById("successMessage");
+        const passwordInput = document.getElementById("password");
+        const showPasswordBtn = document.getElementById("showPassword");
+        const forgotBtn = document.getElementById("forgotBtn");
+        const languageSelect = document.getElementById("languageSelect");
+
+        function getSupabaseClient() {
+            if (typeof db !== "undefined" && db && db.auth) {
+                return db;
+            }
+
+            if (
+                typeof supabaseClient !== "undefined" &&
+                supabaseClient &&
+                supabaseClient.auth
+            ) {
+                return supabaseClient;
+            }
+
+            return null;
+        }
 
         function showError(message) {
             errorMessage.textContent = message;
@@ -154,49 +391,77 @@
             successMessage.style.display = "none";
         }
 
-        function getSupabaseClient() {
-            // Support the client name used by the existing project.
-            if (typeof db !== "undefined" && db && db.auth) {
-                return db;
-            }
-
-            if (typeof supabaseClient !== "undefined" &&
-                supabaseClient && supabaseClient.auth) {
-                return supabaseClient;
-            }
-
-            return null;
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = "block";
+            errorMessage.style.display = "none";
         }
+
+        function clearMessages() {
+            errorMessage.style.display = "none";
+            successMessage.style.display = "none";
+        }
+
+        function updateLanguage() {
+            const t = translations[language] || translations.en;
+
+            document.documentElement.lang = language;
+            document.getElementById("pageTitle").textContent = t.title;
+            document.getElementById("introText").textContent = t.intro;
+            document.getElementById("emailLabel").textContent = t.email;
+            document.getElementById("email").placeholder = t.emailPlaceholder;
+            document.getElementById("passwordLabel").textContent = t.password;
+            passwordInput.placeholder = t.passwordPlaceholder;
+            showPasswordBtn.textContent =
+                passwordInput.type === "password" ? t.show : t.hide;
+            forgotBtn.textContent = t.forgot;
+            document.getElementById("registerText").textContent = t.registerText;
+            document.getElementById("registerLink").textContent = t.registerLink;
+            document.getElementById("homeLink").textContent = t.home;
+
+            if (!loginBtn.disabled) {
+                loginBtn.textContent = t.login;
+            }
+
+            languageSelect.value = language;
+        }
+
+        languageSelect.addEventListener("change", function() {
+            language = this.value;
+            localStorage.setItem("foodLanguage", language);
+            updateLanguage();
+            clearMessages();
+        });
+
+        showPasswordBtn.addEventListener("click", function() {
+            passwordInput.type =
+                passwordInput.type === "password" ? "text" : "password";
+            updateLanguage();
+        });
 
         loginForm.addEventListener("submit", async function(event) {
             event.preventDefault();
+            clearMessages();
 
-            errorMessage.style.display = "none";
-            successMessage.style.display = "none";
-
+            const t = translations[language] || translations.en;
             const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value;
+            const password = passwordInput.value;
 
             if (!email || !password) {
-                showError("Please enter your email and password.");
+                showError(t.required);
                 return;
             }
 
             const client = getSupabaseClient();
 
             if (!client) {
-                showError(
-                    "Supabase connection was not found. Check supabase.js " +
-                    "and confirm that it creates the client as db or supabaseClient."
-                );
-                console.error(
-                    "Supabase client missing. Check supabase.js and browser Console."
-                );
+                showError(t.noClient);
+                console.error("Supabase client missing. Check supabase.js.");
                 return;
             }
 
             loginBtn.disabled = true;
-            loginBtn.textContent = "Logging in...";
+            loginBtn.textContent = t.loggingIn;
 
             try {
                 const { data, error } = await client.auth.signInWithPassword({
@@ -204,45 +469,98 @@
                     password: password
                 });
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
                 if (!data || !data.user) {
-                    throw new Error("Login was not completed. Please try again.");
+                    throw new Error("Login was not completed.");
                 }
 
-                successMessage.textContent = "Login successful. Opening your orders...";
-                successMessage.style.display = "block";
+                showSuccess(t.loginSuccess);
 
-                // Allow Supabase to save the session before navigating.
+                // Keep the existing workflow: login -> customer orders.
                 window.location.assign("my-orders.html");
 
             } catch (error) {
                 console.error("Customer login error:", error);
 
-                let message = error && error.message
-                    ? error.message
-                    : "Login failed. Please try again.";
+                const message = String(error?.message || "").toLowerCase();
+                let friendlyMessage = t.loginFailed;
 
-                if (message.toLowerCase().includes("invalid login credentials")) {
-                    message = "Email or password is incorrect. Please check and try again.";
-                } else if (
-                    message.toLowerCase().includes("email not confirmed")
+                if (
+                    message.includes("invalid login credentials") ||
+                    message.includes("invalid email or password")
                 ) {
-                    message = "Your email has not been confirmed. Please complete email confirmation first.";
+                    friendlyMessage = t.invalid;
+                } else if (message.includes("email not confirmed")) {
+                    friendlyMessage = t.unconfirmed;
                 } else if (
-                    message.toLowerCase().includes("failed to fetch")
+                    message.includes("failed to fetch") ||
+                    message.includes("network") ||
+                    message.includes("fetch")
                 ) {
-                    message = "Cannot connect to Supabase. Check your internet connection and Supabase settings.";
+                    friendlyMessage = t.network;
+                } else if (error?.message) {
+                    friendlyMessage = error.message;
                 }
 
-                showError(message);
-
+                showError(friendlyMessage);
                 loginBtn.disabled = false;
-                loginBtn.textContent = "Login";
+                loginBtn.textContent = t.login;
             }
         });
+
+        forgotBtn.addEventListener("click", async function() {
+            clearMessages();
+
+            const t = translations[language] || translations.en;
+            const email = document.getElementById("email").value.trim();
+
+            if (!email) {
+                showError(t.resetEmail);
+                document.getElementById("email").focus();
+                return;
+            }
+
+            const client = getSupabaseClient();
+
+            if (!client) {
+                showError(t.noClient);
+                return;
+            }
+
+            if (typeof client.auth.resetPasswordForEmail !== "function") {
+                showError(t.resetMissing);
+                return;
+            }
+
+            const originalText = forgotBtn.textContent;
+            forgotBtn.disabled = true;
+            forgotBtn.textContent = t.resetSending;
+
+            try {
+                const { error } = await client.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin +
+                        window.location.pathname.replace(
+                            /customer-login\.html$/,
+                            "customer-account.html"
+                        )
+                });
+
+                if (error) throw error;
+
+                showSuccess(t.resetSent);
+
+            } catch (error) {
+                console.error("Password reset error:", error);
+                showError(t.resetFailed);
+            } finally {
+                forgotBtn.disabled = false;
+                forgotBtn.textContent = originalText;
+            }
+        });
+
+        updateLanguage();
     </script>
 </body>
 </html>
+```
