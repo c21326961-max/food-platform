@@ -1,360 +1,587 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Vendor Registration | Food Platform</title>
+  <title>Vendor Registration | Food Platform</title>
+  <meta name="theme-color" content="#173F35">
+  <meta name="description" content="Register your food business on Food Platform.">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./language.js" defer></script>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <style>
+    :root {
+      --orange: #F15A24;
+      --green: #173F35;
+      --cream: #FFF7E9;
+      --white: #FFFFFF;
+      --text: #24332D;
+      --muted: #718078;
+      --border: #E5E9E3;
+      --red: #B42318;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            color: #222;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .page {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #FFE2CB 0, transparent 38%),
+        linear-gradient(135deg, var(--cream), #F3F7F1);
+      min-height: 100vh;
+    }
 
-        .card {
-            width: 100%;
-            max-width: 460px;
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0,0,0,.08);
-        }
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      align-items: center;
+      gap: 45px;
+      max-width: 1150px;
+      margin: auto;
+      padding: 35px 24px;
+    }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 7px;
-        }
+    .intro {
+      background: var(--green);
+      color: var(--white);
+      border-radius: 28px;
+      padding: 42px 34px;
+      box-shadow: 0 20px 50px rgba(23, 63, 53, 0.15);
+    }
 
-        .subtitle {
-            color: #777;
-            font-size: 14px;
-            margin-bottom: 22px;
-        }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 35px;
+    }
 
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      background: var(--orange);
+      border-radius: 14px;
+      font-size: 25px;
+    }
 
-        input {
-            width: 100%;
-            height: 45px;
-            border: 1px solid #ddd;
-            border-radius: 7px;
-            padding: 0 13px;
-            font-size: 14px;
-            margin-bottom: 16px;
-            outline: none;
-        }
+    .intro h1 {
+      font-size: clamp(30px, 4vw, 43px);
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
 
-        input:focus {
-            border-color: #ff6b35;
-        }
+    .intro h1 span {
+      color: #FFAD7C;
+    }
 
-        button {
-            width: 100%;
-            height: 46px;
-            border: none;
-            border-radius: 7px;
-            background: #ff6b35;
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    .intro p {
+      color: #D8E7DE;
+      line-height: 1.8;
+      font-size: 15px;
+    }
 
-        button:disabled {
-            opacity: .6;
-            cursor: not-allowed;
-        }
+    .benefits {
+      list-style: none;
+      display: grid;
+      gap: 16px;
+      margin-top: 28px;
+    }
 
-        .message {
-            display: none;
-            margin-bottom: 15px;
-            padding: 11px;
-            border-radius: 7px;
-            font-size: 14px;
-        }
+    .benefits li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
-        .error {
-            background: #ffe5e5;
-            color: #b00020;
-        }
+    .check {
+      color: #FFC09A;
+      font-weight: bold;
+    }
 
-        .success {
-            background: #e7f7ed;
-            color: #187a3d;
-        }
+    .card {
+      background: var(--white);
+      padding: 36px;
+      border: 1px solid rgba(23, 63, 53, 0.07);
+      border-radius: 24px;
+      box-shadow: 0 15px 45px rgba(35, 55, 45, 0.09);
+      width: 100%;
+    }
 
-        .login-link {
-            text-align: center;
-            margin-top: 18px;
-            font-size: 14px;
-        }
+    .card h2 {
+      color: var(--green);
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
 
-        .login-link a {
-            color: #ff6b35;
-            text-decoration: none;
-            font-weight: 600;
-        }
-    </style>
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 25px;
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--green);
+    }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #FCFDFB;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(241, 90, 36, 0.12);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 7px;
+    }
+
+    button {
+      width: 100%;
+      min-height: 50px;
+      border: none;
+      border-radius: 12px;
+      background: var(--orange);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      margin-top: 5px;
+    }
+
+    button:hover:not(:disabled) {
+      background: #D94816;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 18px;
+      padding: 13px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .error {
+      display: block;
+      background: #FEECEB;
+      color: var(--red);
+      border: 1px solid #F7CDCA;
+    }
+
+    .success {
+      display: block;
+      background: #E8F7EC;
+      color: #17653A;
+      border: 1px solid #C5E8D0;
+    }
+
+    .login-link {
+      margin-top: 22px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .login-link a {
+      color: var(--orange);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .approval-note {
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 13px;
+      margin-top: 18px;
+      color: #66533F;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 800px) {
+      .page {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        max-width: 560px;
+        padding: 20px 14px 35px;
+      }
+
+      .intro {
+        padding: 25px;
+        border-radius: 20px;
+      }
+
+      .brand {
+        margin-bottom: 22px;
+      }
+
+      .intro h1 {
+        font-size: 30px;
+      }
+
+      .benefits {
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .card {
+        padding: 25px 20px;
+        border-radius: 20px;
+      }
+
+      .card h2 {
+        font-size: 25px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <main class="page">
+    <section class="intro">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">🍲</span>
+        <span>FOOD PLATFORM</span>
+      </div>
 
-<div class="page">
+      <h1>Bring your food business <span>online.</span></h1>
 
-    <div class="card">
+      <p>
+        Join our food ordering platform and connect your restaurant
+        or food business with customers in your community.
+      </p>
 
-        <h1>Create Vendor Account</h1>
+      <ul class="benefits">
+        <li>
+          <span class="check">✓</span>
+          <span>Create a profile for your food business.</span>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <span>Manage your restaurant details and food menu.</span>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <span>Wait for administrator review before operating.</span>
+        </li>
+      </ul>
+    </section>
 
-        <p class="subtitle">
-            Create your vendor account first. You will complete your restaurant information on the next page.
-        </p>
+    <section class="card">
+      <h2>Create vendor account</h2>
 
-        <div id="message" class="message"></div>
+      <p class="subtitle">
+        Enter your personal and business details to get started.
+        Fields marked with * are required.
+      </p>
 
-        <form id="registerForm">
+      <div
+        id="message"
+        class="message"
+        role="status"
+        aria-live="polite"
+      ></div>
 
-            <label>Full Name</label>
-            <input
-                type="text"
-                id="fullName"
-                placeholder="Enter your full name"
-                required
-            >
-
-            <label>Phone Number</label>
-            <input
-                type="tel"
-                id="phone"
-                placeholder="Enter phone number"
-                required
-            >
-
-            <label>Email</label>
-            <input
-                type="email"
-                id="email"
-                placeholder="Enter email"
-                required
-            >
-
-            <label>Password</label>
-            <input
-                type="password"
-                id="password"
-                placeholder="Create password"
-                required
-            >
-
-            <label>Confirm Password</label>
-            <input
-                type="password"
-                id="confirmPassword"
-                placeholder="Confirm password"
-                required
-            >
-
-            <button type="submit" id="registerBtn">
-                Create Account
-            </button>
-
-        </form>
-
-        <div class="login-link">
-            Already have an account?
-            <a href="vendor-login.html">Login</a>
+      <form id="registerForm">
+        <div class="field">
+          <label for="fullName">Full name *</label>
+          <input
+            id="fullName"
+            name="fullName"
+            type="text"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            maxlength="120"
+            required
+          >
         </div>
 
-    </div>
+        <div class="field">
+          <label for="businessName">Business or restaurant name *</label>
+          <input
+            id="businessName"
+            name="businessName"
+            type="text"
+            placeholder="e.g. Mama Asha Food"
+            maxlength="150"
+            required
+          >
+        </div>
 
-</div>
+        <div class="field">
+          <label for="phone">Phone number *</label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="e.g. 07XXXXXXXX"
+            autocomplete="tel"
+            maxlength="25"
+            required
+          >
+        </div>
 
-<script>
+        <div class="field">
+          <label for="email">Email address *</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+            maxlength="254"
+            required
+          >
+        </div>
 
-const SUPABASE_URL = "https://ienquzigbawhvthnirtj.supabase.co";
+        <div class="field">
+          <label for="password">Password *</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+          <p class="hint">Use at least 6 characters.</p>
+        </div>
 
-const SUPABASE_KEY =
-    "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
+        <div class="field">
+          <label for="confirmPassword">Confirm password *</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            placeholder="Enter the password again"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          >
+        </div>
 
-const db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+        <button type="submit" id="registerBtn">
+          Create vendor account
+        </button>
+      </form>
 
+      <div class="approval-note">
+        <strong>Important:</strong> Registration does not mean approval.
+        The administrator must approve your vendor account before
+        your business can operate on the platform.
+      </div>
 
-const registerForm = document.getElementById("registerForm");
-const registerBtn = document.getElementById("registerBtn");
-const message = document.getElementById("message");
+      <div class="login-link">
+        Already have an account?
+        <a href="vendor-login.html">Login</a>
+      </div>
+    </section>
+  </main>
 
+  <script>
+    "use strict";
 
-function showMessage(text, type = "error") {
+    const SUPABASE_URL =
+      "https://ienquzigbawhvthnirtj.supabase.co";
 
-    message.textContent = text;
-    message.className = "message " + type;
-    message.style.display = "block";
+    const SUPABASE_KEY =
+      "sb_publishable_tSbACTjOICJlthE03XmGCA_sIgigXup";
 
-}
+    const db = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
+    const form = document.getElementById("registerForm");
+    const registerBtn = document.getElementById("registerBtn");
+    const message = document.getElementById("message");
 
-registerForm.addEventListener("submit", async function(e) {
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.className = "message " + type;
+    }
 
-    e.preventDefault();
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-    const fullName =
+      if (registerBtn.disabled) return;
+
+      const fullName =
         document.getElementById("fullName").value.trim();
 
-    const phone =
+      const businessName =
+        document.getElementById("businessName").value.trim();
+
+      const phone =
         document.getElementById("phone").value.trim();
 
-    const email =
-        document.getElementById("email").value.trim();
+      const email =
+        document.getElementById("email").value.trim().toLowerCase();
 
-    const password =
+      const password =
         document.getElementById("password").value;
 
-    const confirmPassword =
+      const confirmPassword =
         document.getElementById("confirmPassword").value;
 
-
-    if (password !== confirmPassword) {
-
-        showMessage("Passwords do not match.");
-
+      if (!fullName || !businessName || !phone || !email) {
+        showMessage("Please complete all required fields.");
         return;
-    }
+      }
 
-
-    if (password.length < 6) {
-
-        showMessage("Password must be at least 6 characters.");
-
+      if (password.length < 6) {
+        showMessage("Password must contain at least 6 characters.");
         return;
-    }
+      }
 
+      if (password !== confirmPassword) {
+        showMessage("The passwords do not match.");
+        return;
+      }
 
-    registerBtn.disabled = true;
-    registerBtn.textContent = "Creating Account...";
+      registerBtn.disabled = true;
+      registerBtn.textContent = "Creating account...";
+      message.className = "message";
 
-
-    try {
-
-        /*
-         * STEP 1
-         * Create Supabase Auth account
-         */
-
-        const {
-            data,
-            error
-        } = await db.auth.signUp({
-
-            email: email,
-
-            password: password,
-
-            options: {
-                data: {
-                    full_name: fullName,
-                    phone: phone
-                }
+      try {
+        const { data, error } = await db.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              business_name: businessName,
+              phone: phone,
+              account_type: "vendor"
             }
-
+          }
         });
 
-
-        if (error) {
-            throw error;
-        }
-
+        if (error) throw error;
 
         if (!data.user) {
-            throw new Error("Account could not be created.");
+          throw new Error(
+            "Supabase did not return a user account. Please try again."
+          );
         }
 
-
         /*
-         * STEP 2
-         * Create vendor record
-         */
+          If email confirmation is enabled, Supabase may not create
+          a login session yet. Do not bypass RLS to insert a profile.
+          The post-confirmation/login flow must complete that step.
+        */
+        if (!data.session) {
+          showMessage(
+            "Your authentication account has been created. " +
+            "Check your email and confirm your address. " +
+            "Your vendor profile still needs to be saved after " +
+            "you sign in. Please do not register again.",
+            "success"
+          );
 
-        const {
-            error: vendorError
-        } = await db
-            .from("food_vendors")
-            .insert({
+          registerBtn.textContent = "Check your email";
+          return;
+        }
 
-                id: data.user.id,
-
-                full_name: fullName,
-
-                phone: phone,
-
-                email: email
-
-            });
-
+        const { error: vendorError } = await db
+          .from("food_vendors")
+          .insert({
+            id: data.user.id,
+            full_name: fullName,
+            business_name: businessName,
+            phone: phone,
+            email: email
+          });
 
         if (vendorError) {
-            throw vendorError;
+          console.error(
+            "Vendor profile insert failed:",
+            vendorError
+          );
+
+          showMessage(
+            "Your login account was created, but saving the vendor " +
+            "profile failed. Do not register again. " +
+            "Please share this error with support: " +
+            vendorError.message
+          );
+
+          registerBtn.disabled = false;
+          registerBtn.textContent = "Retry profile setup";
+          return;
         }
 
-
-        /*
-         * STEP 3
-         * Send vendor to profile/setup page
-         */
-
         showMessage(
-            "Account created. Opening your vendor setup...",
-            "success"
+          "Your account and vendor profile were created. " +
+          "Continue to complete your business details. " +
+          "Administrator approval is required before operating.",
+          "success"
         );
 
+        registerBtn.textContent = "Account created";
 
-        setTimeout(() => {
+        window.setTimeout(function () {
+          window.location.href = "vendor-profile.html";
+        }, 1500);
 
-            window.location.href = "vendor-profile.html";
-
-        }, 700);
-
-
-    } catch (error) {
-
-        console.error(error);
+      } catch (error) {
+        console.error("Vendor registration error:", error);
 
         showMessage(
-            error.message || "Registration failed."
+          error.message || "Registration failed. Please try again."
         );
 
         registerBtn.disabled = false;
-        registerBtn.textContent = "Create Account";
-
-    }
-
-});
-
-</script>
-
+        registerBtn.textContent = "Create vendor account";
+      }
+    });
+  </script>
 </body>
 </html>

@@ -1,1526 +1,1345 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="theme-color" content="#f97316">
     <title>Manage Menu | Food Platform</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
+    <script src="language.js" defer></script>
 
     <style>
-
-        * {
-            box-sizing: border-box;
+        :root {
+            --orange: #f97316;
+            --orange-dark: #ea580c;
+            --green: #166534;
+            --green-light: #dcfce7;
+            --cream: #fffaf2;
+            --white: #ffffff;
+            --text: #243126;
+            --muted: #647067;
+            --border: #e8e6df;
+            --danger: #b91c1c;
+            --shadow: 0 8px 28px rgba(37, 50, 38, .07);
         }
+
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f6f8;
-            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background: var(--cream);
         }
 
-        header {
-            background: #f97316;
+        button, input, textarea, select { font: inherit; }
+
+        button { cursor: pointer; }
+
+        .topbar {
+            background: var(--green);
             color: white;
-            padding: 16px;
-        }
-
-        .header-inner {
-            max-width: 1100px;
-            margin: auto;
+            padding: 17px 5%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 20px;
-        }
-
-        .back-btn {
-            border: 0;
-            background: white;
-            color: #f97316;
-            padding: 9px 13px;
-            border-radius: 7px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: auto;
-            padding: 18px;
-        }
-
-        .restaurant-card,
-        .form-card,
-        .menu-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 18px;
-        }
-
-        .restaurant-card h2 {
-            margin: 0 0 5px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-weight: 800;
             font-size: 21px;
         }
 
-        .restaurant-card p {
-            margin: 4px 0;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-card h2,
-        .menu-card h2 {
-            margin: 0 0 15px;
-            font-size: 18px;
-        }
-
-        .grid {
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            place-items: center;
+            background: var(--orange);
+            font-size: 23px;
         }
 
-        .full {
-            grid-column: 1 / -1;
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 13px;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 7px;
+        .top-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 13px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.12);
             font-size: 14px;
-            margin-top: 6px;
         }
 
-        textarea {
-            min-height: 90px;
-            resize: vertical;
+        .top-link:hover { background: rgba(255,255,255,.22); }
+
+        .page {
+            width: min(1180px, 92%);
+            margin: 30px auto 55px;
+        }
+
+        .welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0 0 9px;
+            font-size: clamp(25px, 4vw, 34px);
+            letter-spacing: -.7px;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .restaurant-name {
+            color: var(--green);
+            font-weight: 700;
         }
 
         .btn {
             border: 0;
-            border-radius: 7px;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
+            border-radius: 10px;
+            padding: 12px 17px;
+            font-weight: 700;
+            transition: .18s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
         }
+
+        .btn:hover { transform: translateY(-1px); }
+        .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
         .btn-primary {
-            background: #f97316;
             color: white;
+            background: var(--orange);
         }
 
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #111827;
+        .btn-primary:hover { background: var(--orange-dark); }
+
+        .btn-green {
+            color: white;
+            background: var(--green);
+        }
+
+        .btn-light {
+            color: var(--text);
+            background: #f2f1eb;
         }
 
         .btn-danger {
-            background: #dc2626;
-            color: white;
+            color: var(--danger);
+            background: #fee2e2;
         }
 
-        .message {
-            margin-top: 10px;
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .stat {
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-label {
+            color: var(--muted);
             font-size: 13px;
+            margin-bottom: 9px;
         }
 
-        .success {
-            color: #15803d;
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--green);
         }
 
-        .error {
-            color: #dc2626;
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .search {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .field, .search input, select, textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d9ddd5;
+            border-radius: 10px;
+            background: white;
+            color: var(--text);
+            outline: none;
+        }
+
+        .field:focus, .search input:focus,
+        select:focus, textarea:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(249,115,22,.12);
+        }
+
+        .toolbar select {
+            width: auto;
+            min-width: 175px;
         }
 
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 19px;
         }
 
-        .food-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 9px;
-            overflow: hidden;
+        .food-card {
             background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            min-width: 0;
         }
 
         .food-image {
+            height: 190px;
+            background: #f0eee7;
+            position: relative;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .food-image img {
             width: 100%;
-            height: 150px;
+            height: 100%;
             object-fit: cover;
-            background: #eee;
         }
 
-        .food-body {
-            padding: 13px;
+        .image-placeholder { font-size: 50px; }
+
+        .status {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 7px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--green-light);
+            color: var(--green);
         }
 
-        .food-body h3 {
-            margin: 0 0 6px;
-            font-size: 16px;
+        .status.off {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .food-body { padding: 17px; }
+
+        .food-category {
+            color: var(--orange-dark);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .food-title {
+            margin: 8px 0;
+            font-size: 19px;
+            overflow-wrap: anywhere;
         }
 
         .food-description {
-            margin: 0 0 8px;
-            color: #666;
-            font-size: 13px;
-            min-height: 32px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.55;
+            min-height: 43px;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
         }
 
-        .food-category {
-            display: inline-block;
-            background: #fff7ed;
-            color: #c2410c;
-            padding: 4px 7px;
-            border-radius: 15px;
-            font-size: 11px;
-            margin-bottom: 9px;
+        .food-bottom {
+            margin-top: 17px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
         }
 
         .food-price {
-            font-weight: bold;
-            font-size: 17px;
-            margin-bottom: 10px;
-        }
-
-        .available {
-            color: #15803d;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .unavailable {
-            color: #dc2626;
-            font-size: 12px;
-            font-weight: bold;
+            color: var(--green);
+            font-weight: 800;
+            font-size: 18px;
         }
 
         .food-actions {
             display: flex;
-            gap: 7px;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .food-actions .btn {
+            flex: 1;
+            padding: 10px 11px;
+            font-size: 13px;
+        }
+
+        .empty, .loading {
+            background: white;
+            border: 1px dashed #d8d8cd;
+            border-radius: 16px;
+            padding: 42px 20px;
+            text-align: center;
+            color: var(--muted);
+            grid-column: 1 / -1;
+        }
+
+        .empty-icon { font-size: 43px; margin-bottom: 10px; }
+
+        .notice {
+            display: none;
+            padding: 13px 15px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .notice.show { display: block; }
+        .notice.success { background: #dcfce7; color: #166534; }
+        .notice.error { background: #fee2e2; color: #991b1b; }
+        .notice.info { background: #dbeafe; color: #1e40af; }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(16, 24, 18, .64);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            overflow-y: auto;
+        }
+
+        .modal.open { display: flex; }
+
+        .modal-card {
+            width: min(600px, 100%);
+            max-height: 94vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 { margin: 0; font-size: 23px; }
+
+        .close-btn {
+            border: 0;
+            background: #f3f4f6;
+            border-radius: 9px;
+            width: 38px;
+            height: 38px;
+            font-size: 22px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .required { color: var(--danger); }
+
+        textarea { resize: vertical; min-height: 85px; }
+
+        .image-preview {
+            display: none;
+            width: 100%;
+            max-height: 190px;
+            object-fit: cover;
+            border-radius: 10px;
             margin-top: 10px;
         }
 
-        .food-actions button {
-            flex: 1;
-        }
-
-        .empty {
-            text-align: center;
-            color: #777;
-            padding: 25px;
-        }
-
-        .preview {
-            width: 120px;
-            height: 90px;
-            object-fit: cover;
-            border-radius: 7px;
+        .image-help {
+            font-size: 12px;
+            color: var(--muted);
             margin-top: 7px;
-            display: none;
+            line-height: 1.5;
         }
 
-        .loading {
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-row input { width: 18px; height: 18px; accent-color: var(--green); }
+
+        .footer {
             text-align: center;
-            padding: 25px;
-            color: #777;
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 35px;
         }
 
-        @media (max-width: 850px) {
-
-            .menu-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
+        @media (max-width: 900px) {
+            .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
 
         @media (max-width: 600px) {
-
-            .container {
-                padding: 12px;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .full {
-                grid-column: auto;
-            }
-
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .food-image {
-                height: 190px;
-            }
-
+            .topbar { padding: 14px 4%; }
+            .brand { font-size: 18px; }
+            .top-link { padding: 9px; font-size: 12px; }
+            .page { width: 92%; margin-top: 23px; }
+            .stats { gap: 8px; }
+            .stat { padding: 13px 10px; }
+            .stat-value { font-size: 23px; }
+            .stat-label { font-size: 11px; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .food-image { height: 210px; }
+            .toolbar select { width: 100%; }
+            .modal-card { padding: 19px; }
         }
-
     </style>
-
 </head>
 
 <body>
-
-<header>
-
-    <div class="header-inner">
-
-        <h1>Manage Menu</h1>
-
-        <button
-            class="back-btn"
-            onclick="window.location.href='vendor-dashboard.html'"
-        >
-            Dashboard
-        </button>
-
-    </div>
-
-</header>
-
-
-<div class="container">
-
-    <!-- RESTAURANT -->
-
-    <div class="restaurant-card">
-
-        <h2 id="restaurantName">
-            Loading restaurant...
-        </h2>
-
-        <p id="restaurantAddress">
-            -
-        </p>
-
-    </div>
-
-
-    <!-- ADD / EDIT FOOD -->
-
-    <div class="form-card">
-
-        <h2 id="formTitle">
-            Add Food
-        </h2>
-
-        <form id="foodForm">
-
-            <div class="grid">
-
-                <div>
-
-                    <label>
-                        Food Name
-
-                        <input
-                            id="foodName"
-                            type="text"
-                            placeholder="Example: Chicken Chips"
-                            required
-                        >
-
-                    </label>
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Price
-
-                        <input
-                            id="foodPrice"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder="5000"
-                            required
-                        >
-
-                    </label>
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Category
-
-                        <select id="foodCategory" required>
-
-                            <option value="">
-                                Select Category
-                            </option>
-
-                            <option value="Rice">
-                                Rice
-                            </option>
-
-                            <option value="Ugali">
-                                Ugali
-                            </option>
-
-                            <option value="Chips">
-                                Chips
-                            </option>
-
-                            <option value="Chicken">
-                                Chicken
-                            </option>
-
-                            <option value="Beef">
-                                Beef
-                            </option>
-
-                            <option value="Fish">
-                                Fish
-                            </option>
-
-                            <option value="Banana">
-                                Banana
-                            </option>
-
-                            <option value="Beans">
-                                Beans
-                            </option>
-
-                            <option value="Chapati">
-                                Chapati
-                            </option>
-
-                            <option value="Eggs">
-                                Eggs
-                            </option>
-
-                            <option value="Burger">
-                                Burger
-                            </option>
-
-                            <option value="Pizza">
-                                Pizza
-                            </option>
-
-                            <option value="Pasta">
-                                Pasta
-                            </option>
-
-                            <option value="Sandwich">
-                                Sandwich
-                            </option>
-
-                            <option value="Breakfast">
-                                Breakfast
-                            </option>
-
-                            <option value="Drinks">
-                                Drinks
-                            </option>
-
-                        </select>
-
-                    </label>
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Food Image
-
-                        <input
-                            id="foodImage"
-                            type="file"
-                            accept="image/*"
-                        >
-
-                        <img
-                            id="imagePreview"
-                            class="preview"
-                            alt="Preview"
-                        >
-
-                    </label>
-
-                </div>
-
-
-                <div class="full">
-
-                    <label>
-                        Description
-
-                        <textarea
-                            id="foodDescription"
-                            placeholder="Describe this food..."
-                        ></textarea>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <input
-                id="editingId"
-                type="hidden"
-            >
-
-
-            <button
-                class="btn btn-primary"
-                type="submit"
-                id="saveBtn"
-            >
-                Add Food
-            </button>
-
-
-            <button
-                class="btn btn-secondary"
-                type="button"
-                id="cancelBtn"
-                onclick="cancelEdit()"
-                style="display:none;"
-            >
-                Cancel Edit
-            </button>
-
-
-            <div
-                id="formMessage"
-                class="message"
-            ></div>
-
-        </form>
-
-    </div>
-
-
-    <!-- MENU -->
-
-    <div class="menu-card">
-
-        <h2>
-            Your Menu
-        </h2>
-
-        <div
-            id="menuContainer"
-            class="menu-grid"
-        >
-
-            <div class="loading">
-                Loading menu...
-            </div>
-
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-icon">🍲</div>
+            <span>Food Platform</span>
         </div>
 
-    </div>
+        <nav class="top-actions">
+            <a class="top-link" href="vendor-dashboard.html">← Dashboard</a>
+            <a class="top-link" href="vendor-profile.html">Restaurant Profile</a>
+            <button class="top-link" id="logoutBtn" type="button">Sign out</button>
+        </nav>
+    </header>
 
-</div>
-
-
-<script>
-
-let currentUser = null;
-let vendor = null;
-let restaurant = null;
-let menuItems = [];
-
-
-/* =========================
-   AUTH
-========================= */
-
-async function checkAuth() {
-
-    const {
-        data: {
-            user
-        }
-    } = await db.auth.getUser();
-
-    if (!user) {
-
-        window.location.href =
-            "vendor-login.html";
-
-        return false;
-
-    }
-
-    currentUser = user;
-
-    return true;
-
-}
-
-
-/* =========================
-   LOAD VENDOR
-========================= */
-
-async function loadVendor() {
-
-    const {
-        data,
-        error
-    } = await db
-        .from("food_vendors")
-        .select("*")
-        .eq("id", currentUser.id)
-        .maybeSingle();
-
-    if (error) {
-
-        console.error(error);
-
-        alert(error.message);
-
-        return false;
-
-    }
-
-    if (!data) {
-
-        alert("Vendor profile not found.");
-
-        await db.auth.signOut();
-
-        window.location.href =
-            "vendor-login.html";
-
-        return false;
-
-    }
-
-    vendor = data;
-
-    return true;
-
-}
-
-
-/* =========================
-   LOAD RESTAURANT
-========================= */
-
-async function loadRestaurant() {
-
-    if (!vendor.restaurant_id) {
-
-        document.getElementById(
-            "restaurantName"
-        ).textContent =
-            "No restaurant linked";
-
-        return false;
-
-    }
-
-    const {
-        data,
-        error
-    } = await db
-        .from("food_restaurants")
-        .select("*")
-        .eq("id", vendor.restaurant_id)
-        .maybeSingle();
-
-    if (error) {
-
-        console.error(error);
-
-        alert(error.message);
-
-        return false;
-
-    }
-
-    restaurant = data;
-
-    if (!restaurant) {
-
-        document.getElementById(
-            "restaurantName"
-        ).textContent =
-            "Restaurant not found";
-
-        return false;
-
-    }
-
-    document.getElementById(
-        "restaurantName"
-    ).textContent =
-        restaurant.name || "Restaurant";
-
-    document.getElementById(
-        "restaurantAddress"
-    ).textContent =
-        restaurant.address || "No address";
-
-    return true;
-
-}
-
-
-/* =========================
-   LOAD MENU
-========================= */
-
-async function loadMenu() {
-
-    const container =
-        document.getElementById(
-            "menuContainer"
-        );
-
-    if (!restaurant) {
-
-        container.innerHTML = `
-            <div class="empty">
-                No restaurant linked.
+    <main class="page">
+        <section class="welcome">
+            <div>
+                <h1>Manage Your Menu 🍽️</h1>
+                <p class="subtitle">
+                    Add dishes, update prices and manage availability for
+                    <span class="restaurant-name" id="restaurantName">your restaurant</span>.
+                </p>
             </div>
-        `;
 
-        return;
+            <button class="btn btn-primary" id="addFoodBtn" type="button">
+                + Add Food
+            </button>
+        </section>
 
-    }
+        <div id="notice" class="notice" role="status" aria-live="polite"></div>
 
-    const {
-        data,
-        error
-    } = await db
-        .from("food_menu")
-        .select("*")
-        .eq(
-            "restaurant_id",
-            restaurant.id
-        )
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
-
-    if (error) {
-
-        console.error(error);
-
-        container.innerHTML = `
-            <div class="empty">
-                ${escapeHtml(error.message)}
+        <section class="stats" aria-label="Menu statistics">
+            <div class="stat">
+                <div class="stat-label">Total dishes</div>
+                <div class="stat-value" id="totalCount">—</div>
             </div>
-        `;
-
-        return;
-
-    }
-
-    menuItems = data || [];
-
-    renderMenu();
-
-}
-
-
-/* =========================
-   RENDER MENU
-========================= */
-
-function renderMenu() {
-
-    const container =
-        document.getElementById(
-            "menuContainer"
-        );
-
-    if (!menuItems.length) {
-
-        container.innerHTML = `
-            <div class="empty">
-                No food items yet.
+            <div class="stat">
+                <div class="stat-label">Available</div>
+                <div class="stat-value" id="availableCount">—</div>
             </div>
-        `;
+            <div class="stat">
+                <div class="stat-label">Hidden</div>
+                <div class="stat-value" id="hiddenCount">—</div>
+            </div>
+        </section>
 
-        return;
+        <section class="toolbar">
+            <div class="search">
+                <input id="searchInput" type="search"
+                       placeholder="Search food by name or description..."
+                       aria-label="Search menu">
+            </div>
 
-    }
+            <select id="categoryFilter" aria-label="Filter by category">
+                <option value="">All categories</option>
+                <option>Rice</option>
+                <option>Ugali</option>
+                <option>Chips</option>
+                <option>Chicken</option>
+                <option>Beef</option>
+                <option>Fish</option>
+                <option>Banana</option>
+                <option>Beans</option>
+                <option>Chapati</option>
+                <option>Eggs</option>
+                <option>Burger</option>
+                <option>Pizza</option>
+                <option>Pasta</option>
+                <option>Sandwich</option>
+                <option>Breakfast</option>
+                <option>Drinks</option>
+                <option>Other</option>
+            </select>
 
-    container.innerHTML =
-        menuItems.map(item => {
+            <select id="availabilityFilter" aria-label="Filter by availability">
+                <option value="">All status</option>
+                <option value="available">Available</option>
+                <option value="hidden">Hidden</option>
+            </select>
+        </section>
 
-            const image =
-                item.image_url ||
-                "https://via.placeholder.com/600x400?text=Food";
+        <section class="menu-grid" id="menuGrid" aria-live="polite">
+            <div class="loading">Loading your menu...</div>
+        </section>
 
-            const availability =
-                item.is_available !== false;
+        <div class="footer">
+            Food Platform · Manage your dishes with care.
+        </div>
+    </main>
 
-            return `
+    <div class="modal" id="foodModal" role="dialog"
+         aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Food</h2>
+                <button class="close-btn" id="closeModalBtn" type="button"
+                        aria-label="Close">×</button>
+            </div>
 
-                <div class="food-item">
-
-                    <img
-                        class="food-image"
-                        src="${escapeHtml(image)}"
-                        alt="${escapeHtml(item.name)}"
-                        loading="lazy"
-                    >
-
-                    <div class="food-body">
-
-                        <h3>
-                            ${escapeHtml(item.name)}
-                        </h3>
-
-                        <p class="food-description">
-                            ${escapeHtml(
-                                item.description ||
-                                "No description"
-                            )}
-                        </p>
-
-                        <div class="food-category">
-                            ${escapeHtml(
-                                item.category ||
-                                "Other"
-                            )}
-                        </div>
-
-                        <div class="food-price">
-                            ${money(item.price)}
-                        </div>
-
-                        <div class="${
-                            availability
-                                ? "available"
-                                : "unavailable"
-                        }">
-
-                            ${
-                                availability
-                                    ? "Available"
-                                    : "Unavailable"
-                            }
-
-                        </div>
-
-
-                        <div class="food-actions">
-
-                            <button
-                                class="btn btn-secondary"
-                                onclick="editFood('${item.id}')"
-                            >
-                                Edit
-                            </button>
-
-                            <button
-                                class="btn ${
-                                    availability
-                                        ? "btn-danger"
-                                        : "btn-primary"
-                                }"
-                                onclick="toggleAvailability(
-                                    '${item.id}',
-                                    ${availability}
-                                )"
-                            >
-
-                                ${
-                                    availability
-                                        ? "Disable"
-                                        : "Enable"
-                                }
-
-                            </button>
-
-                        </div>
-
-
-                        <div
-                            class="food-actions"
-                        >
-
-                            <button
-                                class="btn btn-danger"
-                                onclick="deleteFood('${item.id}')"
-                            >
-                                Delete
-                            </button>
-
-                        </div>
-
-                    </div>
-
+            <form id="foodForm">
+                <div class="form-group">
+                    <label for="foodName">Food name <span class="required">*</span></label>
+                    <input class="field" id="foodName" name="name"
+                           maxlength="100" required placeholder="e.g. Chicken Pilau">
                 </div>
 
-            `;
-
-        }).join("");
-
-}
-
-
-/* =========================
-   ADD / EDIT FOOD
-========================= */
-
-document
-    .getElementById("foodForm")
-    .addEventListener(
-        "submit",
-        saveFood
-    );
-
-
-async function saveFood(event) {
-
-    event.preventDefault();
-
-    if (!restaurant) {
-
-        return;
-
-    }
-
-    const message =
-        document.getElementById(
-            "formMessage"
-        );
-
-    const saveBtn =
-        document.getElementById(
-            "saveBtn"
-        );
-
-    message.textContent =
-        "Saving...";
-
-    message.className =
-        "message";
-
-    saveBtn.disabled = true;
-
-
-    try {
-
-        const editingId =
-            document.getElementById(
-                "editingId"
-            ).value;
-
-
-        const name =
-            document.getElementById(
-                "foodName"
-            ).value.trim();
-
-        const description =
-            document.getElementById(
-                "foodDescription"
-            ).value.trim();
-
-        const price =
-            Number(
-                document.getElementById(
-                    "foodPrice"
-                ).value
-            );
-
-        const category =
-            document.getElementById(
-                "foodCategory"
-            ).value;
-
-
-        if (!name) {
-            throw new Error(
-                "Food name is required."
-            );
-        }
-
-        if (!price || price < 0) {
-            throw new Error(
-                "Enter a valid price."
-            );
-        }
-
-        if (!category) {
-            throw new Error(
-                "Select a category."
-            );
-        }
-
-
-        let imageUrl = null;
-
-
-        /* =====================
-           EXISTING IMAGE
-        ===================== */
-
-        if (editingId) {
-
-            const oldItem =
-                menuItems.find(
-                    item =>
-                        item.id === editingId
-                );
-
-            imageUrl =
-                oldItem?.image_url ||
-                null;
-
-        }
-
-
-        /* =====================
-           NEW IMAGE
-        ===================== */
-
-        const file =
-            document.getElementById(
-                "foodImage"
-            ).files[0];
-
-
-        if (file) {
-
-            const extension =
-                file.name
-                    .split(".")
-                    .pop()
-                    .toLowerCase();
-
-            const fileName =
-                currentUser.id +
-                "/" +
-                Date.now() +
-                "-" +
-                Math.random()
-                    .toString(36)
-                    .substring(2) +
-                "." +
-                extension;
-
-
-            const {
-                error: uploadError
-            } = await db.storage
-                .from("food-images")
-                .upload(
-                    fileName,
-                    file,
-                    {
-                        upsert: false
-                    }
-                );
-
-
-            if (uploadError) {
-
-                throw uploadError;
-
-            }
-
-
-            const {
-                data: publicData
-            } = db.storage
-                .from("food-images")
-                .getPublicUrl(
-                    fileName
-                );
-
-
-            imageUrl =
-                publicData.publicUrl;
-
-        }
-
-
-        const payload = {
-
-            name: name,
-
-            description:
-                description || null,
-
-            price: price,
-
-            category: category,
-
-            restaurant_id:
-                restaurant.id,
-
-            image_url:
-                imageUrl,
-
-            is_available: true
-
+                <div class="form-group">
+                    <label for="foodCategory">Category <span class="required">*</span></label>
+                    <select id="foodCategory" name="category" required>
+                        <option value="">Choose category</option>
+                        <option>Rice</option>
+                        <option>Ugali</option>
+                        <option>Chips</option>
+                        <option>Chicken</option>
+                        <option>Beef</option>
+                        <option>Fish</option>
+                        <option>Banana</option>
+                        <option>Beans</option>
+                        <option>Chapati</option>
+                        <option>Eggs</option>
+                        <option>Burger</option>
+                        <option>Pizza</option>
+                        <option>Pasta</option>
+                        <option>Sandwich</option>
+                        <option>Breakfast</option>
+                        <option>Drinks</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="foodPrice">Price (TZS) <span class="required">*</span></label>
+                    <input class="field" id="foodPrice" name="price"
+                           type="number" min="1" max="100000000"
+                           step="1" required placeholder="e.g. 5000">
+                </div>
+
+                <div class="form-group">
+                    <label for="foodDescription">Description</label>
+                    <textarea id="foodDescription" name="description"
+                              maxlength="1000"
+                              placeholder="Describe the food and its ingredients..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="foodImage">Food image</label>
+                    <input class="field" id="foodImage" name="image"
+                           type="file" accept="image/jpeg,image/png,image/webp">
+                    <div class="image-help">
+                        Optional. Accepted formats: JPG, PNG and WebP.
+                        Maximum file size: 5 MB.
+                    </div>
+                    <img id="imagePreview" class="image-preview" alt="Food image preview">
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-row" for="foodAvailable">
+                        <input id="foodAvailable" name="is_available"
+                               type="checkbox" checked>
+                        Make this food available to customers
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-light" id="cancelBtn" type="button">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary" id="saveFoodBtn" type="submit">
+                        Save Food
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    (() => {
+        "use strict";
+
+        const $ = (id) => document.getElementById(id);
+
+        const state = {
+            client: null,
+            user: null,
+            vendor: null,
+            restaurant: null,
+            foods: [],
+            editingId: null,
+            saving: false,
+            noticeTimer: null,
+            previewUrl: null
         };
 
+        const IMAGE_BUCKET = "food-images";
+        const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+        const MIME_EXTENSIONS = {
+            "image/jpeg": "jpg",
+            "image/png": "png",
+            "image/webp": "webp"
+        };
 
-        /* =====================
-           UPDATE
-        ===================== */
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            })[char]);
+        }
 
-        if (editingId) {
+        function formatMoney(value) {
+            const amount = Number(value);
+            if (!Number.isFinite(amount)) return "TZS 0";
+            return "TZS " + new Intl.NumberFormat("en-TZ", {
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
 
-            delete payload.restaurant_id;
-            delete payload.is_available;
+        function showNotice(message, type = "info") {
+            const notice = $("notice");
+            notice.textContent = message;
+            notice.className = "notice show " + type;
 
-            const {
-                error
-            } = await db
+            clearTimeout(state.noticeTimer);
+            state.noticeTimer = setTimeout(() => {
+                notice.className = "notice";
+            }, 6500);
+
+            notice.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+
+        function setLoadingMessage(message) {
+            $("menuGrid").innerHTML =
+                '<div class="loading">' + escapeHtml(message) + '</div>';
+        }
+
+        function getClient() {
+            // Reuse the client created by supabase.js. Do not create a second client.
+            if (typeof db !== "undefined" && db &&
+                typeof db.from === "function") {
+                return db;
+            }
+
+            if (window.db && typeof window.db.from === "function") {
+                return window.db;
+            }
+
+            return null;
+        }
+
+        function getErrorMessage(error) {
+            if (!error) return "An unknown error occurred.";
+            return error.message || String(error);
+        }
+
+        async function initialize() {
+            state.client = getClient();
+
+            if (!state.client) {
+                setLoadingMessage("Supabase client is not available.");
+                showNotice(
+                    "Could not find the Supabase client. Check that supabase.js loads correctly and exposes the client as db.",
+                    "error"
+                );
+                $("addFoodBtn").disabled = true;
+                return;
+            }
+
+            try {
+                const { data: authData, error: authError } =
+                    await state.client.auth.getUser();
+
+                if (authError || !authData?.user) {
+                    window.location.replace("vendor-login.html");
+                    return;
+                }
+
+                state.user = authData.user;
+
+                const { data: vendor, error: vendorError } =
+                    await state.client
+                        .from("food_vendors")
+                        .select("id, full_name, business_name, restaurant_id")
+                        .eq("id", state.user.id)
+                        .maybeSingle();
+
+                if (vendorError) throw vendorError;
+
+                if (!vendor) {
+                    setLoadingMessage("Vendor profile not found.");
+                    showNotice(
+                        "Your vendor profile could not be found. Please complete your vendor profile first.",
+                        "error"
+                    );
+                    $("addFoodBtn").disabled = true;
+                    return;
+                }
+
+                state.vendor = vendor;
+
+                if (!vendor.restaurant_id) {
+                    setLoadingMessage("Restaurant setup is required.");
+                    showNotice(
+                        "Your account is not linked to a restaurant yet. Complete your restaurant profile before adding menu items.",
+                        "info"
+                    );
+
+                    $("menuGrid").innerHTML =
+                        '<div class="empty">' +
+                        '<div class="empty-icon">🏪</div>' +
+                        '<h3>Set up your restaurant</h3>' +
+                        '<p>Link your vendor account to a restaurant to manage its menu.</p>' +
+                        '<a class="btn btn-primary" href="vendor-profile.html">Open Restaurant Profile</a>' +
+                        '</div>';
+
+                    $("addFoodBtn").disabled = true;
+                    return;
+                }
+
+                const { data: restaurant, error: restaurantError } =
+                    await state.client
+                        .from("food_restaurants")
+                        .select("id, name")
+                        .eq("id", vendor.restaurant_id)
+                        .maybeSingle();
+
+                if (restaurantError) throw restaurantError;
+
+                if (!restaurant) {
+                    setLoadingMessage("Restaurant not found.");
+                    showNotice(
+                        "The linked restaurant could not be found. Please review your restaurant profile.",
+                        "error"
+                    );
+                    $("addFoodBtn").disabled = true;
+                    return;
+                }
+
+                state.restaurant = restaurant;
+                $("restaurantName").textContent = restaurant.name || "Your restaurant";
+                await loadFoods();
+            } catch (error) {
+                console.error("Menu initialization failed:", error);
+                setLoadingMessage("Unable to load your menu.");
+                showNotice(
+                    "Could not load your vendor information: " +
+                    getErrorMessage(error),
+                    "error"
+                );
+            }
+        }
+
+        async function loadFoods() {
+            if (!state.client || !state.restaurant) return;
+
+            setLoadingMessage("Loading your menu...");
+
+            const { data, error } = await state.client
                 .from("food_menu")
-                .update(payload)
-                .eq(
-                    "id",
-                    editingId
-                )
-                .eq(
-                    "restaurant_id",
-                    restaurant.id
+                .select("id, restaurant_id, name, description, price, image_url, category, is_available, created_at")
+                .eq("restaurant_id", state.restaurant.id)
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.error("Menu query failed:", error);
+                setLoadingMessage("Unable to load menu items.");
+                showNotice(
+                    "Could not load the menu. Check the food_menu SELECT policy in Supabase. " +
+                    getErrorMessage(error),
+                    "error"
+                );
+                return;
+            }
+
+            state.foods = data || [];
+            renderFoods();
+        }
+
+        function updateStats() {
+            const total = state.foods.length;
+            const available = state.foods.filter(
+                food => food.is_available === true
+            ).length;
+
+            $("totalCount").textContent = total;
+            $("availableCount").textContent = available;
+            $("hiddenCount").textContent = total - available;
+        }
+
+        function renderFoods() {
+            updateStats();
+
+            const query = $("searchInput").value.trim().toLowerCase();
+            const category = $("categoryFilter").value;
+            const availability = $("availabilityFilter").value;
+
+            const filtered = state.foods.filter(food => {
+                const matchesSearch =
+                    String(food.name || "").toLowerCase().includes(query) ||
+                    String(food.description || "").toLowerCase().includes(query);
+
+                const matchesCategory =
+                    !category || food.category === category;
+
+                const matchesAvailability =
+                    !availability ||
+                    (availability === "available" && food.is_available === true) ||
+                    (availability === "hidden" && food.is_available !== true);
+
+                return matchesSearch && matchesCategory && matchesAvailability;
+            });
+
+            if (!filtered.length) {
+                const isEmpty = state.foods.length === 0;
+
+                $("menuGrid").innerHTML =
+                    '<div class="empty">' +
+                    '<div class="empty-icon">' + (isEmpty ? "🍛" : "🔎") + '</div>' +
+                    '<h3>' + (isEmpty ? "Your menu is empty" : "No matching dishes") + '</h3>' +
+                    '<p>' + (isEmpty
+                        ? "Add your first dish to start building your restaurant menu."
+                        : "Try another search or change the selected filters.") + '</p>' +
+                    (isEmpty
+                        ? '<button class="btn btn-primary" type="button" id="emptyAddBtn">+ Add your first food</button>'
+                        : '') +
+                    '</div>';
+
+                const emptyAddBtn = $("emptyAddBtn");
+                if (emptyAddBtn) emptyAddBtn.addEventListener("click", openAddModal);
+                return;
+            }
+
+            $("menuGrid").innerHTML = filtered.map(food => {
+                const available = food.is_available === true;
+                const image = food.image_url
+                    ? '<img src="' + escapeHtml(food.image_url) +
+                      '" alt="' + escapeHtml(food.name) +
+                      '" loading="lazy" referrerpolicy="no-referrer" ' +
+                      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\';">' +
+                      '<div class="image-placeholder" style="display:none">🍲</div>'
+                    : '<div class="image-placeholder">🍲</div>';
+
+                return `
+                    <article class="food-card">
+                        <div class="food-image">
+                            ${image}
+                            <span class="status ${available ? "" : "off"}">
+                                ${available ? "Available" : "Hidden"}
+                            </span>
+                        </div>
+                        <div class="food-body">
+                            <div class="food-category">
+                                ${escapeHtml(food.category || "Other")}
+                            </div>
+                            <h3 class="food-title">${escapeHtml(food.name)}</h3>
+                            <p class="food-description">${
+                                escapeHtml(food.description || "No description added.")
+                            }</p>
+                            <div class="food-bottom">
+                                <span class="food-price">${formatMoney(food.price)}</span>
+                            </div>
+                            <div class="food-actions">
+                                <button class="btn btn-light" type="button"
+                                    data-action="edit" data-id="${escapeHtml(food.id)}">
+                                    Edit
+                                </button>
+                                <button class="btn ${available ? "btn-danger" : "btn-green"}"
+                                    type="button" data-action="toggle"
+                                    data-id="${escapeHtml(food.id)}"
+                                    ${state.saving ? "disabled" : ""}>
+                                    ${available ? "Hide food" : "Show food"}
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join("");
+        }
+
+        function openModal() {
+            $("foodModal").classList.add("open");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+            if (state.saving) return;
+            $("foodModal").classList.remove("open");
+            document.body.style.overflow = "";
+            clearPreview();
+        }
+
+        function clearPreview() {
+            if (state.previewUrl) {
+                URL.revokeObjectURL(state.previewUrl);
+                state.previewUrl = null;
+            }
+
+            $("imagePreview").removeAttribute("src");
+            $("imagePreview").style.display = "none";
+        }
+
+        function resetForm() {
+            $("foodForm").reset();
+            $("foodAvailable").checked = true;
+            $("imagePreview").removeAttribute("src");
+            $("imagePreview").style.display = "none";
+            state.editingId = null;
+            $("modalTitle").textContent = "Add New Food";
+            $("saveFoodBtn").textContent = "Save Food";
+            $("foodImage").required = false;
+        }
+
+        function openAddModal() {
+            resetForm();
+            openModal();
+            $("foodName").focus();
+        }
+
+        function openEditModal(id) {
+            const food = state.foods.find(item => String(item.id) === String(id));
+            if (!food) {
+                showNotice("This menu item could not be found. Reload the menu and try again.", "error");
+                return;
+            }
+
+            resetForm();
+            state.editingId = food.id;
+
+            $("modalTitle").textContent = "Edit Food";
+            $("saveFoodBtn").textContent = "Save Changes";
+            $("foodName").value = food.name || "";
+            $("foodCategory").value = food.category || "";
+            $("foodPrice").value = food.price ?? "";
+            $("foodDescription").value = food.description || "";
+            $("foodAvailable").checked = food.is_available === true;
+
+            if (food.image_url) {
+                $("imagePreview").src = food.image_url;
+                $("imagePreview").style.display = "block";
+            }
+
+            openModal();
+            $("foodName").focus();
+        }
+
+        async function uploadImage(file) {
+            if (!file) return null;
+
+            const extension = MIME_EXTENSIONS[file.type];
+
+            if (!extension) {
+                throw new Error("Please choose a JPG, PNG or WebP image.");
+            }
+
+            if (file.size > MAX_IMAGE_BYTES) {
+                throw new Error("The image is too large. Maximum size is 5 MB.");
+            }
+
+            const safeName = Date.now() + "-" +
+                Math.random().toString(36).slice(2, 10) + "." + extension;
+
+            const path = state.user.id + "/" + safeName;
+
+            const { error: uploadError } = await state.client.storage
+                .from(IMAGE_BUCKET)
+                .upload(path, file, {
+                    contentType: file.type,
+                    upsert: false,
+                    cacheControl: "3600"
+                });
+
+            if (uploadError) throw uploadError;
+
+            const { data } = state.client.storage
+                .from(IMAGE_BUCKET)
+                .getPublicUrl(path);
+
+            if (!data?.publicUrl) {
+                // Best-effort cleanup if no usable URL is returned.
+                await state.client.storage.from(IMAGE_BUCKET).remove([path]);
+                throw new Error("The image was uploaded but its public URL could not be obtained.");
+            }
+
+            return { path, url: data.publicUrl };
+        }
+
+        async function removeUploadedImage(path) {
+            if (!path) return;
+
+            try {
+                const { error } = await state.client.storage
+                    .from(IMAGE_BUCKET)
+                    .remove([path]);
+
+                if (error) console.warn("Uploaded image cleanup failed:", error);
+            } catch (error) {
+                console.warn("Uploaded image cleanup failed:", error);
+            }
+        }
+
+        async function saveFood(event) {
+            event.preventDefault();
+
+            if (state.saving) return;
+
+            if (!state.user || !state.vendor || !state.restaurant) {
+                showNotice("Your vendor or restaurant information is not ready. Reload the page or complete your restaurant profile.", "error");
+                return;
+            }
+
+            const name = $("foodName").value.trim();
+            const category = $("foodCategory").value;
+            const price = Number($("foodPrice").value);
+            const description = $("foodDescription").value.trim();
+            const isAvailable = $("foodAvailable").checked;
+            const file = $("foodImage").files[0] || null;
+
+            if (!name) {
+                showNotice("Enter the food name.", "error");
+                $("foodName").focus();
+                return;
+            }
+
+            if (!category) {
+                showNotice("Choose a food category.", "error");
+                $("foodCategory").focus();
+                return;
+            }
+
+            if (!Number.isFinite(price) || price <= 0 || price > 100000000) {
+                showNotice("Enter a valid price greater than zero.", "error");
+                $("foodPrice").focus();
+                return;
+            }
+
+            if (description.length > 1000) {
+                showNotice("The description must not exceed 1000 characters.", "error");
+                return;
+            }
+
+            state.saving = true;
+            $("saveFoodBtn").disabled = true;
+            $("cancelBtn").disabled = true;
+            $("closeModalBtn").disabled = true;
+            $("saveFoodBtn").textContent = "Saving...";
+
+            let uploadedPath = null;
+
+            try {
+                let imageUrl = null;
+                let existingFood = null;
+
+                if (state.editingId !== null) {
+                    existingFood = state.foods.find(
+                        item => String(item.id) === String(state.editingId)
+                    );
+
+                    if (!existingFood) {
+                        throw new Error("This food item is no longer in the loaded menu. Reload and try again.");
+                    }
+
+                    if (String(existingFood.restaurant_id) !== String(state.restaurant.id)) {
+                        throw new Error("This food item does not belong to your restaurant.");
+                    }
+
+                    imageUrl = existingFood.image_url || null;
+                }
+
+                if (file) {
+                    const upload = await uploadImage(file);
+                    uploadedPath = upload.path;
+                    imageUrl = upload.url;
+                }
+
+                const payload = {
+                    restaurant_id: state.restaurant.id,
+                    name,
+                    description: description || null,
+                    price,
+                    category,
+                    image_url: imageUrl,
+                    is_available: isAvailable
+                };
+
+                let result;
+
+                if (state.editingId !== null) {
+                    result = await state.client
+                        .from("food_menu")
+                        .update(payload)
+                        .eq("id", state.editingId)
+                        .eq("restaurant_id", state.restaurant.id)
+                        .select("id")
+                        .maybeSingle();
+                } else {
+                    result = await state.client
+                        .from("food_menu")
+                        .insert(payload)
+                        .select("id")
+                        .single();
+                }
+
+                if (result.error) throw result.error;
+
+                if (!result.data) {
+                    throw new Error(
+                        "No menu item was returned after saving. Check the food_menu INSERT/UPDATE permissions in Supabase."
+                    );
+                }
+
+                showNotice(
+                    state.editingId !== null
+                        ? "Food details updated successfully."
+                        : "Food added to your menu successfully.",
+                    "success"
                 );
 
-            if (error) {
-                throw error;
-            }
-
-            message.textContent =
-                "Food updated successfully.";
-
-        }
-
-
-        /* =====================
-           INSERT
-        ===================== */
-
-        else {
-
-            const {
-                error
-            } = await db
-                .from("food_menu")
-                .insert(payload);
-
-            if (error) {
-                throw error;
-            }
-
-            message.textContent =
-                "Food added successfully.";
-
-        }
-
-
-        message.className =
-            "message success";
-
-
-        resetForm();
-
-        await loadMenu();
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        message.textContent =
-            error.message ||
-            "Something went wrong.";
-
-        message.className =
-            "message error";
-
-    }
-
-    finally {
-
-        saveBtn.disabled = false;
-
-    }
-
-}
-
-
-/* =========================
-   EDIT FOOD
-========================= */
-
-function editFood(id) {
-
-    const item =
-        menuItems.find(
-            food => food.id === id
-        );
-
-    if (!item) {
-        return;
-    }
-
-    document.getElementById(
-        "editingId"
-    ).value = item.id;
-
-    document.getElementById(
-        "foodName"
-    ).value =
-        item.name || "";
-
-    document.getElementById(
-        "foodDescription"
-    ).value =
-        item.description || "";
-
-    document.getElementById(
-        "foodPrice"
-    ).value =
-        item.price || "";
-
-    document.getElementById(
-        "foodCategory"
-    ).value =
-        item.category || "";
-
-    document.getElementById(
-        "formTitle"
-    ).textContent =
-        "Edit Food";
-
-    document.getElementById(
-        "saveBtn"
-    ).textContent =
-        "Update Food";
-
-    document.getElementById(
-        "cancelBtn"
-    ).style.display =
-        "inline-block";
-
-
-    const preview =
-        document.getElementById(
-            "imagePreview"
-        );
-
-    if (item.image_url) {
-
-        preview.src =
-            item.image_url;
-
-        preview.style.display =
-            "block";
-
-    } else {
-
-        preview.style.display =
-            "none";
-
-    }
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-}
-
-
-/* =========================
-   CANCEL EDIT
-========================= */
-
-function cancelEdit() {
-
-    resetForm();
-
-}
-
-
-/* =========================
-   RESET FORM
-========================= */
-
-function resetForm() {
-
-    document
-        .getElementById("foodForm")
-        .reset();
-
-    document.getElementById(
-        "editingId"
-    ).value = "";
-
-    document.getElementById(
-        "formTitle"
-    ).textContent =
-        "Add Food";
-
-    document.getElementById(
-        "saveBtn"
-    ).textContent =
-        "Add Food";
-
-    document.getElementById(
-        "cancelBtn"
-    ).style.display =
-        "none";
-
-    document.getElementById(
-        "imagePreview"
-    ).style.display =
-        "none";
-
-}
-
-
-/* =========================
-   IMAGE PREVIEW
-========================= */
-
-document.getElementById(
-    "foodImage"
-).addEventListener(
-    "change",
-    function () {
-
-        const file =
-            this.files[0];
-
-        const preview =
-            document.getElementById(
-                "imagePreview"
-            );
-
-        if (!file) {
-
-            preview.style.display =
-                "none";
-
-            return;
-
-        }
-
-        const reader =
-            new FileReader();
-
-        reader.onload =
-            function (event) {
-
-                preview.src =
-                    event.target.result;
-
-                preview.style.display =
-                    "block";
-
-            };
-
-        reader.readAsDataURL(file);
-
-    }
-);
-
-
-/* =========================
-   TOGGLE AVAILABILITY
-========================= */
-
-async function toggleAvailability(
-    id,
-    currentlyAvailable
-) {
-
-    const {
-        error
-    } = await db
-        .from("food_menu")
-        .update({
-            is_available:
-                !currentlyAvailable
-        })
-        .eq("id", id)
-        .eq(
-            "restaurant_id",
-            restaurant.id
-        );
-
-    if (error) {
-
-        alert(error.message);
-
-        return;
-
-    }
-
-    await loadMenu();
-
-}
-
-
-/* =========================
-   DELETE FOOD
-========================= */
-
-async function deleteFood(id) {
-
-    const item =
-        menuItems.find(
-            food => food.id === id
-        );
-
-    if (!item) {
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            `Delete "${item.name}"?`
-        );
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    const {
-        error
-    } = await db
-        .from("food_menu")
-        .delete()
-        .eq("id", id)
-        .eq(
-            "restaurant_id",
-            restaurant.id
-        );
-
-
-    if (error) {
-
-        alert(error.message);
-
-        return;
-
-    }
-
-
-    await loadMenu();
-
-}
-
-
-/* =========================
-   HELPERS
-========================= */
-
-function money(value) {
-
-    return "TSh " +
-        Number(value || 0)
-            .toLocaleString(
-                "en-TZ",
-                {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
+                state.saving = false;
+                $("foodModal").classList.remove("open");
+                document.body.style.overflow = "";
+                resetForm();
+
+                await loadFoods();
+            } catch (error) {
+                console.error("Saving food failed:", error);
+
+                if (uploadedPath) {
+                    await removeUploadedImage(uploadedPath);
                 }
+
+                showNotice(
+                    "Could not save the food. " + getErrorMessage(error),
+                    "error"
+                );
+            } finally {
+                state.saving = false;
+                $("saveFoodBtn").disabled = false;
+                $("cancelBtn").disabled = false;
+                $("closeModalBtn").disabled = false;
+                $("saveFoodBtn").textContent =
+                    state.editingId !== null ? "Save Changes" : "Save Food";
+            }
+        }
+
+        async function toggleAvailability(id) {
+            if (state.saving) return;
+
+            const food = state.foods.find(
+                item => String(item.id) === String(id)
             );
 
-}
+            if (!food || !state.restaurant) {
+                showNotice("The selected food could not be found.", "error");
+                return;
+            }
 
+            if (String(food.restaurant_id) !== String(state.restaurant.id)) {
+                showNotice("You cannot modify food belonging to another restaurant.", "error");
+                return;
+            }
 
-function escapeHtml(value) {
+            const nextValue = food.is_available !== true;
+            const actionText = nextValue ? "show this food to customers" : "hide this food from customers";
 
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+            if (!window.confirm("Do you want to " + actionText + "?")) {
+                return;
+            }
 
-}
+            state.saving = true;
+            renderFoods();
 
+            try {
+                const { data, error } = await state.client
+                    .from("food_menu")
+                    .update({ is_available: nextValue })
+                    .eq("id", food.id)
+                    .eq("restaurant_id", state.restaurant.id)
+                    .select("id")
+                    .maybeSingle();
 
-/* =========================
-   INIT
-========================= */
+                if (error) throw error;
 
-async function init() {
+                if (!data) {
+                    throw new Error("The change was not confirmed. Check the food_menu UPDATE policy in Supabase.");
+                }
 
-    const authenticated =
-        await checkAuth();
+                food.is_available = nextValue;
+                renderFoods();
 
-    if (!authenticated) {
-        return;
-    }
+                showNotice(
+                    nextValue
+                        ? "Food is now available to customers."
+                        : "Food is hidden from the menu. Its record has not been deleted.",
+                    "success"
+                );
+            } catch (error) {
+                console.error("Availability update failed:", error);
+                showNotice("Could not update food availability. " + getErrorMessage(error), "error");
+                await loadFoods();
+            } finally {
+                state.saving = false;
+                renderFoods();
+            }
+        }
 
+        $("addFoodBtn").addEventListener("click", openAddModal);
+        $("closeModalBtn").addEventListener("click", closeModal);
+        $("cancelBtn").addEventListener("click", closeModal);
+        $("foodForm").addEventListener("submit", saveFood);
 
-    const vendorLoaded =
-        await loadVendor();
+        $("searchInput").addEventListener("input", renderFoods);
+        $("categoryFilter").addEventListener("change", renderFoods);
+        $("availabilityFilter").addEventListener("change", renderFoods);
 
-    if (!vendorLoaded) {
-        return;
-    }
+        $("foodImage").addEventListener("change", () => {
+            clearPreview();
 
+            const file = $("foodImage").files[0];
+            if (!file) return;
 
-    const restaurantLoaded =
-        await loadRestaurant();
+            if (!MIME_EXTENSIONS[file.type]) {
+                $("foodImage").value = "";
+                showNotice("Choose a JPG, PNG or WebP image.", "error");
+                return;
+            }
 
-    if (!restaurantLoaded) {
-        return;
-    }
+            if (file.size > MAX_IMAGE_BYTES) {
+                $("foodImage").value = "";
+                showNotice("The image is too large. Maximum size is 5 MB.", "error");
+                return;
+            }
 
+            state.previewUrl = URL.createObjectURL(file);
+            $("imagePreview").src = state.previewUrl;
+            $("imagePreview").style.display = "block";
+        });
 
-    await loadMenu();
+        $("menuGrid").addEventListener("click", event => {
+            const button = event.target.closest("button[data-action]");
+            if (!button) return;
 
-}
+            const id = button.dataset.id;
 
+            if (button.dataset.action === "edit") {
+                openEditModal(id);
+            } else if (button.dataset.action === "toggle") {
+                toggleAvailability(id);
+            }
+        });
 
-init();
+        $("foodModal").addEventListener("click", event => {
+            if (event.target === $("foodModal")) closeModal();
+        });
 
-</script>
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape" && $("foodModal").classList.contains("open")) {
+                closeModal();
+            }
+        });
 
+        $("logoutBtn").addEventListener("click", async () => {
+            if (!state.client) {
+                window.location.replace("vendor-login.html");
+                return;
+            }
+
+            $("logoutBtn").disabled = true;
+
+            try {
+                const { error } = await state.client.auth.signOut();
+                if (error) throw error;
+                window.location.replace("vendor-login.html");
+            } catch (error) {
+                console.error("Sign out failed:", error);
+                showNotice("Could not sign out. " + getErrorMessage(error), "error");
+                $("logoutBtn").disabled = false;
+            }
+        });
+
+        initialize();
+    })();
+    </script>
 </body>
 </html>

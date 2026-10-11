@@ -1,3076 +1,1078 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Admin Dashboard | Food Platform</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f6f8;
-            color: #222;
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 235px;
-            background: #111827;
-            color: white;
-            padding: 20px 14px;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            padding: 8px 10px 22px;
-        }
-
-        .nav-item {
-            display: block;
-            width: 100%;
-            padding: 12px 14px;
-            margin-bottom: 5px;
-            color: #d1d5db;
-            text-decoration: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .nav-item:hover,
-        .nav-item.active {
-            background: #f97316;
-            color: white;
-        }
-
-        .logout {
-            margin-top: 20px;
-            color: #fca5a5;
-        }
-
-        .main {
-            margin-left: 235px;
-            padding: 20px;
-        }
-
-        .topbar {
-            background: white;
-            border-radius: 12px;
-            padding: 15px 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,.05);
-        }
-
-        .topbar h1 {
-            font-size: 21px;
-        }
-
-        .admin-info {
-            font-size: 14px;
-            color: #555;
-        }
-
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 17px;
-            box-shadow: 0 2px 8px rgba(0,0,0,.05);
-        }
-
-        .stat-label {
-            color: #6b7280;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .orange {
-            color: #f97316;
-        }
-
-        .green {
-            color: #16a34a;
-        }
-
-        .red {
-            color: #dc2626;
-        }
-
-        .blue {
-            color: #2563eb;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,.05);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .card-title {
-            font-size: 17px;
-            font-weight: bold;
-        }
-
-        .settings-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        input,
-        select {
-            border: 1px solid #ddd;
-            border-radius: 7px;
-            padding: 9px 11px;
-            background: white;
-            outline: none;
-        }
-
-        input:focus,
-        select:focus {
-            border-color: #f97316;
-        }
-
-        button {
-            border: none;
-            border-radius: 7px;
-            padding: 9px 14px;
-            cursor: pointer;
-            background: #f97316;
-            color: white;
-            font-weight: bold;
-        }
-
-        button:hover {
-            opacity: .9;
-        }
-
-        .secondary {
-            background: #374151;
-        }
-
-        .danger {
-            background: #dc2626;
-        }
-
-        .success {
-            background: #16a34a;
-        }
-
-        .table-wrap {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 11px 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 13px;
-            white-space: nowrap;
-        }
-
-        th {
-            background: #f9fafb;
-            font-weight: bold;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 9px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: #fff7ed;
-            color: #c2410c;
-        }
-
-        .status-confirmed {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-
-        .status-preparing {
-            background: #fefce8;
-            color: #a16207;
-        }
-
-        .status-ready {
-            background: #f0fdf4;
-            color: #15803d;
-        }
-
-        .status-cancelled {
-            background: #fef2f2;
-            color: #b91c1c;
-        }
-
-        .empty {
-            padding: 25px;
-            text-align: center;
-            color: #777;
-        }
-
-        .message {
-            padding: 10px;
-            border-radius: 7px;
-            margin-bottom: 12px;
-            display: none;
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .message.error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .message.success-msg {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .vendor-name {
-            font-weight: bold;
-        }
-
-        .commission-total {
-            font-weight: bold;
-            color: #f97316;
-        }
-
-        .money {
-            font-weight: bold;
-        }
-
-        .summary-box {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .summary-item {
-            background: #f9fafb;
-            padding: 14px;
-            border-radius: 9px;
-        }
-
-        .summary-item span {
-            display: block;
-            color: #6b7280;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-
-        .summary-item strong {
-            font-size: 19px;
-        }
-
-        .business-small {
-            font-size: 11px;
-            color: #777;
-            margin-top: 3px;
-        }
-
-        @media (max-width: 1000px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 700px) {
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                bottom: auto;
-                position: relative;
-            }
-
-            .main {
-                margin-left: 0;
-                padding: 12px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .summary-box {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                align-items: flex-start;
-                gap: 10px;
-                flex-direction: column;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | Food Platform</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="./language.js" defer></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f5f6f8;color:#222}
+button,input,select{font:inherit}
+button{border:0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f97316;color:white;font-weight:bold}
+button:hover{opacity:.9}
+button:disabled{opacity:.5;cursor:not-allowed}
+.secondary{background:#374151}
+.danger{background:#dc2626}
+.success{background:#16a34a}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:235px;background:#111827;color:white;padding:20px 14px;z-index:100}
+.logo{font-size:20px;font-weight:bold;padding:8px 10px 22px}
+.nav-item{display:block;width:100%;padding:12px 14px;margin-bottom:5px;color:#d1d5db;text-decoration:none;border-radius:8px;cursor:pointer}
+.nav-item:hover,.nav-item.active{background:#f97316;color:white}
+.logout{margin-top:20px;color:#fca5a5}
+.main{margin-left:235px;padding:20px}
+.topbar{background:white;border-radius:12px;padding:15px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;box-shadow:0 2px 8px #0000000d}
+.topbar h1{font-size:21px}
+.admin-info{font-size:14px;color:#555}
+.section{display:none}
+.section.active{display:block}
+.section-title{font-size:20px;margin-bottom:15px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card,.card{background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px #0000000d}
+.stat-card{padding:17px}
+.stat-label{color:#6b7280;font-size:13px;margin-bottom:8px}
+.stat-value{font-size:24px;font-weight:bold}
+.orange{color:#f97316}.green{color:#16a34a}.red{color:#dc2626}.blue{color:#2563eb}
+.card{margin-bottom:20px}
+.card-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+.card-title{font-size:17px;font-weight:bold}
+.settings-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+input,select{border:1px solid #ddd;border-radius:7px;padding:9px 11px;background:white;outline:none}
+input:focus,select:focus{border-color:#f97316}
+.table-wrap{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th,td{text-align:left;padding:11px 10px;border-bottom:1px solid #eee;font-size:13px;white-space:nowrap}
+th{background:#f9fafb;font-weight:bold}
+.status{display:inline-block;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold}
+.status-pending{background:#fff7ed;color:#c2410c}
+.status-confirmed{background:#eff6ff;color:#1d4ed8}
+.status-preparing{background:#fefce8;color:#a16207}
+.status-ready,.status-approved{background:#dcfce7;color:#166534}
+.status-cancelled{background:#fef2f2;color:#b91c1c}
+.empty{padding:25px;text-align:center;color:#777}
+.message{padding:10px;border-radius:7px;margin-bottom:12px;display:none;overflow-wrap:anywhere}
+.message.show{display:block}
+.message.error{background:#fee2e2;color:#991b1b}
+.message.success-msg{background:#dcfce7;color:#166534}
+.vendor-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.vendor-actions button{padding:7px 10px;font-size:12px}
+.vendor-restaurant{display:flex;flex-direction:column;gap:8px;min-width:190px;white-space:normal}
+.vendor-restaurant select{width:100%;min-width:180px}
+.vendor-restaurant button{align-self:flex-start;font-size:12px}
+.summary-box{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.summary-item{background:#f9fafb;padding:14px;border-radius:9px}
+.summary-item span{display:block;color:#6b7280;font-size:12px;margin-bottom:5px}
+.summary-item strong{font-size:19px}
+.vendor-name,.money{font-weight:bold}
+.commission-total{font-weight:bold;color:#f97316}
+.business-small{font-size:11px;color:#777;margin-top:3px}
+@media(max-width:1000px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){
+.sidebar{width:100%;height:auto;position:relative}
+.main{margin-left:0;padding:12px}
+.stats-grid{grid-template-columns:1fr 1fr}
+.summary-box{grid-template-columns:1fr}
+.topbar{align-items:flex-start;gap:10px;flex-direction:column}
+}
+</style>
 </head>
 
 <body>
-
 <aside class="sidebar">
-
-    <div class="logo">
-        Food Platform
-    </div>
-
-    <a class="nav-item active" data-section="dashboard">
-        Dashboard
-    </a>
-
-    <a class="nav-item" data-section="orders">
-        Orders
-    </a>
-
-    <a class="nav-item" data-section="commission">
-        Commission
-    </a>
-
-    <a class="nav-item" data-section="restaurants">
-        Restaurants
-    </a>
-
-    <a class="nav-item" data-section="vendors">
-        Vendors
-    </a>
-
-    <a class="nav-item" href="index.html">
-        View Platform
-    </a>
-
-    <a class="nav-item logout" id="logoutBtn">
-        Logout
-    </a>
-
+    <div class="logo">Food Platform</div>
+    <a class="nav-item active" data-section="dashboard">Dashboard</a>
+    <a class="nav-item" data-section="orders">Orders</a>
+    <a class="nav-item" data-section="commission">Commission</a>
+    <a class="nav-item" data-section="restaurants">Restaurants</a>
+    <a class="nav-item" data-section="vendors">Vendors</a>
+    <a class="nav-item" href="index.html">View Platform</a>
+    <a class="nav-item logout" id="logoutBtn">Logout</a>
 </aside>
 
-
 <main class="main">
-
     <div class="topbar">
-
-        <h1>
-            Admin Dashboard
-        </h1>
-
-        <div
-            class="admin-info"
-            id="adminInfo"
-        >
-            Loading admin...
-        </div>
-
+        <h1>Admin Dashboard</h1>
+        <div class="admin-info" id="adminInfo">Loading admin...</div>
     </div>
 
+    <div id="globalMessage" class="message" role="status"></div>
 
-    <div
-        id="globalMessage"
-        class="message"
-    ></div>
-
-
-    <!-- ================= DASHBOARD ================= -->
-
-    <section
-        id="dashboard"
-        class="section active"
-    >
-
-        <h2 class="section-title">
-            Overview
-        </h2>
-
-
+    <section id="dashboard" class="section active">
+        <h2 class="section-title">Overview</h2>
         <div class="stats-grid">
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Customers
-                </div>
-
-                <div
-                    class="stat-value blue"
-                    id="customersCount"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Vendors
-                </div>
-
-                <div
-                    class="stat-value orange"
-                    id="vendorsCount"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Restaurants
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="restaurantsCount"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Orders
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="ordersCount"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Total Sales
-                </div>
-
-                <div
-                    class="stat-value green"
-                    id="totalSales"
-                >
-                    TSh 0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Pending
-                </div>
-
-                <div
-                    class="stat-value orange"
-                    id="pendingCount"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Preparing
-                </div>
-
-                <div
-                    class="stat-value blue"
-                    id="preparingCount"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Ready
-                </div>
-
-                <div
-                    class="stat-value green"
-                    id="readyCount"
-                >
-                    0
-                </div>
-
-            </div>
-
+            <div class="stat-card"><div class="stat-label">Customers</div><div class="stat-value blue" id="customersCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Vendors</div><div class="stat-value orange" id="vendorsCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Restaurants</div><div class="stat-value" id="restaurantsCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Orders</div><div class="stat-value" id="ordersCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Sales</div><div class="stat-value green" id="totalSales">TSh 0</div></div>
+            <div class="stat-card"><div class="stat-label">Pending Orders</div><div class="stat-value orange" id="pendingCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Preparing</div><div class="stat-value blue" id="preparingCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Ready</div><div class="stat-value green" id="readyCount">0</div></div>
         </div>
 
-
         <div class="card">
-
             <div class="card-header">
-
-                <div class="card-title">
-                    Commission Summary
-                </div>
-
-                <button
-                    onclick="showSection('commission')"
-                >
-                    View Vendor Commission
-                </button>
-
+                <div class="card-title">Commission Summary</div>
+                <button type="button" onclick="showSection('commission')">View Vendor Commission</button>
             </div>
-
-
             <div class="summary-box">
-
-                <div class="summary-item">
-
-                    <span>
-                        Commission Rate
-                    </span>
-
-                    <strong
-                        id="dashboardCommissionRate"
-                    >
-                        10%
-                    </strong>
-
-                </div>
-
-
-                <div class="summary-item">
-
-                    <span>
-                        Total Commission Earned
-                    </span>
-
-                    <strong
-                        class="orange"
-                        id="dashboardCommission"
-                    >
-                        TSh 0
-                    </strong>
-
-                </div>
-
-
-                <div class="summary-item">
-
-                    <span>
-                        Total Vendor Earnings
-                    </span>
-
-                    <strong
-                        class="green"
-                        id="dashboardVendorEarnings"
-                    >
-                        TSh 0
-                    </strong>
-
-                </div>
-
+                <div class="summary-item"><span>Commission Rate</span><strong id="dashboardCommissionRate">10%</strong></div>
+                <div class="summary-item"><span>Total Commission Earned</span><strong class="orange" id="dashboardCommission">TSh 0</strong></div>
+                <div class="summary-item"><span>Total Vendor Earnings</span><strong class="green" id="dashboardVendorEarnings">TSh 0</strong></div>
             </div>
-
         </div>
-
     </section>
 
-
-    <!-- ================= ORDERS ================= -->
-
-    <section
-        id="orders"
-        class="section"
-    >
-
-        <h2 class="section-title">
-            Orders
-        </h2>
-
-
+    <section id="orders" class="section">
+        <h2 class="section-title">Orders</h2>
         <div class="card">
-
             <div class="card-header">
-
-                <div class="card-title">
-                    All Orders
-                </div>
-
-
+                <div class="card-title">All Orders</div>
                 <div class="settings-row">
-
-                    <input
-                        type="text"
-                        id="orderSearch"
-                        placeholder="Search order..."
-                    >
-
-
-                    <select
-                        id="orderStatusFilter"
-                    >
-
-                        <option value="">
-                            All Status
-                        </option>
-
-                        <option value="Pending">
-                            Pending
-                        </option>
-
-                        <option value="Confirmed">
-                            Confirmed
-                        </option>
-
-                        <option value="Preparing">
-                            Preparing
-                        </option>
-
-                        <option value="Ready">
-                            Ready
-                        </option>
-
-                        <option value="Cancelled">
-                            Cancelled
-                        </option>
-
+                    <input type="text" id="orderSearch" placeholder="Search order...">
+                    <select id="orderStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Ready">Ready</option>
+                        <option value="Cancelled">Cancelled</option>
                     </select>
-
                 </div>
-
             </div>
-
-
-            <div class="table-wrap">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Order
-                            </th>
-
-                            <th>
-                                Customer
-                            </th>
-
-                            <th>
-                                Restaurant
-                            </th>
-
-                            <th>
-                                Total
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Date
-                            </th>
-
-                            <th>
-                                Action
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="ordersTable"
-                    >
-
-                        <tr>
-
-                            <td
-                                colspan="7"
-                                class="empty"
-                            >
-                                Loading orders...
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
+            <div class="table-wrap"><table>
+                <thead><tr><th>Order</th><th>Customer</th><th>Restaurant</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+                <tbody id="ordersTable"><tr><td colspan="7" class="empty">Loading orders...</td></tr></tbody>
+            </table></div>
         </div>
-
     </section>
 
-
-    <!-- ================= COMMISSION ================= -->
-
-    <section
-        id="commission"
-        class="section"
-    >
-
-        <h2 class="section-title">
-            Commission
-        </h2>
-
-
-        <!-- SETTINGS -->
-
+    <section id="commission" class="section">
+        <h2 class="section-title">Commission</h2>
         <div class="card">
-
-            <div class="card-header">
-
-                <div class="card-title">
-                    Commission Settings
-                </div>
-
-            </div>
-
-
+            <div class="card-header"><div class="card-title">Commission Settings</div></div>
             <div class="settings-row">
-
-                <label>
-                    Commission Rate (%)
-                </label>
-
-
-                <input
-                    type="number"
-                    id="commissionRate"
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    value="10"
-                >
-
-
-                <button
-                    id="saveCommissionBtn"
-                >
-                    Save Rate
-                </button>
-
+                <label for="commissionRate">Commission Rate (%)</label>
+                <input type="number" id="commissionRate" min="0" max="100" step="0.01" value="10">
+                <button type="button" id="saveCommissionBtn">Save Rate</button>
             </div>
-
         </div>
-
-
-        <!-- TOTALS -->
-
         <div class="stats-grid">
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Commission Rate
-                </div>
-
-                <div
-                    class="stat-value orange"
-                    id="commissionRateDisplay"
-                >
-                    10%
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Total Platform Commission
-                </div>
-
-                <div
-                    class="stat-value orange"
-                    id="totalCommissionDisplay"
-                >
-                    TSh 0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Total Vendor Earnings
-                </div>
-
-                <div
-                    class="stat-value green"
-                    id="totalVendorEarningsDisplay"
-                >
-                    TSh 0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    Commission Orders
-                </div>
-
-                <div
-                    class="stat-value blue"
-                    id="commissionOrdersDisplay"
-                >
-                    0
-                </div>
-
-            </div>
-
+            <div class="stat-card"><div class="stat-label">Commission Rate</div><div class="stat-value orange" id="commissionRateDisplay">10%</div></div>
+            <div class="stat-card"><div class="stat-label">Total Platform Commission</div><div class="stat-value orange" id="totalCommissionDisplay">TSh 0</div></div>
+            <div class="stat-card"><div class="stat-label">Total Vendor Earnings</div><div class="stat-value green" id="totalVendorEarningsDisplay">TSh 0</div></div>
+            <div class="stat-card"><div class="stat-label">Commission Orders</div><div class="stat-value blue" id="commissionOrdersDisplay">0</div></div>
         </div>
-
-
-        <!-- PER VENDOR -->
-
         <div class="card">
+            <div class="card-header"><div class="card-title">Commission Per Vendor</div><button type="button" class="secondary" id="refreshVendorCommissionBtn">Refresh</button></div>
+            <div class="table-wrap"><table>
+                <thead><tr><th>Vendor</th><th>Restaurant</th><th>Orders</th><th>Total Sales</th><th>Commission</th><th>Vendor Earnings</th></tr></thead>
+                <tbody id="vendorCommissionTable"><tr><td colspan="6" class="empty">Loading vendor commissions...</td></tr></tbody>
+            </table></div>
+        </div>
+        <div class="card">
+            <div class="card-header"><div class="card-title">Commission Records</div></div>
+            <div class="table-wrap"><table>
+                <thead><tr><th>Order</th><th>Vendor</th><th>Total</th><th>Rate</th><th>Commission</th><th>Vendor Earnings</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody id="commissionTable"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
+            </table></div>
+        </div>
+    </section>
 
+    <section id="restaurants" class="section">
+        <h2 class="section-title">Restaurants</h2>
+        <div class="card">
             <div class="card-header">
-
-                <div class="card-title">
-                    Commission Per Vendor
-                </div>
-
-
-                <button
-                    class="secondary"
-                    id="refreshVendorCommissionBtn"
-                >
-                    Refresh
-                </button>
-
+                <div class="card-title">Restaurants List</div>
+                <button type="button" onclick="loadRestaurants()">Refresh Restaurants</button>
             </div>
-
-
-            <div class="table-wrap">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Vendor
-                            </th>
-
-                            <th>
-                                Restaurant
-                            </th>
-
-                            <th>
-                                Orders
-                            </th>
-
-                            <th>
-                                Total Sales
-                            </th>
-
-                            <th>
-                                Commission
-                            </th>
-
-                            <th>
-                                Vendor Earnings
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="vendorCommissionTable"
-                    >
-
-                        <tr>
-
-                            <td
-                                colspan="6"
-                                class="empty"
-                            >
-                                Loading vendor commissions...
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
+            <div class="table-wrap"><table>
+                <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Rating</th><th>Status</th></tr></thead>
+                <tbody id="restaurantsTable"><tr><td colspan="5" class="empty">Loading restaurants...</td></tr></tbody>
+            </table></div>
         </div>
+    </section>
 
-
-        <!-- COMMISSION RECORDS -->
-
+    <section id="vendors" class="section">
+        <h2 class="section-title">Vendors</h2>
         <div class="card">
-
             <div class="card-header">
-
-                <div class="card-title">
-                    Commission Records
-                </div>
-
+                <div class="card-title">Manage Vendors</div>
+                <button type="button" onclick="refreshVendors()">Refresh Vendors</button>
             </div>
-
-
-            <div class="table-wrap">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Order
-                            </th>
-
-                            <th>
-                                Vendor
-                            </th>
-
-                            <th>
-                                Total
-                            </th>
-
-                            <th>
-                                Rate
-                            </th>
-
-                            <th>
-                                Commission
-                            </th>
-
-                            <th>
-                                Vendor Earnings
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Date
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="commissionTable"
-                    >
-
-                        <tr>
-
-                            <td
-                                colspan="8"
-                                class="empty"
-                            >
-                                Loading...
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
+            <div class="table-wrap"><table>
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Business</th><th>Phone</th><th>Email</th>
+                        <th>Status</th><th>Assign Restaurant</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vendorsTable"><tr><td colspan="7" class="empty">Loading vendors...</td></tr></tbody>
+            </table></div>
         </div>
-
     </section>
-
-
-    <!-- ================= RESTAURANTS ================= -->
-
-    <section
-        id="restaurants"
-        class="section"
-    >
-
-        <h2 class="section-title">
-            Restaurants
-        </h2>
-
-
-        <div class="card">
-
-            <div class="table-wrap">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Name
-                            </th>
-
-                            <th>
-                                Phone
-                            </th>
-
-                            <th>
-                                Address
-                            </th>
-
-                            <th>
-                                Rating
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="restaurantsTable"
-                    >
-
-                        <tr>
-
-                            <td
-                                colspan="5"
-                                class="empty"
-                            >
-                                Loading restaurants...
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ================= VENDORS ================= -->
-
-    <section
-        id="vendors"
-        class="section"
-    >
-
-        <h2 class="section-title">
-            Vendors
-        </h2>
-
-
-        <div class="card">
-
-            <div class="table-wrap">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Name
-                            </th>
-
-                            <th>
-                                Business
-                            </th>
-
-                            <th>
-                                Phone
-                            </th>
-
-                            <th>
-                                Email
-                            </th>
-
-                            <th>
-                                Restaurant ID
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody
-                        id="vendorsTable"
-                    >
-
-                        <tr>
-
-                            <td
-                                colspan="5"
-                                class="empty"
-                            >
-                                Loading vendors...
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </section>
-
 </main>
 
-
 <script>
-
-/* =====================================================
-   GLOBAL VARIABLES
-===================================================== */
+"use strict";
 
 let adminUser = null;
-
 let restaurants = [];
 let vendors = [];
 let orders = [];
 let commissions = [];
-
 let commissionRateValue = 10;
-
-
-/* =====================================================
-   HELPERS
-===================================================== */
+let messageTimer = null;
+let ordersRealtimeChannel = null;
+let realtimeRefreshTimer = null;
 
 function money(value) {
-
-    return "TSh " +
-        Number(value || 0).toLocaleString(
-            "en-TZ",
-            {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }
-        );
-
+    const amount = Number(value ?? 0);
+    return "TSh " + (Number.isFinite(amount) ? amount : 0)
+        .toLocaleString("en-TZ", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
 }
 
-
 function escapeHtml(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
-
+    if (value === null || value === undefined) return "";
     return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
 
+function showMessage(message, type = "success-msg") {
+    const box = document.getElementById("globalMessage");
+    if (!box) return;
 
-function showMessage(
-    message,
-    type = "success-msg"
-) {
+    box.textContent = String(message || "");
+    box.className = "message show " + type;
 
-    const box =
-        document.getElementById(
-            "globalMessage"
-        );
+    if (messageTimer) clearTimeout(messageTimer);
 
-    box.textContent = message;
-
-    box.className =
-        "message show " + type;
-
-
-    setTimeout(() => {
-
-        box.className =
-            "message";
-
-    }, 3500);
-
+    messageTimer = setTimeout(() => {
+        box.className = "message";
+    }, 5000);
 }
-
 
 function statusClass(status) {
-
-    const value =
-        String(status || "")
-        .toLowerCase();
-
-
-    if (value === "pending") {
-        return "status-pending";
+    switch (String(status || "").toLowerCase()) {
+        case "pending": return "status-pending";
+        case "confirmed": return "status-confirmed";
+        case "preparing": return "status-preparing";
+        case "ready": return "status-ready";
+        case "cancelled": return "status-cancelled";
+        case "approved": return "status-approved";
+        default: return "status-pending";
     }
-
-
-    if (value === "confirmed") {
-        return "status-confirmed";
-    }
-
-
-    if (value === "preparing") {
-        return "status-preparing";
-    }
-
-
-    if (value === "ready") {
-        return "status-ready";
-    }
-
-
-    if (value === "cancelled") {
-        return "status-cancelled";
-    }
-
-
-    return "status-pending";
-
 }
 
+function showTableError(tbodyId, colspan, message) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
 
-/* =====================================================
-   NAVIGATION
-===================================================== */
+    tbody.innerHTML =
+        `<tr><td colspan="${colspan}" class="empty">${escapeHtml(message)}</td></tr>`;
+}
 
 function showSection(sectionId) {
-
-    document
-        .querySelectorAll(".section")
-        .forEach(section => {
-
-            section.classList.remove(
-                "active"
-            );
-
-        });
-
-
-    document
-        .querySelectorAll(
-            ".nav-item[data-section]"
-        )
-        .forEach(item => {
-
-            item.classList.remove(
-                "active"
-            );
-
-        });
-
-
-    const section =
-        document.getElementById(
-            sectionId
-        );
-
-
-    if (section) {
-
-        section.classList.add(
-            "active"
-        );
-
-    }
-
-
-    const nav =
-        document.querySelector(
-            '.nav-item[data-section="' +
-            sectionId +
-            '"]'
-        );
-
-
-    if (nav) {
-
-        nav.classList.add(
-            "active"
-        );
-
-    }
-
-}
-
-
-document
-    .querySelectorAll(
-        ".nav-item[data-section]"
-    )
-    .forEach(item => {
-
-        item.addEventListener(
-            "click",
-            () => {
-
-                showSection(
-                    item.dataset.section
-                );
-
-            }
-        );
-
+    document.querySelectorAll(".section").forEach(section => {
+        section.classList.toggle("active", section.id === sectionId);
     });
 
+    document.querySelectorAll(".nav-item[data-section]").forEach(item => {
+        item.classList.toggle("active", item.dataset.section === sectionId);
+    });
+}
 
-/* =====================================================
-   ADMIN CHECK
-===================================================== */
+document.querySelectorAll(".nav-item[data-section]").forEach(item => {
+    item.addEventListener("click", () => showSection(item.dataset.section));
+});
 
+/* ADMIN AUTHENTICATION */
 async function checkAdmin() {
-
-    const {
-        data: {
-            user
-        },
-        error
-    } = await db.auth.getUser();
-
-
-    if (
-        error ||
-        !user
-    ) {
-
-        window.location.href =
-            "admin-login.html";
-
+    if (!window.db || !db.auth) {
+        showMessage("Supabase haijaanzishwa. Kagua supabase.js.", "error");
         return false;
-
     }
 
-
-    const {
-        data: admin,
-        error: adminError
-    } = await db
-        .from("food_admins")
-        .select(
-            "id, full_name, email"
-        )
-        .eq(
-            "id",
-            user.id
-        )
-        .maybeSingle();
-
-
-    if (
-        adminError ||
-        !admin
-    ) {
-
-        await db.auth.signOut();
-
-        window.location.href =
-            "admin-login.html";
-
-        return false;
-
-    }
-
-
-    adminUser = user;
-
-
-    document
-        .getElementById(
-            "adminInfo"
-        )
-        .textContent =
-            admin.full_name ||
-            admin.email ||
-            user.email;
-
-
-    return true;
-
-}
-
-
-/* =====================================================
-   COMMISSION SETTINGS
-===================================================== */
-
-async function loadCommissionSettings() {
-
-    const {
-        data,
-        error
-    } = await db
-        .from(
-            "food_commission_settings"
-        )
-        .select("*")
-        .order(
-            "id",
-            {
-                ascending: false
-            }
-        )
-        .limit(1)
-        .maybeSingle();
-
-
-    if (error) {
-
-        console.error(
-            "Commission settings:",
-            error
-        );
-
-        return;
-
-    }
-
-
-    if (data) {
-
-        commissionRateValue =
-            Number(
-                data.commission_rate ||
-                10
-            );
-
-    }
-
-
-    document
-        .getElementById(
-            "commissionRate"
-        )
-        .value =
-            commissionRateValue;
-
-
-    document
-        .getElementById(
-            "commissionRateDisplay"
-        )
-        .textContent =
-            commissionRateValue +
-            "%";
-
-
-    document
-        .getElementById(
-            "dashboardCommissionRate"
-        )
-        .textContent =
-            commissionRateValue +
-            "%";
-
-}
-
-
-document
-    .getElementById(
-        "saveCommissionBtn"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            const rate =
-                Number(
-                    document
-                        .getElementById(
-                            "commissionRate"
-                        )
-                        .value
-                );
-
-
-            if (
-                Number.isNaN(rate) ||
-                rate < 0 ||
-                rate > 100
-            ) {
-
-                showMessage(
-                    "Commission rate must be between 0 and 100.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            const {
-                data: existing,
-                error: existingError
-            } = await db
-                .from(
-                    "food_commission_settings"
-                )
-                .select("id")
-                .order(
-                    "id",
-                    {
-                        ascending: false
-                    }
-                )
-                .limit(1)
-                .maybeSingle();
-
-
-            if (existingError) {
-
-                showMessage(
-                    existingError.message,
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            let result;
-
-
-            if (existing) {
-
-                result =
-                    await db
-                        .from(
-                            "food_commission_settings"
-                        )
-                        .update({
-
-                            commission_rate:
-                                rate,
-
-                            updated_at:
-                                new Date()
-                                .toISOString()
-
-                        })
-                        .eq(
-                            "id",
-                            existing.id
-                        );
-
-            } else {
-
-                result =
-                    await db
-                        .from(
-                            "food_commission_settings"
-                        )
-                        .insert({
-
-                            commission_rate:
-                                rate
-
-                        });
-
-            }
-
-
-            if (result.error) {
-
-                showMessage(
-                    result.error.message,
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            commissionRateValue =
-                rate;
-
-
-            document
-                .getElementById(
-                    "commissionRateDisplay"
-                )
-                .textContent =
-                    rate + "%";
-
-
-            document
-                .getElementById(
-                    "dashboardCommissionRate"
-                )
-                .textContent =
-                    rate + "%";
-
-
-            showMessage(
-                "Commission rate saved successfully."
-            );
-
+    try {
+        const { data: userData, error: userError } = await db.auth.getUser();
+
+        if (userError || !userData.user) {
+            window.location.href = "admin-login.html";
+            return false;
         }
-    );
 
+        const user = userData.user;
 
-/* =====================================================
-   RESTAURANTS
-===================================================== */
+        const { data: admin, error: adminError } = await db
+            .from("food_admins")
+            .select("id, full_name, email")
+            .eq("id", user.id)
+            .maybeSingle();
 
-async function loadRestaurants() {
+        if (adminError) throw adminError;
 
-    const {
-        data,
-        error
-    } = await db
-        .from("food_restaurants")
-        .select("*")
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
+        if (!admin) {
+            await db.auth.signOut();
+            window.location.href = "admin-login.html";
+            return false;
+        }
 
+        adminUser = user;
 
-    if (error) {
+        document.getElementById("adminInfo").textContent =
+            admin.full_name || admin.email || user.email || "Admin";
 
-        console.error(error);
-
-        document
-            .getElementById(
-                "restaurantsTable"
-            )
-            .innerHTML =
-                `<tr>
-                    <td
-                        colspan="5"
-                        class="empty"
-                    >
-                        ${escapeHtml(
-                            error.message
-                        )}
-                    </td>
-                </tr>`;
-
-        return;
-
+        return true;
+    } catch (error) {
+        console.error("Admin check:", error);
+        showMessage("Admin verification failed: " + error.message, "error");
+        return false;
     }
-
-
-    restaurants =
-        data || [];
-
-
-    document
-        .getElementById(
-            "restaurantsCount"
-        )
-        .textContent =
-            restaurants.length;
-
-
-    renderRestaurants();
-
 }
 
+/* COMMISSION SETTINGS */
+async function loadCommissionSettings() {
+    try {
+        const { data, error } = await db
+            .from("food_commission_settings")
+            .select("*")
+            .order("id", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (data && data.commission_rate !== null) {
+            commissionRateValue = Number(data.commission_rate);
+        }
+
+        document.getElementById("commissionRate").value = commissionRateValue;
+        document.getElementById("commissionRateDisplay").textContent = commissionRateValue + "%";
+        document.getElementById("dashboardCommissionRate").textContent = commissionRateValue + "%";
+    } catch (error) {
+        console.error("Commission settings:", error);
+        showMessage("Commission settings: " + error.message, "error");
+    }
+}
+
+document.getElementById("saveCommissionBtn").addEventListener("click", async () => {
+    const input = document.getElementById("commissionRate");
+    const rate = Number(input.value);
+
+    if (input.value.trim() === "" || !Number.isFinite(rate) || rate < 0 || rate > 100) {
+        showMessage("Commission rate must be between 0 and 100.", "error");
+        return;
+    }
+
+    try {
+        const { data: existing, error: existingError } = await db
+            .from("food_commission_settings")
+            .select("id")
+            .order("id", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (existingError) throw existingError;
+
+        let result;
+
+        if (existing) {
+            result = await db
+                .from("food_commission_settings")
+                .update({
+                    commission_rate: rate,
+                    updated_at: new Date().toISOString()
+                })
+                .eq("id", existing.id);
+        } else {
+            result = await db
+                .from("food_commission_settings")
+                .insert({ commission_rate: rate });
+        }
+
+        if (result.error) throw result.error;
+
+        commissionRateValue = rate;
+
+        document.getElementById("commissionRateDisplay").textContent = rate + "%";
+        document.getElementById("dashboardCommissionRate").textContent = rate + "%";
+
+        showMessage("Commission rate saved successfully.");
+    } catch (error) {
+        console.error(error);
+        showMessage("Unable to save commission rate: " + error.message, "error");
+    }
+});
+
+/* RESTAURANTS */
+async function loadRestaurants() {
+    try {
+        const { data, error } = await db
+            .from("food_restaurants")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        restaurants = data || [];
+
+        document.getElementById("restaurantsCount").textContent = restaurants.length;
+
+        renderRestaurants();
+    } catch (error) {
+        console.error("Restaurants:", error);
+        showTableError("restaurantsTable", 5, error.message || "Unable to load restaurants.");
+        showMessage("Failed to load restaurants: " + error.message, "error");
+    }
+}
 
 function renderRestaurants() {
-
-    const tbody =
-        document.getElementById(
-            "restaurantsTable"
-        );
-
+    const tbody = document.getElementById("restaurantsTable");
+    if (!tbody) return;
 
     if (!restaurants.length) {
-
-        tbody.innerHTML =
-            `<tr>
-                <td
-                    colspan="5"
-                    class="empty"
-                >
-                    No restaurants found.
-                </td>
-            </tr>`;
-
+        showTableError("restaurantsTable", 5, "No restaurants found.");
         return;
-
     }
 
+    tbody.innerHTML = restaurants.map(r => {
+        const isOpen = r.is_open !== false;
 
-    tbody.innerHTML =
-        restaurants
-        .map(r => {
-
-            const open =
-                r.is_open === false
-                    ? "Closed"
-                    : "Open";
-
-
-            return `
-                <tr>
-
-                    <td>
-                        <strong>
-                            ${escapeHtml(
-                                r.name
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            r.phone || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            r.address || "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            r.rating ?? 0
-                        )}
-                    </td>
-
-                    <td>
-
-                        <span class="status ${
-                            open === "Open"
-                                ? "status-ready"
-                                : "status-cancelled"
-                        }">
-
-                            ${open}
-
-                        </span>
-
-                    </td>
-
-                </tr>
-            `;
-
-        })
-        .join("");
-
+        return `<tr>
+            <td><strong>${escapeHtml(r.name || "-")}</strong></td>
+            <td>${escapeHtml(r.phone || "-")}</td>
+            <td>${escapeHtml(r.address || "-")}</td>
+            <td>${escapeHtml(r.rating ?? 0)}</td>
+            <td><span class="status ${isOpen ? "status-ready" : "status-cancelled"}">${isOpen ? "Open" : "Closed"}</span></td>
+        </tr>`;
+    }).join("");
 }
 
-
-/* =====================================================
-   VENDORS
-===================================================== */
-
+/* VENDORS */
 async function loadVendors() {
+    try {
+        const { data, error } = await db
+            .from("food_vendors")
+            .select("*")
+            .order("created_at", { ascending: false });
 
-    const {
-        data,
-        error
-    } = await db
-        .from("food_vendors")
-        .select("*")
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
+        if (error) throw error;
 
+        vendors = data || [];
 
-    if (error) {
+        document.getElementById("vendorsCount").textContent = vendors.length;
 
-        console.error(
-            "Vendors:",
-            error
-        );
-
-
-        document
-            .getElementById(
-                "vendorsTable"
-            )
-            .innerHTML =
-                `<tr>
-                    <td
-                        colspan="5"
-                        class="empty"
-                    >
-                        ${escapeHtml(
-                            error.message
-                        )}
-                    </td>
-                </tr>`;
-
-        return;
-
+        renderVendors();
+        renderCommissionRecords();
+    } catch (error) {
+        console.error("Vendors:", error);
+        showTableError("vendorsTable", 7, error.message || "Unable to load vendors.");
+        showMessage("Failed to load vendors: " + error.message, "error");
     }
-
-
-    vendors =
-        data || [];
-
-
-    document
-        .getElementById(
-            "vendorsCount"
-        )
-        .textContent =
-            vendors.length;
-
-
-    renderVendors();
-
 }
 
+async function refreshVendors() {
+    await loadRestaurants();
+    await loadVendors();
+}
 
 function renderVendors() {
-
-    const tbody =
-        document.getElementById(
-            "vendorsTable"
-        );
-
+    const tbody = document.getElementById("vendorsTable");
+    if (!tbody) return;
 
     if (!vendors.length) {
+        showTableError("vendorsTable", 7, "No vendors found.");
+        return;
+    }
 
-        tbody.innerHTML =
-            `<tr>
-                <td
-                    colspan="5"
-                    class="empty"
-                >
-                    No vendors found.
+    tbody.innerHTML = vendors.map(vendor => {
+        const status = String(vendor.status || "pending").toLowerCase();
+        const approved = status === "approved";
+
+        const restaurant = restaurants.find(
+            r => String(r.id) === String(vendor.restaurant_id)
+        );
+
+        const restaurantDisplay = restaurant
+            ? escapeHtml(restaurant.name || "Unnamed restaurant")
+            : vendor.restaurant_id
+                ? "Restaurant ID: " + escapeHtml(vendor.restaurant_id)
+                : "Not assigned";
+
+        const restaurantOptions = [
+            `<option value="">-- Select restaurant --</option>`,
+            ...restaurants.map(r => `
+                <option value="${escapeHtml(r.id)}"
+                    ${String(r.id) === String(vendor.restaurant_id) ? "selected" : ""}>
+                    ${escapeHtml(r.name || "Unnamed restaurant")}
+                </option>
+            `)
+        ].join("");
+
+        return `
+            <tr>
+                <td><strong>${escapeHtml(vendor.full_name || "-")}</strong></td>
+                <td>${escapeHtml(vendor.business_name || "-")}</td>
+                <td>${escapeHtml(vendor.phone || "-")}</td>
+                <td>${escapeHtml(vendor.email || "-")}</td>
+                <td>
+                    <span class="status ${approved ? "status-approved" : "status-pending"}">
+                        ${escapeHtml(status.toUpperCase())}
+                    </span>
                 </td>
-            </tr>`;
-
-        return;
-
-    }
-
-
-    tbody.innerHTML =
-        vendors
-        .map(v => {
-
-            return `
-                <tr>
-
-                    <td>
-                        <strong>
-                            ${escapeHtml(
-                                v.full_name ||
-                                "-"
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            v.business_name ||
-                            "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            v.phone ||
-                            "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            v.email ||
-                            "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            v.restaurant_id ||
-                            "-"
-                        )}
-                    </td>
-
-                </tr>
-            `;
-
-        })
-        .join("");
-
-}
-
-
-/* =====================================================
-   ORDERS
-===================================================== */
-
-async function loadOrders() {
-
-    const {
-        data,
-        error
-    } = await db
-        .from("food_orders")
-        .select("*")
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
-
-
-    if (error) {
-
-        console.error(
-            "Orders:",
-            error
-        );
-
-
-        document
-            .getElementById(
-                "ordersTable"
-            )
-            .innerHTML =
-                `<tr>
-                    <td
-                        colspan="7"
-                        class="empty"
-                    >
-                        ${escapeHtml(
-                            error.message
-                        )}
-                    </td>
-                </tr>`;
-
-        return;
-
-    }
-
-
-    orders =
-        data || [];
-
-
-    renderOrders();
-
-    updateDashboardStats();
-
-}
-
-
-function renderOrders() {
-
-    const tbody =
-        document.getElementById(
-            "ordersTable"
-        );
-
-
-    const search =
-        document
-            .getElementById(
-                "orderSearch"
-            )
-            .value
-            .toLowerCase()
-            .trim();
-
-
-    const status =
-        document
-            .getElementById(
-                "orderStatusFilter"
-            )
-            .value;
-
-
-    const filtered =
-        orders.filter(o => {
-
-            const text = [
-
-                o.order_number,
-                o.customer_name,
-                o.customer_phone
-
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-
-
-            const matchesSearch =
-                !search ||
-                text.includes(search);
-
-
-            const matchesStatus =
-                !status ||
-                o.status === status;
-
-
-            return (
-                matchesSearch &&
-                matchesStatus
-            );
-
-        });
-
-
-    if (!filtered.length) {
-
-        tbody.innerHTML =
-            `<tr>
-                <td
-                    colspan="7"
-                    class="empty"
-                >
-                    No orders found.
-                </td>
-            </tr>`;
-
-        return;
-
-    }
-
-
-    tbody.innerHTML =
-        filtered
-        .map(o => {
-
-            const restaurant =
-                restaurants.find(
-                    r =>
-                        r.id ===
-                        o.restaurant_id
-                );
-
-
-            const restaurantName =
-                restaurant
-                    ? restaurant.name
-                    : "-";
-
-
-            const date =
-                o.created_at
-                    ? new Date(
-                        o.created_at
-                    ).toLocaleString()
-                    : "-";
-
-
-            return `
-                <tr>
-
-                    <td>
-                        <strong>
-                            ${escapeHtml(
-                                o.order_number ||
-                                o.id
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            o.customer_name ||
-                            "-"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            restaurantName
-                        )}
-                    </td>
-
-                    <td class="money">
-                        ${money(
-                            o.total
-                        )}
-                    </td>
-
-                    <td>
-
-                        <span class="status ${
-                            statusClass(
-                                o.status
-                            )
-                        }">
-
-                            ${escapeHtml(
-                                o.status ||
-                                "Pending"
-                            )}
-
-                        </span>
-
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            date
-                        )}
-                    </td>
-
-                    <td>
-
-                        <select
-                            onchange="changeOrderStatus(
-                                '${o.id}',
-                                this.value
-                            )"
-                        >
-
-                            <option
-                                value="Pending"
-                                ${
-                                    o.status ===
-                                    "Pending"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Pending
-                            </option>
-
-                            <option
-                                value="Confirmed"
-                                ${
-                                    o.status ===
-                                    "Confirmed"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Confirmed
-                            </option>
-
-                            <option
-                                value="Preparing"
-                                ${
-                                    o.status ===
-                                    "Preparing"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Preparing
-                            </option>
-
-                            <option
-                                value="Ready"
-                                ${
-                                    o.status ===
-                                    "Ready"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Ready
-                            </option>
-
-                            <option
-                                value="Cancelled"
-                                ${
-                                    o.status ===
-                                    "Cancelled"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Cancelled
-                            </option>
-
+                <td>
+                    <div class="vendor-restaurant">
+                        <strong>${restaurantDisplay}</strong>
+                        <select id="vendor-restaurant-${escapeHtml(vendor.id)}"
+                            aria-label="Select restaurant for vendor">
+                            ${restaurantOptions}
                         </select>
-
-                    </td>
-
-                </tr>
-            `;
-
-        })
-        .join("");
-
+                        <button type="button"
+                            onclick="assignVendorRestaurant('${vendor.id}')">
+                            Save Restaurant
+                        </button>
+                    </div>
+                </td>
+                <td>
+                    <div class="vendor-actions">
+                        ${approved
+                            ? `<button type="button" class="secondary"
+                                onclick="changeVendorStatus('${vendor.id}','pending')">
+                                Revoke Approval
+                               </button>`
+                            : `<button type="button" class="success"
+                                onclick="changeVendorStatus('${vendor.id}','approved')">
+                                Approve
+                               </button>`
+                        }
+                        <button type="button" class="danger"
+                            onclick="deleteVendor('${vendor.id}')">
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join("");
 }
 
+/* ASSIGN RESTAURANT */
+async function assignVendorRestaurant(vendorId) {
+    const vendor = vendors.find(v => String(v.id) === String(vendorId));
 
-document
-    .getElementById(
-        "orderSearch"
-    )
-    .addEventListener(
-        "input",
-        renderOrders
-    );
+    if (!vendor) {
+        showMessage("Vendor not found.", "error");
+        return;
+    }
 
+    const select = document.getElementById("vendor-restaurant-" + vendorId);
 
-document
-    .getElementById(
-        "orderStatusFilter"
-    )
-    .addEventListener(
-        "change",
-        renderOrders
-    );
+    if (!select) {
+        showMessage("Restaurant selector not found.", "error");
+        return;
+    }
 
+    const restaurantId = select.value;
 
-/* =====================================================
-   CHANGE ORDER STATUS
-===================================================== */
+    if (!restaurantId) {
+        showMessage("Please select a restaurant first.", "error");
+        return;
+    }
 
-async function changeOrderStatus(
-    orderId,
-    newStatus
-) {
+    const restaurant = restaurants.find(r => String(r.id) === String(restaurantId));
 
-    const {
-        error
-    } = await db
-        .from("food_orders")
-        .update({
-            status: newStatus
-        })
-        .eq(
-            "id",
-            orderId
-        );
+    if (!restaurant) {
+        showMessage("Selected restaurant was not found. Refresh and try again.", "error");
+        return;
+    }
 
+    if (!confirm("Assign " + vendor.business_name + " to " + restaurant.name + "?")) {
+        return;
+    }
 
-    if (error) {
+    try {
+        const { data, error } = await db
+            .from("food_vendors")
+            .update({ restaurant_id: restaurantId })
+            .eq("id", vendorId)
+            .select("id, restaurant_id");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error("No vendor updated. Check admin login and food_vendors UPDATE permissions.");
+        }
+
+        showMessage("Restaurant assigned successfully to " + restaurant.name + ".");
+        await loadVendors();
+    } catch (error) {
+        console.error("Assign restaurant:", error);
+        showMessage("Failed to assign restaurant: " + error.message, "error");
+    }
+}
+
+/* APPROVE OR REVOKE VENDOR */
+async function changeVendorStatus(vendorId, newStatus) {
+    if (!["approved", "pending"].includes(newStatus)) {
+        showMessage("Invalid vendor status.", "error");
+        return;
+    }
+
+    const vendor = vendors.find(v => String(v.id) === String(vendorId));
+
+    if (!vendor) {
+        showMessage("Vendor not found.", "error");
+        return;
+    }
+
+    if (newStatus === "approved" && !vendor.restaurant_id) {
+        showMessage("Please assign a restaurant to this vendor before approving.", "error");
+        return;
+    }
+
+    const action = newStatus === "approved" ? "approve" : "revoke approval for";
+
+    if (!confirm("Are you sure you want to " + action + " " + vendor.business_name + "?")) {
+        return;
+    }
+
+    try {
+        const { data, error } = await db
+            .from("food_vendors")
+            .update({ status: newStatus })
+            .eq("id", vendorId)
+            .select("id, status");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error("No vendor updated. Check admin permissions and RLS policies.");
+        }
 
         showMessage(
-            error.message,
-            "error"
+            newStatus === "approved"
+                ? "Vendor approved successfully."
+                : "Vendor approval revoked successfully."
         );
 
-        return;
-
+        await loadVendors();
+    } catch (error) {
+        console.error("Vendor status:", error);
+        showMessage("Failed to update vendor: " + error.message, "error");
     }
-
-
-    const order =
-        orders.find(
-            o =>
-                o.id ===
-                orderId
-        );
-
-
-    if (order) {
-
-        order.status =
-            newStatus;
-
-    }
-
-
-    renderOrders();
-
-    updateDashboardStats();
-
-
-    /*
-     * When an order becomes Ready,
-     * the Supabase trigger creates
-     * the commission automatically.
-     */
-
-    await loadCommissionData();
-
-
-    showMessage(
-        "Order status updated."
-    );
-
 }
 
+/* DELETE VENDOR RECORD */
+async function deleteVendor(vendorId) {
+    const vendor = vendors.find(v => String(v.id) === String(vendorId));
 
-/* =====================================================
-   DASHBOARD STATS
-===================================================== */
+    if (!vendor) {
+        showMessage("Vendor not found.", "error");
+        return;
+    }
+
+    const confirmed = confirm(
+        "WARNING!\n\nDelete vendor record: " + vendor.business_name + "?\n\n" +
+        "This removes the food_vendors record only. " +
+        "It does not delete the Supabase Auth account."
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const { data, error } = await db
+            .from("food_vendors")
+            .delete()
+            .eq("id", vendorId)
+            .select("id");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error("No vendor deleted. Check admin permissions and database relationships.");
+        }
+
+        showMessage("Vendor record deleted successfully.");
+        await loadVendors();
+    } catch (error) {
+        console.error("Delete vendor:", error);
+        showMessage("Failed to delete vendor: " + error.message, "error");
+    }
+}
+
+/* ORDERS */
+async function loadOrders() {
+    try {
+        const { data, error } = await db
+            .from("food_orders")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        orders = data || [];
+
+        renderOrders();
+        updateDashboardStats();
+    } catch (error) {
+        console.error("Orders:", error);
+        showTableError("ordersTable", 7, error.message || "Unable to load orders.");
+        showMessage("Failed to load orders: " + error.message, "error");
+    }
+}
+
+function renderOrders() {
+    const tbody = document.getElementById("ordersTable");
+    const search = document.getElementById("orderSearch").value.toLowerCase().trim();
+    const selectedStatus = document.getElementById("orderStatusFilter").value;
+
+    const filtered = orders.filter(order => {
+        const text = [
+            order.order_number,
+            order.customer_name,
+            order.customer_phone,
+            order.id
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        return (!search || text.includes(search)) &&
+            (!selectedStatus || order.status === selectedStatus);
+    });
+
+    if (!filtered.length) {
+        showTableError("ordersTable", 7, "No orders found.");
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(order => {
+        const restaurant = restaurants.find(
+            r => String(r.id) === String(order.restaurant_id)
+        );
+
+        const date = order.created_at
+            ? new Date(order.created_at).toLocaleString()
+            : "-";
+
+        const currentStatus = order.status || "Pending";
+
+        const options = [
+            "Pending", "Confirmed", "Preparing", "Ready", "Cancelled"
+        ].map(s =>
+            `<option value="${s}" ${currentStatus === s ? "selected" : ""}>${s}</option>`
+        ).join("");
+
+        return `<tr>
+            <td><strong>${escapeHtml(order.order_number || order.id || "-")}</strong></td>
+            <td>${escapeHtml(order.customer_name || "-")}</td>
+            <td>${escapeHtml(restaurant ? restaurant.name : "-")}</td>
+            <td class="money">${money(order.total)}</td>
+            <td><span class="status ${statusClass(currentStatus)}">${escapeHtml(currentStatus)}</span></td>
+            <td>${escapeHtml(date)}</td>
+            <td><select aria-label="Change order status"
+                onchange="changeOrderStatus('${order.id}',this.value)">${options}</select></td>
+        </tr>`;
+    }).join("");
+}
+
+document.getElementById("orderSearch").addEventListener("input", renderOrders);
+document.getElementById("orderStatusFilter").addEventListener("change", renderOrders);
+
+async function changeOrderStatus(orderId, newStatus) {
+    const allowed = ["Pending", "Confirmed", "Preparing", "Ready", "Cancelled"];
+
+    if (!allowed.includes(newStatus)) {
+        showMessage("Invalid order status.", "error");
+        return;
+    }
+
+    try {
+        const { error } = await db
+            .from("food_orders")
+            .update({ status: newStatus })
+            .eq("id", orderId);
+
+        if (error) throw error;
+
+        const order = orders.find(o => String(o.id) === String(orderId));
+        if (order) order.status = newStatus;
+
+        renderOrders();
+        updateDashboardStats();
+
+        await loadCommissionData();
+
+        showMessage("Order status updated.");
+    } catch (error) {
+        console.error(error);
+        showMessage("Unable to update order: " + error.message, "error");
+        await loadOrders();
+    }
+}
 
 function updateDashboardStats() {
+    document.getElementById("ordersCount").textContent = orders.length;
 
-    const totalOrders =
-        orders.length;
+    document.getElementById("pendingCount").textContent =
+        orders.filter(o => String(o.status || "").toLowerCase() === "pending").length;
 
+    document.getElementById("preparingCount").textContent =
+        orders.filter(o => String(o.status || "").toLowerCase() === "preparing").length;
 
-    const pending =
-        orders.filter(
-            o =>
-                o.status ===
-                "Pending"
-        ).length;
+    document.getElementById("readyCount").textContent =
+        orders.filter(o => String(o.status || "").toLowerCase() === "ready").length;
 
+    const sales = orders
+        .filter(o => String(o.status || "").toLowerCase() !== "cancelled")
+        .reduce((sum, o) => sum + Number(o.total || 0), 0);
 
-    const preparing =
-        orders.filter(
-            o =>
-                o.status ===
-                "Preparing"
-        ).length;
+    const customers = new Set(orders.map(o => o.customer_id).filter(Boolean));
 
-
-    const ready =
-        orders.filter(
-            o =>
-                o.status ===
-                "Ready"
-        ).length;
-
-
-    const sales =
-        orders
-        .filter(
-            o =>
-                o.status !==
-                "Cancelled"
-        )
-        .reduce(
-            (sum, o) =>
-                sum +
-                Number(
-                    o.total || 0
-                ),
-            0
-        );
-
-
-    const customers =
-        new Set(
-            orders
-            .map(
-                o =>
-                    o.customer_id
-            )
-            .filter(Boolean)
-        ).size;
-
-
-    document
-        .getElementById(
-            "ordersCount"
-        )
-        .textContent =
-            totalOrders;
-
-
-    document
-        .getElementById(
-            "pendingCount"
-        )
-        .textContent =
-            pending;
-
-
-    document
-        .getElementById(
-            "preparingCount"
-        )
-        .textContent =
-            preparing;
-
-
-    document
-        .getElementById(
-            "readyCount"
-        )
-        .textContent =
-            ready;
-
-
-    document
-        .getElementById(
-            "totalSales"
-        )
-        .textContent =
-            money(sales);
-
-
-    document
-        .getElementById(
-            "customersCount"
-        )
-        .textContent =
-            customers;
-
+    document.getElementById("totalSales").textContent = money(sales);
+    document.getElementById("customersCount").textContent = customers.size;
 }
 
-
-/* =====================================================
-   LOAD COMMISSION RECORDS
-===================================================== */
-
+/* COMMISSION RECORDS */
 async function loadCommissionData() {
+    try {
+        const { data, error } = await db
+            .from("food_commissions")
+            .select("*")
+            .order("created_at", { ascending: false });
 
-    const {
-        data,
-        error
-    } = await db
-        .from(
-            "food_commissions"
-        )
-        .select("*")
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
+        if (error) throw error;
 
+        commissions = data || [];
 
-    if (error) {
+        renderCommissionRecords();
+        updateCommissionTotals();
 
-        console.error(
-            "Commission:",
-            error
-        );
-
-
-        document
-            .getElementById(
-                "commissionTable"
-            )
-            .innerHTML =
-                `<tr>
-                    <td
-                        colspan="8"
-                        class="empty"
-                    >
-                        ${escapeHtml(
-                            error.message
-                        )}
-                    </td>
-                </tr>`;
-
-
-        return;
-
+        await loadVendorCommissions();
+    } catch (error) {
+        console.error("Commission:", error);
+        showTableError("commissionTable", 8, error.message || "Unable to load commission records.");
+        showMessage("Failed to load commissions: " + error.message, "error");
     }
-
-
-    commissions =
-        data || [];
-
-
-    renderCommissionRecords();
-
-    updateCommissionTotals();
-
-
-    /*
-     * IMPORTANT:
-     * Vendor commission is loaded
-     * separately using RPC.
-     */
-
-    await loadVendorCommissions();
-
 }
-
-
-/* =====================================================
-   LOAD VENDOR COMMISSION
-===================================================== */
 
 async function loadVendorCommissions() {
-
-    const tbody =
-        document.getElementById(
-            "vendorCommissionTable"
-        );
-
+    const tbody = document.getElementById("vendorCommissionTable");
+    if (!tbody) return;
 
     tbody.innerHTML =
-        `<tr>
-            <td
-                colspan="6"
-                class="empty"
-            >
-                Loading vendor commissions...
-            </td>
-        </tr>`;
+        `<tr><td colspan="6" class="empty">Loading vendor commissions...</td></tr>`;
 
+    try {
+        const { data, error } = await db.rpc("get_vendor_commission_summary");
 
-    const {
-        data,
-        error
-    } = await db
-        .rpc(
-            "get_vendor_commission_summary"
-        );
+        if (error) throw error;
 
+        if (!data || !data.length) {
+            showTableError("vendorCommissionTable", 6, "No vendors found.");
+            return;
+        }
 
-    if (error) {
-
-        console.error(
-            "Vendor commission:",
-            error
-        );
-
-
-        tbody.innerHTML =
-            `<tr>
-                <td
-                    colspan="6"
-                    class="empty"
-                >
-                    ${escapeHtml(
-                        error.message
-                    )}
-                </td>
-            </tr>`;
-
-
-        return;
-
+        tbody.innerHTML = data.map(row => `<tr>
+            <td><strong class="vendor-name">${escapeHtml(row.vendor_name || "Unknown Vendor")}</strong>
+                <div class="business-small">${escapeHtml(row.business_name || "-")}</div></td>
+            <td>${escapeHtml(row.restaurant_name || "Unknown Restaurant")}</td>
+            <td>${Number(row.commission_orders || 0)}</td>
+            <td class="money">${money(row.total_sales)}</td>
+            <td class="commission-total">${money(row.total_commission)}</td>
+            <td class="money green">${money(row.vendor_earnings)}</td>
+        </tr>`).join("");
+    } catch (error) {
+        console.error("Vendor commission:", error);
+        showTableError("vendorCommissionTable", 6, error.message || "Unable to load vendor commissions.");
     }
-
-
-    if (
-        !data ||
-        !data.length
-    ) {
-
-        tbody.innerHTML =
-            `<tr>
-                <td
-                    colspan="6"
-                    class="empty"
-                >
-                    No vendors found.
-                </td>
-            </tr>`;
-
-
-        return;
-
-    }
-
-
-    tbody.innerHTML =
-        data
-        .map(row => {
-
-            return `
-                <tr>
-
-                    <td>
-
-                        <strong
-                            class="vendor-name"
-                        >
-                            ${escapeHtml(
-                                row.vendor_name ||
-                                "Unknown Vendor"
-                            )}
-                        </strong>
-
-
-                        <div
-                            class="business-small"
-                        >
-                            ${escapeHtml(
-                                row.business_name ||
-                                "-"
-                            )}
-                        </div>
-
-                    </td>
-
-
-                    <td>
-                        ${escapeHtml(
-                            row.restaurant_name ||
-                            "Unknown Restaurant"
-                        )}
-                    </td>
-
-
-                    <td>
-                        ${Number(
-                            row.commission_orders ||
-                            0
-                        )}
-                    </td>
-
-
-                    <td class="money">
-                        ${money(
-                            row.total_sales ||
-                            0
-                        )}
-                    </td>
-
-
-                    <td class="commission-total">
-                        ${money(
-                            row.total_commission ||
-                            0
-                        )}
-                    </td>
-
-
-                    <td class="money green">
-                        ${money(
-                            row.vendor_earnings ||
-                            0
-                        )}
-                    </td>
-
-                </tr>
-            `;
-
-        })
-        .join("");
-
 }
-
-
-/* =====================================================
-   COMMISSION RECORDS
-===================================================== */
 
 function renderCommissionRecords() {
-
-    const tbody =
-        document.getElementById(
-            "commissionTable"
-        );
-
+    const tbody = document.getElementById("commissionTable");
+    if (!tbody) return;
 
     if (!commissions.length) {
-
-        tbody.innerHTML =
-            `<tr>
-                <td
-                    colspan="8"
-                    class="empty"
-                >
-                    No commission records found.
-                </td>
-            </tr>`;
-
+        showTableError("commissionTable", 8, "No commission records found.");
         return;
-
     }
 
+    tbody.innerHTML = commissions.map(c => {
+        const vendor = vendors.find(
+            v => String(v.restaurant_id) === String(c.restaurant_id)
+        );
 
-    tbody.innerHTML =
-        commissions
-        .map(c => {
+        const order = orders.find(o => String(o.id) === String(c.order_id));
 
-            const vendor =
-                vendors.find(
-                    v =>
-                        v.restaurant_id ===
-                        c.restaurant_id
-                );
+        const date = c.created_at
+            ? new Date(c.created_at).toLocaleString()
+            : "-";
 
-
-            const order =
-                orders.find(
-                    o =>
-                        o.id ===
-                        c.order_id
-                );
-
-
-            const vendorName =
-                vendor
-                    ? (
-                        vendor.full_name ||
-                        vendor.business_name ||
-                        "Unknown Vendor"
-                    )
-                    : "Unknown Vendor";
-
-
-            const orderNumber =
-                order
-                    ? (
-                        order.order_number ||
-                        order.id
-                    )
-                    : c.order_id;
-
-
-            const date =
-                c.created_at
-                    ? new Date(
-                        c.created_at
-                    ).toLocaleString()
-                    : "-";
-
-
-            return `
-                <tr>
-
-                    <td>
-
-                        <strong>
-                            ${escapeHtml(
-                                orderNumber
-                            )}
-                        </strong>
-
-                    </td>
-
-
-                    <td>
-                        ${escapeHtml(
-                            vendorName
-                        )}
-                    </td>
-
-
-                    <td class="money">
-                        ${money(
-                            c.order_total
-                        )}
-                    </td>
-
-
-                    <td>
-                        ${Number(
-                            c.commission_rate ||
-                            0
-                        )}%
-                    </td>
-
-
-                    <td class="commission-total">
-                        ${money(
-                            c.commission_amount
-                        )}
-                    </td>
-
-
-                    <td class="money green">
-                        ${money(
-                            c.vendor_amount
-                        )}
-                    </td>
-
-
-                    <td>
-
-                        <span
-                            class="status ${
-                                statusClass(
-                                    c.status
-                                )
-                            }"
-                        >
-
-                            ${escapeHtml(
-                                c.status
-                            )}
-
-                        </span>
-
-                    </td>
-
-
-                    <td>
-                        ${escapeHtml(
-                            date
-                        )}
-                    </td>
-
-                </tr>
-            `;
-
-        })
-        .join("");
-
+        return `<tr>
+            <td><strong>${escapeHtml(order ? (order.order_number || order.id) : (c.order_id || "-"))}</strong></td>
+            <td>${escapeHtml(vendor ? (vendor.full_name || vendor.business_name) : "Unknown Vendor")}</td>
+            <td class="money">${money(c.order_total)}</td>
+            <td>${Number(c.commission_rate || 0)}%</td>
+            <td class="commission-total">${money(c.commission_amount)}</td>
+            <td class="money green">${money(c.vendor_amount)}</td>
+            <td><span class="status ${statusClass(c.status)}">${escapeHtml(c.status || "-")}</span></td>
+            <td>${escapeHtml(date)}</td>
+        </tr>`;
+    }).join("");
 }
-
-
-/* =====================================================
-   COMMISSION TOTALS
-===================================================== */
 
 function updateCommissionTotals() {
+    const earned = commissions.filter(
+        c => String(c.status || "").toLowerCase() === "earned"
+    );
 
-    const earned =
-        commissions.filter(
-            c =>
-                c.status ===
-                "Earned"
-        );
+    const totalCommission = earned.reduce(
+        (sum, c) => sum + Number(c.commission_amount || 0), 0
+    );
 
+    const totalVendor = earned.reduce(
+        (sum, c) => sum + Number(c.vendor_amount || 0), 0
+    );
 
-    const totalCommission =
-        earned.reduce(
-            (sum, c) =>
-                sum +
-                Number(
-                    c.commission_amount ||
-                    0
-                ),
-            0
-        );
-
-
-    const totalVendor =
-        earned.reduce(
-            (sum, c) =>
-                sum +
-                Number(
-                    c.vendor_amount ||
-                    0
-                ),
-            0
-        );
-
-
-    document
-        .getElementById(
-            "totalCommissionDisplay"
-        )
-        .textContent =
-            money(
-                totalCommission
-            );
-
-
-    document
-        .getElementById(
-            "totalVendorEarningsDisplay"
-        )
-        .textContent =
-            money(
-                totalVendor
-            );
-
-
-    document
-        .getElementById(
-            "commissionOrdersDisplay"
-        )
-        .textContent =
-            earned.length;
-
-
-    document
-        .getElementById(
-            "dashboardCommission"
-        )
-        .textContent =
-            money(
-                totalCommission
-            );
-
-
-    document
-        .getElementById(
-            "dashboardVendorEarnings"
-        )
-        .textContent =
-            money(
-                totalVendor
-            );
-
+    document.getElementById("totalCommissionDisplay").textContent = money(totalCommission);
+    document.getElementById("totalVendorEarningsDisplay").textContent = money(totalVendor);
+    document.getElementById("commissionOrdersDisplay").textContent = earned.length;
+    document.getElementById("dashboardCommission").textContent = money(totalCommission);
+    document.getElementById("dashboardVendorEarnings").textContent = money(totalVendor);
 }
 
+document.getElementById("refreshVendorCommissionBtn").addEventListener("click", async () => {
+    await loadVendorCommissions();
+    showMessage("Vendor commission refresh attempted.");
+});
 
-/* =====================================================
-   REFRESH VENDOR COMMISSION BUTTON
-===================================================== */
+/* REALTIME: ODA ZIKIBADILIKA */
+function subscribeToOrdersRealtime() {
+    if (ordersRealtimeChannel) return;
 
-document
-    .getElementById(
-        "refreshVendorCommissionBtn"
-    )
-    .addEventListener(
-        "click",
-        async () => {
+    ordersRealtimeChannel = db
+        .channel("admin-food-orders-realtime")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "food_orders"
+            },
+            () => {
+                // Punguza refresh nyingi zikitokea kwa muda mmoja.
+                if (realtimeRefreshTimer) {
+                    clearTimeout(realtimeRefreshTimer);
+                }
 
-            await loadVendorCommissions();
+                realtimeRefreshTimer = setTimeout(async () => {
+                    await loadOrders();
+                    await loadCommissionData();
+                }, 300);
+            }
+        )
+        .subscribe((status) => {
+            console.log("Admin Orders Realtime:", status);
 
-            showMessage(
-                "Vendor commission refreshed."
+            if (status === "SUBSCRIBED") {
+                console.log("Realtime imeunganishwa kikamilifu.");
+            }
+
+            if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                console.error("Realtime connection issue:", status);
+            }
+        });
+}
+
+/* LOGOUT */
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+        const { error } = await db.auth.signOut();
+
+        if (error) throw error;
+
+        window.location.href = "admin-login.html";
+    } catch (error) {
+        console.error("Logout:", error);
+        showMessage("Unable to log out: " + error.message, "error");
+    }
+});
+
+function subscribeToOrdersRealtime() {
+    if (!window.db || ordersRealtimeChannel) return;
+
+    ordersRealtimeChannel = db
+        .channel("admin-food-orders-realtime")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "food_orders"
+            },
+            () => {
+                // Punguza refresh zinazoweza kujirudia kwa haraka.
+                if (realtimeRefreshTimer) {
+                    clearTimeout(realtimeRefreshTimer);
+                }
+
+                realtimeRefreshTimer = setTimeout(async () => {
+                    try {
+                        await loadOrders();
+                        await loadCommissionData();
+                    } catch (error) {
+                        console.error(
+                            "Realtime refresh error:",
+                            error
+                        );
+                    }
+                }, 500);
+            }
+        )
+        .subscribe((status) => {
+            console.log(
+                "Admin Orders Realtime:",
+                status
             );
 
-        }
-    );
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-document
-    .getElementById(
-        "logoutBtn"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            await db.auth.signOut();
-
-            window.location.href =
-                "admin-login.html";
-
-        }
-    );
-
+            if (status === "CHANNEL_ERROR") {
+                console.error(
+                    "Realtime imeshindwa. Kagua Supabase Realtime na RLS."
+                );
+            }
+        });
+}
 
 /* =====================================================
-   INITIAL LOAD
+   INITIALIZE DASHBOARD
 ===================================================== */
 
 async function init() {
+    const isAdmin = await checkAdmin();
 
-    const isAdmin =
-        await checkAdmin();
-
-
-    if (!isAdmin) {
-        return;
-    }
-
+    if (!isAdmin) return;
 
     await loadCommissionSettings();
-
     await loadRestaurants();
-
     await loadVendors();
-
     await loadOrders();
-
     await loadCommissionData();
 
+    // Anza kusikiliza mabadiliko ya oda baada ya admin kuthibitishwa.
+    subscribeToOrdersRealtime();
 }
 
-
 init();
-
 </script>
-
 </body>
 </html>
+```
