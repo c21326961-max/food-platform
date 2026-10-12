@@ -192,8 +192,16 @@ th{background:#f9fafb;font-weight:bold}
                 <button type="button" onclick="loadRestaurants()">Refresh Restaurants</button>
             </div>
             <div class="table-wrap"><table>
-                <thead><tr><th>Name</th><th>Phone</th><th>Address</th><th>Rating</th><th>Status</th></tr></thead>
-                <tbody id="restaurantsTable"><tr><td colspan="5" class="empty">Loading restaurants...</td></tr></tbody>
+                <thead>
+    <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Rating</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+</thead>
             </table></div>
         </div>
     </section>
@@ -212,9 +220,9 @@ th{background:#f9fafb;font-weight:bold}
                         <th>Status</th><th>Assign Restaurant</th><th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="vendorsTable"><tr><td colspan="7" class="empty">Loading vendors...</td></tr></tbody>
-            </table></div>
-        </div>
+             <tbody id="restaurantsTable">
+    <tr><td colspan="6" class="empty">Loading restaurants...</td></tr>
+</tbody>   
     </section>
 </main>
 
@@ -443,22 +451,143 @@ function renderRestaurants() {
     if (!tbody) return;
 
     if (!restaurants.length) {
-        showTableError("restaurantsTable", 5, "No restaurants found.");
+        showTableError("restaurantsTable", 6, "No restaurants found.");
         return;
     }
 
     tbody.innerHTML = restaurants.map(r => {
         const isOpen = r.is_open !== false;
 
-        return `<tr>
-            <td><strong>${escapeHtml(r.name || "-")}</strong></td>
-            <td>${escapeHtml(r.phone || "-")}</td>
-            <td>${escapeHtml(r.address || "-")}</td>
-            <td>${escapeHtml(r.rating ?? 0)}</td>
-            <td><span class="status ${isOpen ? "status-ready" : "status-cancelled"}">${isOpen ? "Open" : "Closed"}</span></td>
-        </tr>`;
+        return `
+            <tr>
+                <td><strong>${escapeHtml(r.name || "-")}</strong></td>
+                <td>${escapeHtml(r.phone || "-")}</td>
+                <td>${escapeHtml(r.address || "-")}</td>
+                <td>${escapeHtml(r.rating ?? 0)}</td>
+                <td>
+                    <span class="status ${isOpen ? "status-ready" : "status-cancelled"}">
+                        ${isOpen ? "Open" : "Hidden"}
+                    </span>
+                </td>
+                <td>
+                    <div class="vendor-actions">
+                        <button type="button"
+                            class="secondary"
+                            onclick="toggleRestaurantStatus('${escapeHtml(r.id)}', ${!isOpen})">
+                            ${isOpen ? "Hide" : "Show"}
+                        </button>
+
+                        <button type="button"
+                            class="danger"
+                            onclick="deleteRestaurant('${escapeHtml(r.id)}')">
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
     }).join("");
 }
+
+/* HIDE OR SHOW RESTAURANT */
+async function toggleRestaurantStatus(restaurantId, newStatus) {
+    const restaurant = restaurants.find(
+        r => String(r.id) === String(restaurantId)
+    );
+
+    if (!restaurant) {
+        showMessage("Restaurant not found.", "error");
+        return;
+    }
+
+    const action = newStatus ? "show" : "hide";
+
+    if (!confirm(
+        `Are you sure you want to ${action} "${restaurant.name}"?`
+    )) {
+        return;
+    }
+
+    try {
+        const { data, error } = await db
+            .from("food_restaurants")
+            .update({ is_open: newStatus })
+            .eq("id", restaurantId)
+            .select("id, is_open");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error(
+                "Restaurant was not updated. Check admin permissions and RLS policies."
+            );
+        }
+
+        showMessage(
+            newStatus
+                ? "Restaurant shown successfully."
+                : "Restaurant hidden successfully."
+        );
+
+        await loadRestaurants();
+    } catch (error) {
+        console.error("Restaurant visibility:", error);
+        showMessage("Failed to update restaurant: " + error.message, "error");
+    }
+}
+
+/* DELETE RESTAURANT */
+async function deleteRestaurant(restaurantId) {
+    const restaurant = restaurants.find(
+        r => String(r.id) === String(restaurantId)
+    );
+
+    if (!restaurant) {
+        showMessage("Restaurant not found.", "error");
+        return;
+    }
+
+    const confirmed = confirm(
+        `WARNING: PERMANENT DELETION\n\n` +
+        `Delete restaurant "${restaurant.name}"?\n\n` +
+        `This action may be blocked if the restaurant has linked vendors, ` +
+        `menu items, orders or commission records. Check related data first.\n\n` +
+        `Continue?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const { data, error } = await db
+            .from("food_restaurants")
+            .delete()
+            .eq("id", restaurantId)
+            .select("id");
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            throw new Error(
+                "No restaurant deleted. Check admin permissions, RLS policies and linked records."
+            );
+        }
+
+        showMessage("Restaurant deleted successfully.");
+
+        await loadRestaurants();
+        await loadVendors();
+        await loadOrders();
+        await loadCommissionData();
+    } catch (error) {
+        console.error("Delete restaurant:", error);
+        showMessage(
+            "Failed to delete restaurant. It may have linked data or insufficient permissions: " +
+            error.message,
+            "error"
+        );
+    }
+}
+    
 
 /* VENDORS */
 async function loadVendors() {
