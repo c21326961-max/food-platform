@@ -3,31 +3,25 @@
 <html lang="sw">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vendor Dashboard | Food Platform</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
-:root {
-    --green:#176b45;
-    --dark:#104b32;
-    --light:#e8f5ed;
-    --orange:#f28c28;
-    --cream:#f7f8f4;
-    --text:#24332b;
-    --muted:#718078;
-    --border:#e4eae5;
-    --red:#c83d3d;
+:root{
+ --green:#176b45;--dark:#104b32;--light:#e8f5ed;
+ --orange:#f28c28;--cream:#f7f8f4;--text:#24332b;
+ --muted:#718078;--border:#e4eae5;--red:#c83d3d
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:var(--cream);color:var(--text)}
-button,input,select{font:inherit}
+button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
 .center-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.panel{background:white;border:1px solid var(--border);border-radius:18px;padding:30px;box-shadow:0 8px 28px #18412c12}
+.panel{background:#fff;border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:0 8px 28px #18412c12}
 .message-panel{width:100%;max-width:480px;text-align:center}
 .brand-mark{width:58px;height:58px;display:grid;place-items:center;margin:0 auto 16px;border-radius:17px;background:var(--light);font-size:28px}
 h1{font-size:25px;margin:0 0 8px}
@@ -36,40 +30,41 @@ p{margin-top:0}
 .muted{color:var(--muted);line-height:1.6}
 .btn{border:0;border-radius:9px;padding:10px 14px;font-weight:700}
 .btn:disabled{opacity:.55;cursor:not-allowed}
-.btn-primary{background:var(--green);color:white}
+.btn-primary{background:var(--green);color:#fff}
 .btn-primary:hover{background:var(--dark)}
 .btn-light{background:var(--light);color:var(--green)}
 .btn-danger{background:#fff0f0;color:var(--red)}
-.app{min-height:100vh;display:grid;grid-template-columns:245px minmax(0,1fr)}
-.sidebar{background:var(--dark);color:white;padding:24px 16px;display:flex;flex-direction:column;gap:25px}
-.brand{display:flex;gap:12px;align-items:center;padding:4px 8px}
-.brand-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:12px;background:var(--orange);font-size:23px}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.app{min-height:100vh;display:grid;grid-template-columns:235px minmax(0,1fr)}
+.sidebar{background:var(--dark);color:#fff;padding:20px 14px;display:flex;flex-direction:column;gap:23px}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px}
+.brand-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:var(--orange);font-size:22px}
 .brand strong{display:block}
 .brand small{color:#c7e1d1}
-.nav-label{padding:0 12px;margin-bottom:9px;font-size:11px;color:#a8cbb7;text-transform:uppercase}
-.nav-btn{width:100%;display:flex;gap:12px;padding:13px 12px;border:0;border-radius:9px;background:transparent;color:white;text-align:left;margin-bottom:5px}
+.nav-label{padding:0 12px;margin-bottom:8px;font-size:11px;color:#a8cbb7;text-transform:uppercase}
+.nav-btn{width:100%;display:flex;gap:9px;padding:12px 10px;border:0;border-radius:9px;background:transparent;color:#fff;text-align:left;margin-bottom:4px}
 .nav-btn:hover,.nav-btn.active{background:#287752}
 .sidebar-bottom{margin-top:auto}
-.vendor-card{padding:14px;border-radius:12px;background:#ffffff17;overflow-wrap:anywhere}
+.vendor-card{padding:13px;border-radius:12px;background:#ffffff17;overflow-wrap:anywhere}
 .vendor-card small{color:#c7e1d1}
-.vendor-card strong{display:block;margin-top:7px}
-.main{min-width:0;padding:26px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:25px}
+.vendor-card strong{display:block;margin:7px 0}
+.main{min-width:0;padding:24px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:22px}
 .topbar p{margin-bottom:0}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:25px}
-.stat-card,.content-card{background:white;border:1px solid var(--border);border-radius:15px;box-shadow:0 8px 28px #18412c0a}
-.stat-card{padding:18px;min-width:0}
-.stat-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:var(--light);font-size:19px;margin-bottom:15px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:22px}
+.stat-card,.content-card{background:#fff;border:1px solid var(--border);border-radius:15px;box-shadow:0 8px 28px #18412c0a}
+.stat-card{padding:16px;min-width:0}
+.stat-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:12px;background:var(--light);margin-bottom:13px}
 .stat-card p{font-size:13px;color:var(--muted);margin-bottom:8px}
-.stat-card strong{font-size:25px;overflow-wrap:anywhere}
-.content-card{overflow:hidden}
-.card-header{padding:19px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:13px;border-bottom:1px solid var(--border)}
+.stat-card strong{font-size:23px;overflow-wrap:anywhere}
+.content-card{overflow:hidden;margin-bottom:18px}
+.card-header{padding:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--border)}
 .card-header h2{margin-bottom:5px}
 .filters{display:flex;gap:8px;flex-wrap:wrap}
-.filters input,.filters select{min-height:40px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:white;max-width:100%}
+.filters input,.filters select{min-height:40px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:#fff;max-width:100%}
 .table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:790px}
-th,td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border);font-size:13px}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{padding:13px 15px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border);font-size:13px}
 th{background:#fbfcfa;color:var(--muted);font-size:11px;text-transform:uppercase}
 tbody tr:hover{background:#fcfefc}
 .order-number{color:var(--green);font-weight:700}
@@ -77,13 +72,13 @@ tbody tr:hover{background:#fcfefc}
 .status-pending{background:#fff2d8;color:#8b5a00}
 .status-confirmed,.status-ready{background:#e6f0ff;color:#245bb5}
 .status-preparing{background:#f1e8ff;color:#7040a7}
-.status-delivered{background:#e1f5e8;color:#176b45}
-.status-cancelled{background:#ffe8e8;color:#b52d2d}
+.status-delivered,.status-approved{background:#e1f5e8;color:#176b45}
+.status-cancelled,.status-revoked{background:#ffe8e8;color:#b52d2d}
 .status-out-for-delivery{background:#e0f6f7;color:#176c76}
-.actions{display:flex;flex-wrap:wrap;gap:6px;min-width:140px}
+.actions{display:flex;flex-wrap:wrap;gap:6px;min-width:130px}
 .actions .btn{padding:8px 10px;font-size:11px}
-.empty-state{padding:40px 20px;text-align:center;color:var(--muted)}
-.notice{padding:13px 15px;border-radius:9px;margin-bottom:18px;line-height:1.5;overflow-wrap:anywhere}
+.empty-state{padding:35px 20px;text-align:center;color:var(--muted)}
+.notice{padding:13px 15px;border-radius:9px;margin-bottom:17px;line-height:1.5;overflow-wrap:anywhere}
 .notice.error{background:#fff0f0;color:#9c2929}
 .notice.success{background:var(--light);color:var(--green)}
 .notice.info{background:#eef6ff;color:#285c8f}
@@ -91,190 +86,227 @@ tbody tr:hover{background:#fcfefc}
 .currency{white-space:nowrap;font-weight:700}
 .section{display:none}
 .section.active{display:block}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;padding:18px}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:13px;font-weight:700}
+.field input,.field select,.field textarea{width:100%;min-height:42px;border:1px solid #dbe4dd;border-radius:9px;padding:10px 11px;background:#fff;color:var(--text)}
+.field textarea{min-height:90px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #b5dec4;border-color:var(--green)}
+.form-actions{display:flex;flex-wrap:wrap;gap:9px;padding:0 18px 18px}
+.form-note{padding:0 18px 16px;font-size:12px;color:var(--muted);line-height:1.6}
+.menu-image{width:52px;height:52px;object-fit:cover;border-radius:9px;background:#f1f3f1}
+.available-label{display:inline-block;border-radius:20px;padding:5px 8px;font-size:11px;font-weight:700}
+.available-yes{background:#e1f5e8;color:#176b45}
+.available-no{background:#ffe8e8;color:#b52d2d}
+.small-text{font-size:12px;color:var(--muted);line-height:1.6}
 @media(max-width:1100px){
  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
- .app{grid-template-columns:210px minmax(0,1fr)}
- .main{padding:18px}
+ .app{grid-template-columns:205px minmax(0,1fr)}
+ .main{padding:17px}
 }
 @media(max-width:720px){
  .app{grid-template-columns:1fr}
- .sidebar{padding:14px;gap:12px}
- .sidebar nav{display:flex;flex-wrap:wrap;gap:5px}
+ .sidebar{padding:12px;gap:10px}
+ .sidebar nav{display:flex;flex-wrap:wrap;gap:4px}
  .nav-label,.sidebar-bottom{display:none}
- .nav-btn{width:auto;margin:0;padding:10px}
- .main{padding:14px}
+ .nav-btn{width:auto;margin:0;padding:10px 9px;font-size:12px}
+ .main{padding:13px}
  .topbar{align-items:flex-start}
- .stats{gap:9px}
- .stat-card{padding:12px}
- .stat-card strong{font-size:21px}
+ .stats{gap:8px}
+ .stat-card{padding:11px}
+ .stat-card strong{font-size:20px}
+ .form-grid{grid-template-columns:1fr;padding:14px}
+ .field.full{grid-column:auto}
+ .form-actions{padding:0 14px 14px}
+ .card-header{padding:14px}
 }
 </style>
 </head>
-
 <body>
 
-<!-- LOADING -->
 <section id="loadingView" class="center-screen">
-    <div class="panel message-panel">
-        <div class="brand-mark">🍽️</div>
-        <h1>Food Platform</h1>
-        <p id="loadingMessage" class="muted">Inaunganisha mfumo...</p>
-    </div>
+ <div class="panel message-panel">
+  <div class="brand-mark">FP</div>
+  <h1>Food Platform</h1>
+  <p id="loadingMessage" class="muted">Inaunganisha mfumo...</p>
+ </div>
 </section>
 
-<!-- PENDING / REVOKED / ACCOUNT PROBLEMS -->
 <section id="approvalView" class="center-screen hidden">
-    <div class="panel message-panel">
-        <div class="brand-mark" id="approvalIcon">⏳</div>
-        <h1 id="approvalTitle">Akaunti inakaguliwa</h1>
-        <p id="approvalMessage" class="muted">
-            Akaunti yako inasubiri idhini ya Admin.
-        </p>
-        <button id="approvalRefreshButton" class="btn btn-primary">
-            Kagua tena hali ya akaunti
-        </button>
-        <button id="approvalLogoutButton" class="btn btn-light">
-            Toka kwenye akaunti
-        </button>
-    </div>
+ <div class="panel message-panel">
+  <div class="brand-mark" id="approvalIcon">⏳</div>
+  <h1 id="approvalTitle">Akaunti inakaguliwa</h1>
+  <p id="approvalMessage" class="muted">Akaunti yako inasubiri idhini ya Admin.</p>
+  <button id="approvalRefreshButton" class="btn btn-primary">Kagua tena</button>
+  <button id="approvalLogoutButton" class="btn btn-light">Toka kwenye akaunti</button>
+ </div>
 </section>
 
-<!-- GENERAL ERROR -->
 <section id="errorView" class="center-screen hidden">
-    <div class="panel message-panel">
-        <div class="brand-mark">⚠️</div>
-        <h1>Imeshindikana kufungua dashboard</h1>
-        <p id="errorMessage" class="muted"></p>
-        <button id="retryButton" class="btn btn-primary">Jaribu tena</button>
-        <button id="errorLogoutButton" class="btn btn-light">Rudi kwenye login</button>
-    </div>
+ <div class="panel message-panel">
+  <div class="brand-mark">!</div>
+  <h1>Imeshindikana kufungua dashboard</h1>
+  <p id="errorMessage" class="muted"></p>
+  <button id="retryButton" class="btn btn-primary">Jaribu tena</button>
+  <button id="errorLogoutButton" class="btn btn-light">Rudi kwenye login</button>
+ </div>
 </section>
 
-<!-- MAIN DASHBOARD -->
 <div id="dashboardView" class="app hidden">
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-icon">🍲</div>
-            <div>
-                <strong>Food Platform</strong>
-                <small>Vendor Portal</small>
-            </div>
-        </div>
+ <aside class="sidebar">
+  <div class="brand">
+   <div class="brand-icon">FP</div>
+   <div><strong>Food Platform</strong><small>Vendor Portal</small></div>
+  </div>
 
-        <nav>
-            <div class="nav-label">Menyu kuu</div>
-            <button class="nav-btn active" data-section="overview">▦ Muhtasari</button>
-            <button class="nav-btn" data-section="orders">🧾 Oda</button>
-        </nav>
+  <nav>
+   <div class="nav-label">Menyu kuu</div>
+   <button class="nav-btn active" data-section="overview">Muhtasari</button>
+   <button class="nav-btn" data-section="orders">Oda</button>
+   <button class="nav-btn" data-section="menu">Simamia Chakula</button>
+   <button class="nav-btn" data-section="restaurant">Taarifa za Mkahawa</button>
+   <button class="nav-btn" data-section="account">Akaunti Yangu</button>
+  </nav>
 
-        <div class="sidebar-bottom">
-            <div class="vendor-card">
-                <small>Mkahawa wako</small>
-                <strong id="sidebarRestaurantName">Inapakia...</strong>
-                <small id="sidebarVendorEmail"></small>
-            </div>
-            <button id="logoutButton" class="btn btn-light" style="width:100%;margin-top:12px">
-                Toka kwenye akaunti
-            </button>
-        </div>
-    </aside>
+  <div class="sidebar-bottom">
+   <div class="vendor-card">
+    <small>Mkahawa wako</small>
+    <strong id="sidebarRestaurantName">Inapakia...</strong>
+    <small id="sidebarVendorEmail"></small>
+   </div>
+   <button id="logoutButton" class="btn btn-light" style="width:100%;margin-top:12px">Toka kwenye akaunti</button>
+  </div>
+ </aside>
 
-    <main class="main">
-        <header class="topbar">
-            <div>
-                <h1 id="welcomeTitle">Dashboard ya Mkahawa</h1>
-                <p class="muted">Simamia oda na ufuatilie shughuli za mkahawa wako.</p>
-            </div>
-            <button id="refreshButton" class="btn btn-light">↻ Onyesha upya</button>
-        </header>
+ <main class="main">
+  <header class="topbar">
+   <div>
+    <h1 id="welcomeTitle">Dashboard ya Mkahawa</h1>
+    <p id="pageSubtitle" class="muted">Simamia oda na biashara yako.</p>
+   </div>
+   <button id="refreshButton" class="btn btn-light">Onyesha upya</button>
+  </header>
 
-        <div id="notice" class="notice hidden"></div>
+  <div id="notice" class="notice hidden"></div>
 
-        <section id="overviewSection" class="section active">
-            <div class="stats">
-                <article class="stat-card">
-                    <div class="stat-icon">🧾</div>
-                    <p>Jumla ya oda</p>
-                    <strong id="totalOrders">0</strong>
-                </article>
-                <article class="stat-card">
-                    <div class="stat-icon">⏳</div>
-                    <p>Zinasubiri</p>
-                    <strong id="pendingOrders">0</strong>
-                </article>
-                <article class="stat-card">
-                    <div class="stat-icon">👨‍🍳</div>
-                    <p>Zinazoandaliwa</p>
-                    <strong id="preparingOrders">0</strong>
-                </article>
-                <article class="stat-card">
-                    <div class="stat-icon">💰</div>
-                    <p>Mapato ya oda zilizokamilika</p>
-                    <strong id="completedRevenue" style="font-size:20px">TZS 0</strong>
-                </article>
-            </div>
+  <section id="overviewSection" class="section active">
+   <div class="stats">
+    <article class="stat-card"><div class="stat-icon">O</div><p>Jumla ya oda</p><strong id="totalOrders">0</strong></article>
+    <article class="stat-card"><div class="stat-icon">P</div><p>Zinasubiri</p><strong id="pendingOrders">0</strong></article>
+    <article class="stat-card"><div class="stat-icon">K</div><p>Zinazoandaliwa</p><strong id="preparingOrders">0</strong></article>
+    <article class="stat-card"><div class="stat-icon">T</div><p>Mapato ya oda zilizokamilika</p><strong id="completedRevenue" style="font-size:20px">TZS 0</strong></article>
+   </div>
 
-            <div class="content-card">
-                <div class="card-header">
-                    <div>
-                        <h2>Oda za karibuni</h2>
-                        <p class="muted" style="margin:0">Oda mpya na zinazoendelea.</p>
-                    </div>
-                    <button class="btn btn-primary" data-go-section="orders">Oda zote</button>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Namba ya oda</th><th>Mteja</th><th>Bidhaa</th>
-                                <th>Jumla</th><th>Hali</th><th>Tarehe</th><th>Hatua</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentOrdersBody"></tbody>
-                    </table>
-                </div>
-                <div id="recentEmpty" class="empty-state hidden">Bado hakuna oda za kuonyesha.</div>
-            </div>
-        </section>
+   <div class="content-card">
+    <div class="card-header">
+     <div><h2>Oda za karibuni</h2><p class="muted" style="margin:0">Oda mpya na zinazoendelea.</p></div>
+     <button class="btn btn-primary" data-go-section="orders">Oda zote</button>
+    </div>
+    <div class="table-wrap"><table>
+     <thead><tr><th>Namba ya oda</th><th>Mteja</th><th>Bidhaa</th><th>Jumla</th><th>Hali</th><th>Tarehe</th><th>Hatua</th></tr></thead>
+     <tbody id="recentOrdersBody"></tbody>
+    </table></div>
+    <div id="recentEmpty" class="empty-state hidden">Bado hakuna oda za kuonyesha.</div>
+   </div>
+  </section>
 
-        <section id="ordersSection" class="section">
-            <div class="content-card">
-                <div class="card-header">
-                    <div>
-                        <h2>Oda zote</h2>
-                        <p class="muted" style="margin:0">Angalia oda na ubadilishe hatua zake.</p>
-                    </div>
-                    <div class="filters">
-                        <input id="searchOrders" type="search" placeholder="Tafuta namba au mteja">
-                        <select id="statusFilter">
-                            <option value="">Hali zote</option>
-                            <option>Pending</option>
-                            <option>Confirmed</option>
-                            <option>Preparing</option>
-                            <option>Ready</option>
-                            <option>Out for Delivery</option>
-                            <option>Delivered</option>
-                            <option>Cancelled</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Namba ya oda</th><th>Mteja</th><th>Bidhaa</th>
-                                <th>Jumla</th><th>Hali</th><th>Tarehe</th><th>Hatua</th>
-                            </tr>
-                        </thead>
-                        <tbody id="allOrdersBody"></tbody>
-                    </table>
-                </div>
-                <div id="ordersEmpty" class="empty-state hidden">
-                    Hakuna oda zinazolingana na utafutaji wako.
-                </div>
-            </div>
-        </section>
-    </main>
+  <section id="ordersSection" class="section">
+   <div class="content-card">
+    <div class="card-header">
+     <div><h2>Oda zote</h2><p class="muted" style="margin:0">Angalia oda na ubadilishe hatua zake.</p></div>
+     <div class="filters">
+      <input id="searchOrders" type="search" placeholder="Tafuta namba au mteja">
+      <select id="statusFilter">
+       <option value="">Hali zote</option><option>Pending</option><option>Confirmed</option>
+       <option>Preparing</option><option>Ready</option><option>Out for Delivery</option>
+       <option>Delivered</option><option>Cancelled</option>
+      </select>
+     </div>
+    </div>
+    <div class="table-wrap"><table>
+     <thead><tr><th>Namba ya oda</th><th>Mteja</th><th>Bidhaa</th><th>Jumla</th><th>Hali</th><th>Tarehe</th><th>Hatua</th></tr></thead>
+     <tbody id="allOrdersBody"></tbody>
+    </table></div>
+    <div id="ordersEmpty" class="empty-state hidden">Hakuna oda zinazolingana na utafutaji wako.</div>
+   </div>
+  </section>
+
+  <section id="menuSection" class="section">
+   <div class="content-card">
+    <div class="card-header">
+     <div><h2 id="menuFormTitle">Ongeza chakula</h2><p class="muted" style="margin:0">Jaza taarifa za chakula unachouza.</p></div>
+    </div>
+    <form id="menuForm">
+     <input type="hidden" id="menuItemId">
+     <div class="form-grid">
+      <div class="field"><label for="foodName">Jina la chakula *</label><input id="foodName" required maxlength="150" placeholder="Mfano: Wali kuku"></div>
+      <div class="field"><label for="foodPrice">Bei (TZS) *</label><input id="foodPrice" required type="number" min="0" step="1" placeholder="8000"></div>
+      <div class="field"><label for="foodCategory">Category</label><input id="foodCategory" maxlength="80" placeholder="Mfano: Rice, Chicken, Chips"></div>
+      <div class="field"><label for="foodImage">Kiungo cha picha (URL)</label><input id="foodImage" type="url" maxlength="2000" placeholder="https://..."></div>
+      <div class="field full"><label for="foodDescription">Maelezo ya chakula</label><textarea id="foodDescription" maxlength="2000" placeholder="Eleza chakula hiki..."></textarea></div>
+      <div class="field full"><label><input id="foodAvailable" type="checkbox" checked style="width:auto;min-height:auto"> Chakula kinapatikana kwa sasa</label></div>
+     </div>
+     <div class="form-actions">
+      <button id="saveMenuButton" class="btn btn-primary" type="submit">Hifadhi chakula</button>
+      <button id="cancelMenuEditButton" class="btn btn-outline hidden" type="button">Ghairi kuhariri</button>
+      <button id="clearMenuButton" class="btn btn-light" type="button">Safisha fomu</button>
+     </div>
+    </form>
+   </div>
+
+   <div class="content-card">
+    <div class="card-header">
+     <div><h2>Menyu ya mgahawa wako</h2><p class="muted" style="margin:0">Hariri bei, upatikanaji au futa chakula.</p></div>
+     <div class="filters"><input id="searchMenu" type="search" placeholder="Tafuta chakula"><button id="reloadMenuButton" class="btn btn-light" type="button">Refresh</button></div>
+    </div>
+    <div class="table-wrap"><table>
+     <thead><tr><th>Picha</th><th>Chakula</th><th>Category</th><th>Bei</th><th>Upatikanaji</th><th>Hatua</th></tr></thead>
+     <tbody id="menuItemsBody"></tbody>
+    </table></div>
+    <div id="menuEmpty" class="empty-state hidden">Bado hakuna chakula kwenye menyu yako.</div>
+   </div>
+  </section>
+
+  <section id="restaurantSection" class="section">
+   <div class="content-card">
+    <div class="card-header"><div><h2>Taarifa za mgahawa</h2><p class="muted" style="margin:0">Taarifa hizi zinaweza kuonekana kwa wateja.</p></div></div>
+    <form id="restaurantForm">
+     <div class="form-grid">
+      <div class="field"><label for="restaurantName">Jina la mgahawa *</label><input id="restaurantName" required maxlength="150"></div>
+      <div class="field"><label for="restaurantPhone">Simu ya mgahawa</label><input id="restaurantPhone" type="tel" maxlength="40"></div>
+      <div class="field full"><label for="restaurantAddress">Anuani / eneo</label><input id="restaurantAddress" maxlength="300" placeholder="Mfano: Keko, Dar es Salaam"></div>
+      <div class="field full"><label for="restaurantDescription">Maelezo</label><textarea id="restaurantDescription" maxlength="3000" placeholder="Maelezo ya mgahawa wako"></textarea></div>
+      <div class="field full"><label for="restaurantImage">Kiungo cha picha ya mgahawa (URL)</label><input id="restaurantImage" type="url" maxlength="2000" placeholder="https://..."></div>
+      <div class="field"><label for="openingTime">Muda wa kufungua</label><input id="openingTime" type="time"></div>
+      <div class="field"><label for="closingTime">Muda wa kufunga</label><input id="closingTime" type="time"></div>
+      <div class="field"><label for="deliveryFee">Ada ya delivery (TZS)</label><input id="deliveryFee" type="number" min="0" step="1"></div>
+      <div class="field"><label for="deliveryAvailable">Delivery</label><select id="deliveryAvailable"><option value="true">Inapatikana</option><option value="false">Haipatikani</option></select></div>
+      <div class="field full"><label for="restaurantOpen">Hali ya mgahawa</label><select id="restaurantOpen"><option value="true">Uko wazi</option><option value="false">Umefungwa kwa sasa</option></select></div>
+     </div>
+     <div class="form-actions"><button id="saveRestaurantButton" class="btn btn-primary" type="submit">Hifadhi taarifa za mgahawa</button></div>
+    </form>
+   </div>
+   <p class="small-text">Kumbuka: kubadilisha muda au hali ya mgahawa hakumaanishi kuwa mfumo utafungua au kufunga kiotomatiki kwa muda huo; inategemea jinsi ukurasa wa wateja unavyotumia taarifa hizi.</p>
+  </section>
+
+  <section id="accountSection" class="section">
+   <div class="content-card">
+    <div class="card-header"><div><h2>Akaunti ya Vendor</h2><p class="muted" style="margin:0">Badilisha taarifa za akaunti yako ya biashara.</p></div></div>
+    <form id="accountForm">
+     <div class="form-grid">
+      <div class="field"><label for="vendorFullName">Jina kamili *</label><input id="vendorFullName" required maxlength="150"></div>
+      <div class="field"><label for="vendorPhone">Namba ya simu</label><input id="vendorPhone" type="tel" maxlength="40"></div>
+      <div class="field"><label for="vendorBusinessName">Jina la biashara *</label><input id="vendorBusinessName" required maxlength="150"></div>
+      <div class="field"><label for="vendorBusinessType">Aina ya biashara</label><input id="vendorBusinessType" maxlength="100" placeholder="Mfano: Restaurant"></div>
+      <div class="field full"><label for="vendorAddress">Anuani ya biashara</label><input id="vendorAddress" maxlength="300"></div>
+      <div class="field full"><label>Barua pepe ya kuingia</label><input id="vendorEmail" readonly disabled><p class="small-text">Barua pepe ya kuingia haibadilishwi hapa.</p></div>
+     </div>
+     <div class="form-actions"><button id="saveAccountButton" class="btn btn-primary" type="submit">Hifadhi akaunti</button></div>
+    </form>
+   </div>
+  </section>
+ </main>
 </div>
 
 <script>
@@ -284,534 +316,635 @@ tbody tr:hover{background:#fcfefc}
 const $ = id => document.getElementById(id);
 
 const state = {
-    db: null,
-    user: null,
-    restaurantId: null,
-    restaurantName: "Mkahawa",
-    vendorStatus: null,
-    orders: [],
-    busyOrderIds: new Set()
+ db:null,user:null,vendor:null,restaurant:null,
+ restaurantId:null,restaurantName:"Mkahawa",
+ vendorStatus:null,orders:[],menuItems:[],
+ busyOrderIds:new Set()
 };
 
 const ORDER_STATUSES = [
-    "Pending", "Confirmed", "Preparing", "Ready",
-    "Out for Delivery", "Delivered", "Cancelled"
+ "Pending","Confirmed","Preparing","Ready",
+ "Out for Delivery","Delivered","Cancelled"
 ];
 
 const NEXT_STATUSES = {
-    "Pending": ["Confirmed", "Cancelled"],
-    "Confirmed": ["Preparing", "Cancelled"],
-    "Preparing": ["Ready", "Cancelled"],
-    "Ready": ["Out for Delivery", "Delivered"],
-    "Out for Delivery": ["Delivered"],
-    "Delivered": [],
-    "Cancelled": []
+ "Pending":["Confirmed","Cancelled"],
+ "Confirmed":["Preparing","Cancelled"],
+ "Preparing":["Ready","Cancelled"],
+ "Ready":["Out for Delivery","Delivered"],
+ "Out for Delivery":["Delivered"],
+ "Delivered":[],
+ "Cancelled":[]
 };
 
-function showView(id) {
-    ["loadingView", "approvalView", "errorView", "dashboardView"].forEach(view => {
-        $(view).classList.toggle("hidden", view !== id);
-    });
+function showView(id){
+ ["loadingView","approvalView","errorView","dashboardView"].forEach(view=>{
+  $(view).classList.toggle("hidden",view!==id);
+ });
 }
 
-function showNotice(message, type = "info") {
-    const box = $("notice");
-    box.textContent = message;
-    box.className = "notice " + type;
-    box.classList.remove("hidden");
+function showNotice(message,type="info"){
+ const box=$("notice");
+ box.textContent=message;
+ box.className="notice "+type;
+ box.classList.remove("hidden");
 }
 
-function hideNotice() {
-    $("notice").classList.add("hidden");
+function hideNotice(){$("notice").classList.add("hidden")}
+
+function escapeHtml(value){
+ return String(value??"").replace(/[&<>"']/g,char=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ })[char]);
 }
 
-function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-    })[char]);
+function money(value){
+ return "TZS "+Number(value||0).toLocaleString("en-TZ",{maximumFractionDigits:2});
 }
 
-function money(value) {
-    return "TZS " + Number(value || 0).toLocaleString("en-TZ", {
-        maximumFractionDigits: 2
-    });
+function formatDate(value){
+ if(!value)return "—";
+ const date=new Date(value);
+ if(Number.isNaN(date.getTime()))return "—";
+ return date.toLocaleString("sw-TZ",{
+  year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"
+ });
 }
 
-function formatDate(value) {
-    if (!value) return "—";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "—";
-    return date.toLocaleString("sw-TZ", {
-        year:"numeric", month:"short", day:"numeric",
-        hour:"2-digit", minute:"2-digit"
-    });
+function statusClass(status){
+ return "status-"+String(status||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 }
 
-function statusClass(status) {
-    return "status-" + String(status || "").toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function getClient(){
+ if(window.db&&typeof window.db.from==="function"&&window.db.auth)return window.db;
+ throw new Error("Supabase haijaunganishwa. Kagua supabase.js na intaneti.");
 }
 
-function getClient() {
-    if (window.db && typeof window.db.from === "function" && window.db.auth) {
-        return window.db;
-    }
-    throw new Error("Supabase haijaunganishwa. Kagua supabase.js na intaneti.");
+async function requireLogin(){
+ const {data,error}=await state.db.auth.getSession();
+ if(error)throw error;
+ if(!data?.session?.user){
+  window.location.replace("vendor-login.html");
+  return false;
+ }
+ state.user=data.session.user;
+ return true;
 }
 
-async function requireLogin() {
-    const {data, error} = await state.db.auth.getSession();
-    if (error) throw error;
-
-    if (!data?.session?.user) {
-        window.location.replace("vendor-login.html");
-        return false;
-    }
-
-    state.user = data.session.user;
-    return true;
+function showApprovalMessage(status){
+ const normalized=String(status||"").trim().toLowerCase();
+ if(normalized==="pending"){
+  $("approvalIcon").textContent="⏳";
+  $("approvalTitle").textContent="Akaunti inasubiri idhini";
+  $("approvalMessage").textContent="Subiri Admin aidhinishe akaunti yako kabla ya kutumia Vendor Dashboard.";
+ }else if(normalized==="revoked"){
+  $("approvalIcon").textContent="!";
+  $("approvalTitle").textContent="Idhini ya akaunti imeondolewa";
+  $("approvalMessage").textContent="Huruhusiwi kutumia Vendor Dashboard kwa sasa. Wasiliana na Admin.";
+ }else{
+  $("approvalIcon").textContent="🔒";
+  $("approvalTitle").textContent="Akaunti haijaidhinishwa";
+  $("approvalMessage").textContent="Hali ya akaunti haijatambulika. Wasiliana na Admin.";
+ }
+ showView("approvalView");
 }
 
-/*
- * Muhimu:
- * Vendor anaruhusiwa kuendelea tu kama status yake ni "approved".
- * Pending, revoked, status isiyojulikana au status tupu huzuiwa.
- */
-function showApprovalMessage(status) {
-    const normalized = String(status || "").trim().toLowerCase();
+async function loadVendorProfile(){
+ const {data:vendor,error}=await state.db
+  .from("food_vendors")
+  .select("id,full_name,phone,email,business_name,business_type,address,profile_image_url,restaurant_id,status")
+  .eq("id",state.user.id)
+  .maybeSingle();
 
-    if (normalized === "pending") {
-        $("approvalIcon").textContent = "⏳";
-        $("approvalTitle").textContent = "Akaunti inasubiri idhini";
-        $("approvalMessage").textContent =
-            "Usajili wako umepokelewa. Subiri Admin aidhinishe akaunti yako kabla ya kutumia Vendor Dashboard.";
-    } else if (normalized === "revoked") {
-        $("approvalIcon").textContent = "🚫";
-        $("approvalTitle").textContent = "Idhini ya akaunti imeondolewa";
-        $("approvalMessage").textContent =
-            "Huruhusiwi kutumia Vendor Dashboard kwa sasa. Wasiliana na Admin kwa msaada.";
-    } else {
-        $("approvalIcon").textContent = "🔒";
-        $("approvalTitle").textContent = "Akaunti haijaidhinishwa";
-        $("approvalMessage").textContent =
-            "Akaunti yako haina hali ya idhini inayotambulika. Wasiliana na Admin akague taarifa zako.";
-    }
+ if(error)throw new Error("Imeshindikana kusoma wasifu wa Vendor: "+error.message);
+ if(!vendor)throw new Error("Akaunti haipo kwenye food_vendors au ruhusa ya kusoma wasifu haijatolewa.");
 
-    showView("approvalView");
+ state.vendor=vendor;
+ state.vendorStatus=String(vendor.status||"").trim().toLowerCase();
+
+ if(state.vendorStatus!=="approved"){
+  showApprovalMessage(state.vendorStatus);
+  return false;
+ }
+
+ if(!vendor.restaurant_id){
+  $("approvalIcon").textContent="!";
+  $("approvalTitle").textContent="Mkahawa haujaunganishwa";
+  $("approvalMessage").textContent="Akaunti yako imeidhinishwa lakini haina restaurant_id. Wasiliana na Admin.";
+  showView("approvalView");
+  return false;
+ }
+
+ state.restaurantId=vendor.restaurant_id;
+
+ const {data:restaurant,error:restaurantError}=await state.db
+  .from("food_restaurants")
+  .select("id,name,description,phone,address,opening_time,closing_time,delivery_available,delivery_fee,image_url,is_open,owner_vendor_id")
+  .eq("id",state.restaurantId)
+  .maybeSingle();
+
+ if(restaurantError)throw new Error("Imeshindikana kusoma taarifa za mgahawa: "+restaurantError.message);
+ if(!restaurant)throw new Error("Mgahawa wa Vendor huyu haujapatikana.");
+
+ // Hakikisha uhusiano wa mmiliki unalingana ikiwa owner_vendor_id imewekwa.
+ if(restaurant.owner_vendor_id&&restaurant.owner_vendor_id!==vendor.id){
+  throw new Error("Mgahawa huu haujaunganishwa na akaunti yako kama mmiliki. Wasiliana na Admin.");
+ }
+
+ state.restaurant=restaurant;
+ state.restaurantName=restaurant.name||vendor.business_name||"Mkahawa";
+ $("sidebarRestaurantName").textContent=state.restaurantName;
+ $("sidebarVendorEmail").textContent=state.user.email||vendor.email||"";
+ $("welcomeTitle").textContent=state.restaurantName;
+ fillRestaurantForm();
+ fillAccountForm();
+ return true;
 }
 
-async function loadVendorProfile() {
-    /*
-     * Tunachukulia food_vendors.id kuwa sawa na auth.uid(),
-     * kama ilivyo kwenye code yako ya awali.
-     */
-    const {data: vendor, error} = await state.db
-        .from("food_vendors")
-        .select("id, restaurant_id, status")
-        .eq("id", state.user.id)
-        .maybeSingle();
-
-    if (error) {
-        throw new Error(
-            "Imeshindikana kusoma wasifu wa vendor: " + error.message
-        );
-    }
-
-    if (!vendor) {
-        throw new Error(
-            "Akaunti hii haipo kwenye food_vendors au ruhusa ya kusoma wasifu haijatolewa."
-        );
-    }
-
-    state.vendorStatus = String(vendor.status || "").trim().toLowerCase();
-
-    // Hakuna dashboard bila status iliyoidhinishwa.
-    if (state.vendorStatus !== "approved") {
-        showApprovalMessage(state.vendorStatus);
-        return false;
-    }
-
-    if (!vendor.restaurant_id) {
-        $("approvalIcon").textContent = "🏪";
-        $("approvalTitle").textContent = "Mkahawa bado haujaunganishwa";
-        $("approvalMessage").textContent =
-            "Akaunti yako imeidhinishwa, lakini haina restaurant_id. Wasiliana na Admin au kamilisha usajili wa mkahawa wako.";
-        showView("approvalView");
-        return false;
-    }
-
-    state.restaurantId = vendor.restaurant_id;
-
-    const {data: restaurant, error: restaurantError} = await state.db
-        .from("food_restaurants")
-        .select("id, name")
-        .eq("id", state.restaurantId)
-        .maybeSingle();
-
-    if (restaurantError) {
-        throw new Error(
-            "Imeshindikana kusoma mkahawa: " + restaurantError.message
-        );
-    }
-
-    if (!restaurant) {
-        throw new Error("Mkahawa wa vendor huyu haujapatikana.");
-    }
-
-    state.restaurantName = restaurant.name || "Mkahawa";
-    $("sidebarRestaurantName").textContent = state.restaurantName;
-    $("sidebarVendorEmail").textContent = state.user.email || "";
-    $("welcomeTitle").textContent = state.restaurantName;
-
-    return true;
+function fillRestaurantForm(){
+ const r=state.restaurant||{};
+ $("restaurantName").value=r.name||"";
+ $("restaurantPhone").value=r.phone||"";
+ $("restaurantAddress").value=r.address||"";
+ $("restaurantDescription").value=r.description||"";
+ $("restaurantImage").value=r.image_url||"";
+ $("openingTime").value=String(r.opening_time||"").slice(0,5);
+ $("closingTime").value=String(r.closing_time||"").slice(0,5);
+ $("deliveryFee").value=r.delivery_fee??0;
+ $("deliveryAvailable").value=String(r.delivery_available!==false);
+ $("restaurantOpen").value=String(r.is_open!==false);
 }
 
-async function loadOrders() {
-    if (state.vendorStatus !== "approved" || !state.restaurantId) {
-        throw new Error("Akaunti haina idhini au mkahawa haujaunganishwa.");
-    }
-
-    const {data: orders, error} = await state.db
-        .from("food_orders")
-        .select("id, order_number, customer_name, customer_phone, delivery_location, instructions, delivery_type, subtotal, delivery_fee, total, status, created_at, restaurant_id")
-        .eq("restaurant_id", state.restaurantId)
-        .order("created_at", {ascending:false});
-
-    if (error) {
-        throw new Error("Imeshindikana kupakia oda: " + error.message);
-    }
-
-    const list = orders || [];
-    const ids = list.map(order => order.id);
-    let items = [];
-
-    if (ids.length) {
-        const {data, error: itemError} = await state.db
-            .from("food_order_items")
-            .select("id, order_id, food_name, price, quantity, item_total")
-            .in("order_id", ids);
-
-        if (itemError) {
-            throw new Error(
-                "Imeshindikana kupakia bidhaa za oda: " + itemError.message
-            );
-        }
-
-        items = data || [];
-    }
-
-    const byOrder = new Map();
-
-    items.forEach(item => {
-        if (!byOrder.has(item.order_id)) {
-            byOrder.set(item.order_id, []);
-        }
-        byOrder.get(item.order_id).push(item);
-    });
-
-    state.orders = list.map(order => ({
-        ...order,
-        items: byOrder.get(order.id) || []
-    }));
-
-    renderDashboard();
+function fillAccountForm(){
+ const v=state.vendor||{};
+ $("vendorFullName").value=v.full_name||"";
+ $("vendorPhone").value=v.phone||"";
+ $("vendorBusinessName").value=v.business_name||"";
+ $("vendorBusinessType").value=v.business_type||"";
+ $("vendorAddress").value=v.address||"";
+ $("vendorEmail").value=state.user?.email||v.email||"";
 }
 
-function renderItems(order) {
-    if (!order.items.length) {
-        return '<span class="muted">Hakuna bidhaa</span>';
-    }
+async function loadOrders(){
+ if(state.vendorStatus!=="approved"||!state.restaurantId)throw new Error("Akaunti haina idhini au mkahawa haujaunganishwa.");
 
-    return order.items.map(item =>
-        `<div>${escapeHtml(item.food_name)} × ${Number(item.quantity || 1)}</div>`
-    ).join("");
+ const {data:orders,error}=await state.db.from("food_orders")
+  .select("id,order_number,customer_name,customer_phone,delivery_location,instructions,delivery_type,subtotal,delivery_fee,total,status,created_at,restaurant_id")
+  .eq("restaurant_id",state.restaurantId)
+  .order("created_at",{ascending:false});
+
+ if(error)throw new Error("Imeshindikana kupakia oda: "+error.message);
+
+ const list=orders||[];
+ const ids=list.map(order=>order.id);
+ let items=[];
+
+ if(ids.length){
+  const {data,error:itemError}=await state.db.from("food_order_items")
+   .select("id,order_id,food_name,price,quantity,item_total")
+   .in("order_id",ids);
+  if(itemError)throw new Error("Imeshindikana kupakia bidhaa za oda: "+itemError.message);
+  items=data||[];
+ }
+
+ const byOrder=new Map();
+ items.forEach(item=>{
+  if(!byOrder.has(item.order_id))byOrder.set(item.order_id,[]);
+  byOrder.get(item.order_id).push(item);
+ });
+
+ state.orders=list.map(order=>({...order,items:byOrder.get(order.id)||[]}));
+ renderDashboard();
 }
 
-function renderActions(order) {
-    const next = NEXT_STATUSES[order.status] || [];
-
-    if (!next.length) {
-        return '<span class="muted">Imekamilika</span>';
-    }
-
-    return `<div class="actions">${next.map(status => {
-        const danger = status === "Cancelled";
-
-        const label = {
-            "Confirmed":"Kubali",
-            "Preparing":"Andaa",
-            "Ready":"Tayari",
-            "Out for Delivery":"Anasafirisha",
-            "Delivered":"Amepokea",
-            "Cancelled":"Ghairi"
-        }[status] || status;
-
-        return `<button class="btn ${danger ? "btn-danger" : "btn-primary"}"
-            data-order-id="${escapeHtml(order.id)}"
-            data-next-status="${escapeHtml(status)}"
-            ${state.busyOrderIds.has(order.id) ? "disabled" : ""}>${label}</button>`;
-    }).join("")}</div>`;
+function renderItems(order){
+ if(!order.items.length)return '<span class="muted">Hakuna bidhaa</span>';
+ return order.items.map(item=>`<div>${escapeHtml(item.food_name)} × ${Number(item.quantity||1)}</div>`).join("");
 }
 
-function renderOrderRow(order) {
-    return `<tr>
-        <td>
-            <span class="order-number">${escapeHtml(order.order_number || order.id)}</span>
-            <div class="muted">${escapeHtml(order.delivery_type || "")}</div>
-        </td>
-        <td>
-            <strong>${escapeHtml(order.customer_name)}</strong>
-            <div class="muted">${escapeHtml(order.customer_phone)}</div>
-            <div class="muted">${escapeHtml(order.delivery_location)}</div>
-        </td>
-        <td><div class="order-items">${renderItems(order)}</div></td>
-        <td class="currency">${money(order.total)}</td>
-        <td>
-            <span class="status ${statusClass(order.status)}">${escapeHtml(order.status || "Pending")}</span>
-        </td>
-        <td>${formatDate(order.created_at)}</td>
-        <td>${renderActions(order)}</td>
-    </tr>`;
+function renderActions(order){
+ const next=NEXT_STATUSES[order.status]||[];
+ if(!next.length)return '<span class="muted">Imekamilika</span>';
+ return `<div class="actions">${next.map(status=>{
+  const danger=status==="Cancelled";
+  const label={"Confirmed":"Kubali","Preparing":"Andaa","Ready":"Tayari","Out for Delivery":"Anasafirisha","Delivered":"Amepokea","Cancelled":"Ghairi"}[status]||status;
+  return `<button class="btn ${danger?"btn-danger":"btn-primary"}" data-order-id="${escapeHtml(order.id)}" data-next-status="${escapeHtml(status)}" ${state.busyOrderIds.has(order.id)?"disabled":""}>${label}</button>`;
+ }).join("")}</div>`;
 }
 
-function renderDashboard() {
-    const orders = state.orders;
-
-    $("totalOrders").textContent = orders.length;
-    $("pendingOrders").textContent =
-        orders.filter(o => o.status === "Pending").length;
-    $("preparingOrders").textContent =
-        orders.filter(o => o.status === "Preparing").length;
-
-    const revenue = orders
-        .filter(o => o.status === "Delivered")
-        .reduce((sum, o) => sum + Number(o.total || 0), 0);
-
-    $("completedRevenue").textContent = money(revenue);
-
-    const recent = orders.slice(0, 5);
-    $("recentOrdersBody").innerHTML = recent.map(renderOrderRow).join("");
-    $("recentEmpty").classList.toggle("hidden", recent.length > 0);
-
-    renderAllOrders();
+function renderOrderRow(order){
+ return `<tr>
+ <td><span class="order-number">${escapeHtml(order.order_number||order.id)}</span><div class="muted">${escapeHtml(order.delivery_type||"")}</div></td>
+ <td><strong>${escapeHtml(order.customer_name)}</strong><div class="muted">${escapeHtml(order.customer_phone)}</div><div class="muted">${escapeHtml(order.delivery_location)}</div></td>
+ <td><div class="order-items">${renderItems(order)}</div></td>
+ <td class="currency">${money(order.total)}</td>
+ <td><span class="status ${statusClass(order.status)}">${escapeHtml(order.status||"Pending")}</span></td>
+ <td>${formatDate(order.created_at)}</td>
+ <td>${renderActions(order)}</td></tr>`;
 }
 
-function renderAllOrders() {
-    const search = $("searchOrders").value.trim().toLowerCase();
-    const status = $("statusFilter").value;
-
-    const filtered = state.orders.filter(order => {
-        const matchesSearch = !search ||
-            String(order.order_number || "").toLowerCase().includes(search) ||
-            String(order.customer_name || "").toLowerCase().includes(search) ||
-            String(order.customer_phone || "").toLowerCase().includes(search);
-
-        return matchesSearch && (!status || order.status === status);
-    });
-
-    $("allOrdersBody").innerHTML = filtered.map(renderOrderRow).join("");
-    $("ordersEmpty").classList.toggle("hidden", filtered.length > 0);
+function renderDashboard(){
+ const orders=state.orders;
+ $("totalOrders").textContent=orders.length;
+ $("pendingOrders").textContent=orders.filter(o=>o.status==="Pending").length;
+ $("preparingOrders").textContent=orders.filter(o=>o.status==="Preparing").length;
+ const revenue=orders.filter(o=>o.status==="Delivered").reduce((sum,o)=>sum+Number(o.total||0),0);
+ $("completedRevenue").textContent=money(revenue);
+ const recent=orders.slice(0,5);
+ $("recentOrdersBody").innerHTML=recent.map(renderOrderRow).join("");
+ $("recentEmpty").classList.toggle("hidden",recent.length>0);
+ renderAllOrders();
 }
 
-async function updateOrderStatus(orderId, nextStatus) {
-    // Zuia mabadiliko ikiwa idhini imeondolewa.
-    if (state.vendorStatus !== "approved" || !state.restaurantId) {
-        showNotice("Huna idhini ya kusimamia oda.", "error");
-        return;
-    }
-
-    if (!ORDER_STATUSES.includes(nextStatus)) {
-        showNotice("Hali uliyochagua haitambuliki.", "error");
-        return;
-    }
-
-    const order = state.orders.find(item => item.id === orderId);
-
-    if (!order) {
-        showNotice("Oda hii haijapatikana.", "error");
-        return;
-    }
-
-    if (!(NEXT_STATUSES[order.status] || []).includes(nextStatus)) {
-        showNotice("Mabadiliko haya ya hali hayaruhusiwi.", "error");
-        return;
-    }
-
-    if (
-        nextStatus === "Cancelled" &&
-        !window.confirm("Una uhakika unataka kughairi oda hii?")
-    ) {
-        return;
-    }
-
-    state.busyOrderIds.add(orderId);
-    renderDashboard();
-
-    try {
-        const {data, error} = await state.db
-            .from("food_orders")
-            .update({status:nextStatus})
-            .eq("id", orderId)
-            .eq("restaurant_id", state.restaurantId)
-            .eq("status", order.status)
-            .select("id, status")
-            .maybeSingle();
-
-        if (error) throw error;
-
-        if (!data) {
-            throw new Error(
-                "Oda haikubadilishwa. Kagua hali ya oda na ruhusa za Supabase."
-            );
-        }
-
-        order.status = data.status;
-        showNotice(
-            "Hali ya oda imebadilishwa kuwa " + data.status + ".",
-            "success"
-        );
-    } catch (error) {
-        showNotice(
-            "Imeshindikana kubadilisha hali ya oda: " + error.message,
-            "error"
-        );
-    } finally {
-        state.busyOrderIds.delete(orderId);
-        renderDashboard();
-    }
+function renderAllOrders(){
+ const search=$("searchOrders").value.trim().toLowerCase();
+ const status=$("statusFilter").value;
+ const filtered=state.orders.filter(order=>{
+  const matches=!search||
+   String(order.order_number||"").toLowerCase().includes(search)||
+   String(order.customer_name||"").toLowerCase().includes(search)||
+   String(order.customer_phone||"").toLowerCase().includes(search);
+  return matches&&(!status||order.status===status);
+ });
+ $("allOrdersBody").innerHTML=filtered.map(renderOrderRow).join("");
+ $("ordersEmpty").classList.toggle("hidden",filtered.length>0);
 }
 
-async function refreshDashboard() {
-    hideNotice();
-    $("refreshButton").disabled = true;
-    $("refreshButton").textContent = "Inapakia...";
+async function updateOrderStatus(orderId,nextStatus){
+ if(state.vendorStatus!=="approved"||!state.restaurantId){showNotice("Huna idhini ya kusimamia oda.","error");return;}
+ if(!ORDER_STATUSES.includes(nextStatus)){showNotice("Hali uliyochagua haitambuliki.","error");return;}
+ const order=state.orders.find(item=>item.id===orderId);
+ if(!order){showNotice("Oda hii haijapatikana.","error");return;}
+ if(!(NEXT_STATUSES[order.status]||[]).includes(nextStatus)){showNotice("Mabadiliko haya hayaruhusiwi.","error");return;}
+ if(nextStatus==="Cancelled"&&!window.confirm("Una uhakika unataka kughairi oda hii?"))return;
 
-    try {
-        // Kagua idhini tena kila vendor anapobonyeza refresh.
-        const profileLoaded = await loadVendorProfile();
+ state.busyOrderIds.add(orderId);
+ renderDashboard();
 
-        if (!profileLoaded) {
-            state.orders = [];
-            return;
-        }
-
-        await loadOrders();
-        showNotice("Taarifa za oda zimeonyeshwa upya.", "success");
-    } catch (error) {
-        showNotice(error.message, "error");
-    } finally {
-        $("refreshButton").disabled = false;
-        $("refreshButton").textContent = "↻ Onyesha upya";
-    }
+ try{
+  const {data,error}=await state.db.from("food_orders").update({status:nextStatus})
+   .eq("id",orderId).eq("restaurant_id",state.restaurantId).eq("status",order.status)
+   .select("id,status").maybeSingle();
+  if(error)throw error;
+  if(!data)throw new Error("Oda haikubadilishwa. Kagua hali ya oda na ruhusa za Supabase.");
+  order.status=data.status;
+  showNotice("Hali ya oda imebadilishwa kuwa "+data.status+".","success");
+ }catch(error){
+  showNotice("Imeshindikana kubadilisha hali ya oda: "+error.message,"error");
+ }finally{
+  state.busyOrderIds.delete(orderId);
+  renderDashboard();
+ }
 }
 
-async function logout() {
-    try {
-        if (state.db) {
-            const {error} = await state.db.auth.signOut();
-            if (error) throw error;
-        }
-
-        window.location.replace("vendor-login.html");
-    } catch (error) {
-        if (!$("dashboardView").classList.contains("hidden")) {
-            showNotice(
-                "Imeshindikana kutoka kwenye akaunti: " + error.message,
-                "error"
-            );
-        } else {
-            $("approvalMessage").textContent =
-                "Imeshindikana kutoka: " + error.message;
-        }
-    }
+/* MENU: soma chakula cha mgahawa wa Vendor huyu pekee. */
+async function loadMenu(){
+ if(state.vendorStatus!=="approved"||!state.restaurantId)throw new Error("Huna idhini ya kusimamia menyu.");
+ const {data,error}=await state.db.from("food_menu")
+  .select("id,restaurant_id,name,description,price,image_url,category,is_available,created_at")
+  .eq("restaurant_id",state.restaurantId)
+  .order("created_at",{ascending:false});
+ if(error)throw new Error("Imeshindikana kupakia menyu: "+error.message);
+ state.menuItems=data||[];
+ renderMenu();
 }
 
-function showError(error) {
-    $("errorMessage").textContent =
-        error?.message || "Hitilafu isiyojulikana imetokea.";
-
-    showView("errorView");
+function renderMenu(){
+ const search=$("searchMenu").value.trim().toLowerCase();
+ const items=state.menuItems.filter(item=>
+  !search||String(item.name||"").toLowerCase().includes(search)||
+  String(item.category||"").toLowerCase().includes(search)
+ );
+ $("menuItemsBody").innerHTML=items.map(item=>{
+  const image=item.image_url
+   ?`<img class="menu-image" src="${escapeHtml(item.image_url)}" alt="Picha ya chakula" loading="lazy" onerror="this.style.display='none'">`
+   :'<div class="menu-image"></div>';
+  return `<tr>
+   <td>${image}</td>
+   <td><strong>${escapeHtml(item.name)}</strong><div class="small-text">${escapeHtml(item.description||"")}</div></td>
+   <td>${escapeHtml(item.category||"—")}</td>
+   <td class="currency">${money(item.price)}</td>
+   <td><span class="available-label ${item.is_available===false?"available-no":"available-yes"}">${item.is_available===false?"Haipatikani":"Inapatikana"}</span></td>
+   <td><div class="actions">
+    <button class="btn btn-light" data-edit-menu="${escapeHtml(item.id)}">Hariri</button>
+    <button class="btn btn-outline" data-toggle-menu="${escapeHtml(item.id)}">${item.is_available===false?"Washa":"Zima"}</button>
+    <button class="btn btn-danger" data-delete-menu="${escapeHtml(item.id)}">Futa</button>
+   </div></td></tr>`;
+ }).join("");
+ $("menuEmpty").classList.toggle("hidden",items.length>0);
 }
 
-async function init() {
-    showView("loadingView");
-    $("loadingMessage").textContent =
-        "Inathibitisha akaunti na idhini ya vendor...";
-
-    try {
-        state.db = getClient();
-
-        const loggedIn = await requireLogin();
-        if (!loggedIn) return;
-
-        const profileLoaded = await loadVendorProfile();
-
-        // Pending, revoked au vendor asiye na restaurant:
-        // usifungue dashboard.
-        if (!profileLoaded) return;
-
-        await loadOrders();
-        showView("dashboardView");
-    } catch (error) {
-        console.error("Vendor dashboard error:", error);
-        showError(error);
-    }
+function clearMenuForm(){
+ $("menuForm").reset();
+ $("menuItemId").value="";
+ $("foodAvailable").checked=true;
+ $("menuFormTitle").textContent="Ongeza chakula";
+ $("saveMenuButton").textContent="Hifadhi chakula";
+ $("cancelMenuEditButton").classList.add("hidden");
 }
 
-document.querySelectorAll("[data-section]").forEach(button => {
-    button.addEventListener("click", () => {
-        const section = button.dataset.section;
+function editMenuItem(id){
+ const item=state.menuItems.find(row=>row.id===id);
+ if(!item){showNotice("Chakula hakijapatikana. Refresh menyu.","error");return;}
+ $("menuItemId").value=item.id;
+ $("foodName").value=item.name||"";
+ $("foodPrice").value=item.price??"";
+ $("foodCategory").value=item.category||"";
+ $("foodImage").value=item.image_url||"";
+ $("foodDescription").value=item.description||"";
+ $("foodAvailable").checked=item.is_available!==false;
+ $("menuFormTitle").textContent="Hariri chakula";
+ $("saveMenuButton").textContent="Hifadhi mabadiliko";
+ $("cancelMenuEditButton").classList.remove("hidden");
+ $("menuForm").scrollIntoView({behavior:"smooth",block:"start"});
+}
 
-        document.querySelectorAll("[data-section]").forEach(item => {
-            item.classList.toggle("active", item === button);
-        });
+async function saveMenuItem(event){
+ event.preventDefault();
+ if(state.vendorStatus!=="approved"||!state.restaurantId){showNotice("Huna idhini ya kubadilisha menyu.","error");return;}
+ const id=$("menuItemId").value;
+ const name=$("foodName").value.trim();
+ const price=Number($("foodPrice").value);
+ const category=$("foodCategory").value.trim();
+ const imageUrl=$("foodImage").value.trim();
+ const description=$("foodDescription").value.trim();
 
-        document.querySelectorAll(".section").forEach(item => {
-            item.classList.remove("active");
-        });
+ if(!name){showNotice("Weka jina la chakula.","error");return;}
+ if(!Number.isFinite(price)||price<0){showNotice("Weka bei sahihi.","error");return;}
+ if(imageUrl){
+  try{const u=new URL(imageUrl);if(!["http:","https:"].includes(u.protocol))throw new Error();}
+  catch{showNotice("Kiungo cha picha si sahihi. Tumia URL inayoanza na https:// au http://.","error");return;}
+ }
 
-        $(section + "Section").classList.add("active");
-    });
+ const payload={
+  name,price,category:category||null,image_url:imageUrl||null,
+  description:description||null,is_available:$("foodAvailable").checked
+ };
+ const button=$("saveMenuButton");
+ button.disabled=true;
+ button.textContent="Inahifadhi...";
+
+ try{
+  let result;
+  if(id){
+   result=await state.db.from("food_menu").update(payload)
+    .eq("id",id).eq("restaurant_id",state.restaurantId)
+    .select("id").maybeSingle();
+  }else{
+   result=await state.db.from("food_menu")
+    .insert({...payload,restaurant_id:state.restaurantId})
+    .select("id").single();
+  }
+  if(result.error)throw result.error;
+  if(id&&!result.data)throw new Error("Chakula hakikubadilishwa. Kagua ruhusa za Supabase.");
+  clearMenuForm();
+  await loadMenu();
+  showNotice(id?"Mabadiliko ya chakula yamehifadhiwa.":"Chakula kimeongezwa kwenye menyu.","success");
+ }catch(error){
+  showNotice("Imeshindikana kuhifadhi chakula: "+error.message,"error");
+ }finally{
+  button.disabled=false;
+  button.textContent=$("menuItemId").value?"Hifadhi mabadiliko":"Hifadhi chakula";
+ }
+}
+
+async function toggleMenuItem(id){
+ const item=state.menuItems.find(row=>row.id===id);
+ if(!item)return;
+ try{
+  const {data,error}=await state.db.from("food_menu")
+   .update({is_available:item.is_available===false})
+   .eq("id",id).eq("restaurant_id",state.restaurantId)
+   .select("id,is_available").maybeSingle();
+  if(error)throw error;
+  if(!data)throw new Error("Mabadiliko hayakuhifadhiwa. Kagua ruhusa za Supabase.");
+  await loadMenu();
+  showNotice(data.is_available?"Chakula sasa kinapatikana.":"Chakula kimezimwa kwa sasa.","success");
+ }catch(error){showNotice("Imeshindikana kubadilisha upatikanaji: "+error.message,"error");}
+}
+
+async function deleteMenuItem(id){
+ const item=state.menuItems.find(row=>row.id===id);
+ if(!item)return;
+ if(!window.confirm("Una uhakika unataka kufuta chakula hiki: "+item.name+"?"))return;
+ try{
+  const {data,error}=await state.db.from("food_menu").delete()
+   .eq("id",id).eq("restaurant_id",state.restaurantId)
+   .select("id").maybeSingle();
+  if(error)throw error;
+  if(!data)throw new Error("Chakula hakikufutwa. Kagua ruhusa za Supabase.");
+  if($("menuItemId").value===id)clearMenuForm();
+  await loadMenu();
+  showNotice("Chakula kimefutwa.","success");
+ }catch(error){showNotice("Imeshindikana kufuta chakula: "+error.message,"error");}
+}
+
+/* RESTAURANT PROFILE */
+async function saveRestaurant(event){
+ event.preventDefault();
+ if(state.vendorStatus!=="approved"||!state.restaurantId||!state.vendor){showNotice("Huna idhini ya kubadilisha taarifa za mgahawa.","error");return;}
+ const name=$("restaurantName").value.trim();
+ const phone=$("restaurantPhone").value.trim();
+ const address=$("restaurantAddress").value.trim();
+ const description=$("restaurantDescription").value.trim();
+ const imageUrl=$("restaurantImage").value.trim();
+ const fee=Number($("deliveryFee").value);
+
+ if(!name){showNotice("Jina la mgahawa linahitajika.","error");return;}
+ if(!Number.isFinite(fee)||fee<0){showNotice("Weka delivery fee sahihi.","error");return;}
+ if(imageUrl){
+  try{const u=new URL(imageUrl);if(!["http:","https:"].includes(u.protocol))throw new Error();}
+  catch{showNotice("Kiungo cha picha si sahihi.","error");return;}
+ }
+
+ const payload={
+  name,phone:phone||null,address:address||null,
+  description:description||null,image_url:imageUrl||null,
+  opening_time:$("openingTime").value||null,
+  closing_time:$("closingTime").value||null,
+  delivery_fee:fee,
+  delivery_available:$("deliveryAvailable").value==="true",
+  is_open:$("restaurantOpen").value==="true"
+ };
+ const button=$("saveRestaurantButton");
+ button.disabled=true;
+ button.textContent="Inahifadhi...";
+
+ try{
+  // Tumia restaurant_id na mmiliki pamoja kwenye filter.
+  let query=state.db.from("food_restaurants").update(payload)
+   .eq("id",state.restaurantId);
+  query=query.eq("owner_vendor_id",state.vendor.id);
+  const {data,error}=await query.select("id,name").maybeSingle();
+  if(error)throw error;
+  if(!data)throw new Error("Hakuna taarifa iliyobadilishwa. Hakikisha owner_vendor_id ya mgahawa inalingana na ID yako ya Vendor na RLS inaruhusu update.");
+  await loadVendorProfile();
+  showNotice("Taarifa za mgahawa zimehifadhiwa.","success");
+ }catch(error){
+  showNotice("Imeshindikana kuhifadhi mgahawa: "+error.message,"error");
+ }finally{
+  button.disabled=false;
+  button.textContent="Hifadhi taarifa za mgahawa";
+ }
+}
+
+/* VENDOR ACCOUNT */
+async function saveAccount(event){
+ event.preventDefault();
+ if(state.vendorStatus!=="approved"||!state.vendor){showNotice("Huna idhini ya kubadilisha akaunti.","error");return;}
+ const fullName=$("vendorFullName").value.trim();
+ const phone=$("vendorPhone").value.trim();
+ const businessName=$("vendorBusinessName").value.trim();
+ const businessType=$("vendorBusinessType").value.trim();
+ const address=$("vendorAddress").value.trim();
+
+ if(!fullName||!businessName){showNotice("Jina kamili na jina la biashara vinahitajika.","error");return;}
+
+ const button=$("saveAccountButton");
+ button.disabled=true;
+ button.textContent="Inahifadhi...";
+
+ try{
+  const {data,error}=await state.db.from("food_vendors")
+   .update({
+    full_name:fullName,phone:phone||null,
+    business_name:businessName,business_type:businessType||null,
+    address:address||null
+   })
+   .eq("id",state.user.id)
+   .select("id,full_name,phone,business_name,business_type,address,status,restaurant_id")
+   .maybeSingle();
+
+  if(error)throw error;
+  if(!data)throw new Error("Akaunti haikubadilishwa. Kagua ruhusa za Supabase.");
+  state.vendor={...state.vendor,...data};
+  $("sidebarVendorEmail").textContent=state.user.email||state.vendor.email||"";
+  showNotice("Taarifa za akaunti zimehifadhiwa.","success");
+ }catch(error){
+  showNotice("Imeshindikana kuhifadhi akaunti: "+error.message,"error");
+ }finally{
+  button.disabled=false;
+  button.textContent="Hifadhi akaunti";
+ }
+}
+
+async function refreshDashboard(){
+ hideNotice();
+ $("refreshButton").disabled=true;
+ $("refreshButton").textContent="Inapakia...";
+ try{
+  const loaded=await loadVendorProfile();
+  if(!loaded){state.orders=[];state.menuItems=[];return;}
+  await loadOrders();
+  const active=document.querySelector(".section.active");
+  if(active?.id==="menuSection")await loadMenu();
+  if(active?.id==="restaurantSection")fillRestaurantForm();
+  if(active?.id==="accountSection")fillAccountForm();
+  showNotice("Taarifa zimeonyeshwa upya.","success");
+ }catch(error){showNotice(error.message,"error");}
+ finally{$("refreshButton").disabled=false;$("refreshButton").textContent="Onyesha upya";}
+}
+
+async function logout(){
+ try{
+  if(state.db){
+   const {error}=await state.db.auth.signOut();
+   if(error)throw error;
+  }
+  window.location.replace("vendor-login.html");
+ }catch(error){
+  if(!$("dashboardView").classList.contains("hidden"))showNotice("Imeshindikana kutoka: "+error.message,"error");
+  else $("approvalMessage").textContent="Imeshindikana kutoka: "+error.message;
+ }
+}
+
+function showError(error){
+ $("errorMessage").textContent=error?.message||"Hitilafu isiyojulikana imetokea.";
+ showView("errorView");
+}
+
+function activateSection(section){
+ const target=$(section+"Section");
+ if(!target)return;
+ document.querySelectorAll("[data-section]").forEach(button=>{
+  button.classList.toggle("active",button.dataset.section===section);
+ });
+ document.querySelectorAll(".section").forEach(item=>item.classList.remove("active"));
+ target.classList.add("active");
+ hideNotice();
+
+ const titles={
+  overview:["Dashboard ya Mkahawa","Muhtasari wa biashara yako."],
+  orders:["Oda","Angalia oda na ubadilishe hatua zake."],
+  menu:["Simamia Chakula","Ongeza, hariri au ficha chakula kwenye menyu yako."],
+  restaurant:["Taarifa za Mkahawa","Sasisha taarifa zinazoonekana kwa wateja."],
+  account:["Akaunti Yangu","Simamia taarifa za akaunti yako."]
+ };
+ $("welcomeTitle").textContent=titles[section]?.[0]||state.restaurantName;
+ $("pageSubtitle").textContent=titles[section]?.[1]||"";
+ if(section==="menu")loadMenu().catch(error=>showNotice(error.message,"error"));
+ if(section==="restaurant")fillRestaurantForm();
+ if(section==="account")fillAccountForm();
+}
+
+async function init(){
+ showView("loadingView");
+ $("loadingMessage").textContent="Inathibitisha akaunti na idhini ya Vendor...";
+ try{
+  state.db=getClient();
+  const loggedIn=await requireLogin();
+  if(!loggedIn)return;
+  const loaded=await loadVendorProfile();
+  if(!loaded)return;
+  await loadOrders();
+  showView("dashboardView");
+ }catch(error){
+  console.error("Vendor dashboard error:",error);
+  showError(error);
+ }
+}
+
+/* Navigation */
+document.querySelectorAll("[data-section]").forEach(button=>{
+ button.addEventListener("click",()=>activateSection(button.dataset.section));
+});
+document.querySelectorAll("[data-go-section]").forEach(button=>{
+ button.addEventListener("click",()=>activateSection(button.dataset.goSection));
 });
 
-document.querySelectorAll("[data-go-section]").forEach(button => {
-    button.addEventListener("click", () => {
-        const section = button.dataset.goSection;
+/* Oda */
+document.addEventListener("click",event=>{
+ const orderButton=event.target.closest("[data-order-id]");
+ if(orderButton)updateOrderStatus(orderButton.dataset.orderId,orderButton.dataset.nextStatus);
 
-        document.querySelectorAll("[data-section]").forEach(item => {
-            item.classList.toggle("active", item.dataset.section === section);
-        });
+ const editButton=event.target.closest("[data-edit-menu]");
+ if(editButton)editMenuItem(editButton.dataset.editMenu);
 
-        document.querySelectorAll(".section").forEach(item => {
-            item.classList.remove("active");
-        });
+ const toggleButton=event.target.closest("[data-toggle-menu]");
+ if(toggleButton)toggleMenuItem(toggleButton.dataset.toggleMenu);
 
-        $(section + "Section").classList.add("active");
-    });
+ const deleteButton=event.target.closest("[data-delete-menu]");
+ if(deleteButton)deleteMenuItem(deleteButton.dataset.deleteMenu);
 });
 
-document.addEventListener("click", event => {
-    const button = event.target.closest("[data-order-id]");
-
-    if (button) {
-        updateOrderStatus(
-            button.dataset.orderId,
-            button.dataset.nextStatus
-        );
-    }
-});
-
-$("searchOrders").addEventListener("input", renderAllOrders);
-$("statusFilter").addEventListener("change", renderAllOrders);
-$("refreshButton").addEventListener("click", refreshDashboard);
-$("logoutButton").addEventListener("click", logout);
-$("approvalLogoutButton").addEventListener("click", logout);
-$("errorLogoutButton").addEventListener("click", logout);
-$("retryButton").addEventListener("click", init);
-$("approvalRefreshButton").addEventListener("click", init);
+/* Fomu na vitufe */
+$("menuForm").addEventListener("submit",saveMenuItem);
+$("restaurantForm").addEventListener("submit",saveRestaurant);
+$("accountForm").addEventListener("submit",saveAccount);
+$("clearMenuButton").addEventListener("click",clearMenuForm);
+$("cancelMenuEditButton").addEventListener("click",clearMenuForm);
+$("searchMenu").addEventListener("input",renderMenu);
+$("reloadMenuButton").addEventListener("click",()=>loadMenu().then(()=>showNotice("Menyu imeonyeshwa upya.","success")).catch(error=>showNotice(error.message,"error")));
+$("searchOrders").addEventListener("input",renderAllOrders);
+$("statusFilter").addEventListener("change",renderAllOrders);
+$("refreshButton").addEventListener("click",refreshDashboard);
+$("logoutButton").addEventListener("click",logout);
+$("approvalLogoutButton").addEventListener("click",logout);
+$("errorLogoutButton").addEventListener("click",logout);
+$("retryButton").addEventListener("click",init);
+$("approvalRefreshButton").addEventListener("click",init);
 
 init();
-
 })();
 </script>
 </body>
