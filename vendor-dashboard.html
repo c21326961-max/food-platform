@@ -243,7 +243,13 @@ tbody tr:hover{background:#fcfefc}
       <div class="field"><label for="foodName">Jina la chakula *</label><input id="foodName" required maxlength="150" placeholder="Mfano: Wali kuku"></div>
       <div class="field"><label for="foodPrice">Bei (TZS) *</label><input id="foodPrice" required type="number" min="0" step="1" placeholder="8000"></div>
       <div class="field"><label for="foodCategory">Category</label><input id="foodCategory" maxlength="80" placeholder="Mfano: Rice, Chicken, Chips"></div>
-      <div class="field"><label for="foodImage">Kiungo cha picha (URL)</label><input id="foodImage" type="url" maxlength="2000" placeholder="https://..."></div>
+      <div class="field full">
+    <label for="foodImageFile">Picha ya chakula</label>
+    <input id="foodImageFile" type="file" accept="image/*">
+    <img id="foodImagePreview" class="menu-image hidden"
+         alt="Picha ya chakula iliyochaguliwa">
+    <p class="small-text">Chagua picha kutoka kwenye simu au kompyuta. Ukubwa wa juu: 5 MB.</p>
+</div>
       <div class="field full"><label for="foodDescription">Maelezo ya chakula</label><textarea id="foodDescription" maxlength="2000" placeholder="Eleza chakula hiki..."></textarea></div>
       <div class="field full"><label><input id="foodAvailable" type="checkbox" checked style="width:auto;min-height:auto"> Chakula kinapatikana kwa sasa</label></div>
      </div>
